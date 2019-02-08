@@ -340,7 +340,7 @@ public class Feed extends Fragment {
 
                                         viewHolder.commentCount.setText(String.valueOf(countComment));
 
-                                        viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 Intent feedDetail = new Intent(getContext(), FeedDetails.class);
@@ -368,7 +368,7 @@ public class Feed extends Fragment {
 
                                         viewHolder.commentCount.setText(String.valueOf(countComment));
 
-                                        viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 Intent feedDetail = new Intent(getContext(), FeedDetails.class);
@@ -391,19 +391,6 @@ public class Feed extends Fragment {
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-                    /*---   FEED COMMENT CLICK   ---*/
-                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                            startActivity(feedDetail);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
@@ -674,7 +661,7 @@ public class Feed extends Fragment {
 
                                         viewHolder.commentCount.setText(String.valueOf(countComment));
 
-                                        viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 Intent feedDetail = new Intent(getContext(), FeedDetails.class);
@@ -702,7 +689,7 @@ public class Feed extends Fragment {
 
                                         viewHolder.commentCount.setText(String.valueOf(countComment));
 
-                                        viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 Intent feedDetail = new Intent(getContext(), FeedDetails.class);
@@ -725,19 +712,6 @@ public class Feed extends Fragment {
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-                    /*---   FEED COMMENT CLICK   ---*/
-                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                            startActivity(feedDetail);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
