@@ -500,4 +500,8 @@ public class FeedDetails extends AppCompatActivity {
         PicassoFaceDetector.releaseDetector();
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
 }
