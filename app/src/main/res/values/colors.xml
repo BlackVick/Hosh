@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#f78453</color>
+    <color name="colorPrimaryDark">#f16925</color>
+    <color name="colorAccent">#444444</color>
+    <color name="backgroundColor">#D6F6BC</color>
+    <color name="black">#ff000000</color>
+    <color name="offBlack">#212121</color>
+    <color name="veryLightBlueBtnBack">#c3dced</color>
+    <color name="overlayBackground">#7f333639</color>
+    <color name="overlayActionBar">#4f0e0d0e</color>
+    <color name="white">#ffffff</color>
+    <color name="offWhite">#eaeaea</color>
+    <color name="transparent">#00000000</color>
+    <color name="red">#FF0000</color>
+    <color name="ButtonAlt">#b22222</color>
+    <color name="ButtonSign">#1e90ff</color>
+    <color name="transparentBTShaded">#3df27c2c</color>
+    <color name="proceed">#36FF8D</color>
+    <color name="rippleEffectColor">#834702</color>
+    <color name="btnSignIn">#1fbad6</color>
+    <color name="btnRegister">#83838c</color>
+    <color name="baseReleaseColor">#212121</color>
+    <color name="basePressColor">#FAFAFA</color>
+    <color name="ballReleaseColor">#9E9E9E</color>
+    <color name="grey">#737373</color>
+    <color name="bottom_nav_clicked">#d1d0d0</color>
+    <color name="chatBackYou">#f7e2b3</color>
+    <color name="chatBack">#e4e4e4</color>
+    <color name="semiWhite">#f7d1d0d0</color>
+</resources>

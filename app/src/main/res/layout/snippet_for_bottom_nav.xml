@@ -1,0 +1,70 @@
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <RelativeLayout
+        android:id="@+id/navLayout"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/white_grey_border_top">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:animateLayoutChanges="true"
+            android:gravity="center"
+            android:weightSum="10">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_feed"
+                android:adjustViewBounds="true"
+                android:padding="10dp"
+                android:id="@+id/feed"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_hookup"
+                android:adjustViewBounds="true"
+                android:padding="10dp"
+                android:id="@+id/hookup"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_hosh_update"
+                android:adjustViewBounds="true"
+                android:padding="10dp"
+                android:id="@+id/hopdate"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_messaging"
+                android:adjustViewBounds="true"
+                android:padding="10dp"
+                android:id="@+id/messaging"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_account"
+                android:adjustViewBounds="true"
+                android:padding="10dp"
+                android:id="@+id/account"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</merge>

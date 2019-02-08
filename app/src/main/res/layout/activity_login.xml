@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.blackviking.hosh.Login"
+    android:id="@+id/loginRootLayout">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="10dp"
+        android:orientation="vertical"
+        android:animateLayoutChanges="true"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="250dp"
+            android:layout_height="120dp"
+            android:src="@drawable/hosh_name_and_logo_white"
+            android:adjustViewBounds="true"/>
+
+        <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+            android:id="@+id/loginButtonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:padding="15dp"
+            app:corner_radius="10dp"
+            android:background="@color/transparentBTShaded"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/signInWithGoogle"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/white_backround_ripple"
+                android:text="Sign In With Google"
+                android:drawableStart="@drawable/google_sign_in_icon"
+                android:drawablePadding="7dp"
+                android:padding="7dp"
+                android:layout_margin="10dp"/>
+
+            <Button
+                android:layout_below="@id/signInWithGoogle"
+                android:id="@+id/signInWithEmail"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/white_backround_ripple"
+                android:text="Sign In With Email"
+                android:drawableStart="@drawable/email_sign_in_icon"
+                android:drawablePadding="7dp"
+                android:padding="7dp"
+                android:layout_margin="10dp"/>
+
+            <Button
+                android:layout_below="@id/signInWithEmail"
+                android:id="@+id/signInAnonymously"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/white_backround_ripple"
+                android:text="Sign In Anonymously"
+                android:drawableStart="@drawable/anonymous_sign_in_icon"
+                android:drawablePadding="7dp"
+                android:padding="7dp"
+                android:layout_margin="10dp"/>
+
+        </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Black Viking &#169;"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

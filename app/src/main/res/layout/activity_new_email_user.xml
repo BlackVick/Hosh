@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.blackviking.hosh.NewEmailUser"
+    android:id="@+id/newEmailRootLayout">
+
+    <include layout="@layout/snippet_for_general"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/unverifiedView"
+        android:visibility="gone"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_reload_page"
+            android:background="@drawable/white_backround_ripple"
+            android:tint="@color/colorPrimaryDark"
+            android:adjustViewBounds="true"
+            android:padding="4dp"
+            android:layout_margin="10dp"
+            android:id="@+id/reloadPage"
+            android:layout_alignParentEnd="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            android:layout_margin="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ACCESS DENIED !"
+                android:gravity="center"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:layout_marginTop="35dp"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:layout_gravity="center"
+                android:src="@drawable/frost"
+                android:adjustViewBounds="true"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You have not Verified Your Account ! Please Check Your Mail"
+                android:gravity="center"
+                android:textColor="@color/ButtonSign"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_backround_ripple"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            android:text="RESEND VERIFICATION"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="20sp"
+            android:id="@+id/resendVerification"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_marginTop="?attr/actionBarSize"
+        android:id="@+id/verifiedView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/registerBtn"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/new_user_welcome_message"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:gravity="center"
+                android:layout_margin="15sp"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/userNameRegEdt"
+                android:inputType="textPersonName"
+                android:hint="User Name"
+                android:text=""
+                android:textColor="@color/black"
+                android:textColorHint="@color/colorPrimaryDark"
+                android:textSize="18sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_singleLineEllipsis="true"
+                app:met_baseColor="@color/colorPrimaryDark"
+                app:met_floatingLabelAnimating="true"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/colorPrimaryDark"
+                app:met_clearButton="true"
+                android:drawableStart="@drawable/ic_person_hollow"
+                android:drawableTint="@color/colorPrimaryDark"
+                android:drawablePadding="15dp"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/userEmailRegEdt"
+                android:inputType="textEmailAddress"
+                android:hint="User E-mail"
+                android:text=""
+                android:textColor="@color/black"
+                android:textColorHint="@color/colorPrimaryDark"
+                android:textSize="20sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_singleLineEllipsis="true"
+                app:met_baseColor="@color/colorPrimaryDark"
+                app:met_floatingLabelAnimating="true"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/colorPrimaryDark"
+                app:met_clearButton="true"
+                android:drawableStart="@drawable/fui_ic_mail_white_24dp"
+                android:drawableTint="@color/colorPrimaryDark"
+                android:drawablePadding="15dp"/>
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:id="@+id/sexGroup">
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Male"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="18sp"
+                    android:layout_margin="4dp"
+                    android:id="@+id/maleRadio"/>
+
+                <RadioButton
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Female"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="18sp"
+                    android:layout_margin="4dp"
+                    android:id="@+id/femaleRadio"/>
+
+            </RadioGroup>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/userSexRegEdt"
+                android:inputType="text"
+                android:hint="Sex"
+                android:text=""
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textSize="18sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:met_singleLineEllipsis="true"
+                app:met_baseColor="@color/white"
+                app:met_floatingLabelAnimating="true"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/white"
+                app:met_clearButton="true"
+                android:drawableStart="@drawable/ic_person_hollow"
+                android:drawableTint="@color/colorPrimaryDark"
+                android:drawablePadding="15dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/registerBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:text="SIGN UP"
+        android:textSize="18sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:background="@drawable/white_backround_ripple"
+        android:padding="15dp"
+        android:layout_margin="5dp"
+        android:visibility="gone"/>
+
+</RelativeLayout>

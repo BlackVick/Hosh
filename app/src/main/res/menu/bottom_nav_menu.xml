@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/feed"
+        android:icon="@drawable/ic_action_feed"
+        android:orderInCategory="100"
+        android:title=""
+        app:showAsAction="ifRoom"
+        android:enabled="true"/>
+    <item
+        android:id="@+id/hookup"
+        android:icon="@drawable/ic_action_hookup"
+        android:orderInCategory="101"
+        android:title=""
+        app:showAsAction="ifRoom"
+        android:enabled="true"/>
+    <item
+        android:id="@+id/hopdate"
+        android:icon="@drawable/ic_action_hosh_update"
+        android:orderInCategory="102"
+        android:title=""
+        app:showAsAction="ifRoom"
+        android:enabled="true"/>
+    <item
+        android:id="@+id/messaging"
+        android:icon="@drawable/ic_action_messaging"
+        android:orderInCategory="103"
+        android:title=""
+        app:showAsAction="ifRoom"
+        android:enabled="true"/>
+    <item
+        android:id="@+id/account"
+        android:icon="@drawable/ic_action_account"
+        android:orderInCategory="104"
+        android:title=""
+        app:showAsAction="ifRoom"
+        android:enabled="true"/>
+</menu>

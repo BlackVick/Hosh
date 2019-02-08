@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "426852579183",
+    "firebase_url": "https://bv-hosh-ng.firebaseio.com",
+    "project_id": "bv-hosh-ng",
+    "storage_bucket": "bv-hosh-ng.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:426852579183:android:a40bcbf63b704680",
+        "android_client_info": {
+          "package_name": "com.blackviking.hosh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "426852579183-kf2b459d6n6b0hkd4dmp96bcvvig720u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.blackviking.hosh",
+            "certificate_hash": "79bd84dd5e89362aa89c299e5cc1959501d79069"
+          }
+        },
+        {
+          "client_id": "426852579183-1tlpppu3dvnquv5u5ov05q2le5p3d4m8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPvRyN4jBoVxLczs6uHXHOGEAI9agyKIY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "426852579183-1tlpppu3dvnquv5u5ov05q2le5p3d4m8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

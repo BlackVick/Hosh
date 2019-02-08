@@ -1,0 +1,69 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.blackviking.hosh.Fragments.Hopdate">
+
+    <include layout="@layout/snippet_for_general"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:id="@+id/hopdateDetails"
+                android:hint="Your Hopdate . . ."
+                android:textColorHint="@color/grey"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:drawableStart="@drawable/ic_action_hookup"
+                android:drawableTint="@color/grey"
+                android:drawablePadding="7dp"
+                android:maxLines="4"
+                android:minLines="2"/>
+            
+            
+            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_margin="20dp"
+                app:corner_radius="15dp"
+                android:background="@color/grey">
+                
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_action_add_image"
+                    android:adjustViewBounds="true"
+                    android:id="@+id/hopdateImage"/>
+
+            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_backround_ripple"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="16dp"
+            android:text="SHARE"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:id="@+id/hopdateShare"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
