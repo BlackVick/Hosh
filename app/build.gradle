@@ -50,6 +50,8 @@ dependencies {
     implementation 'com.github.Shashank02051997:FancyAlertDialog-Android:0.1'
     implementation 'com.github.andyxialm:ColorDialog:1.0.0'
     implementation 'com.yarolegovich:lovely-dialog:1.1.0'
+    implementation 'com.roger.catloadinglibrary:catloadinglibrary:1.0.4'
+    implementation 'com.leo.simplearcloader:simplearcloader:1.0.+'
 
     /*---   FIREBASE LIBRARIES   ---*/
     implementation 'com.google.firebase:firebase-core:11.4.2'

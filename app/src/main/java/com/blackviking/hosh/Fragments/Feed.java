@@ -1,6 +1,7 @@
 package com.blackviking.hosh.Fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -14,7 +15,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blackviking.hosh.FeedDetails;
 import com.blackviking.hosh.Model.HopdateModel;
+import com.blackviking.hosh.OtherUserProfile;
 import com.blackviking.hosh.R;
 import com.blackviking.hosh.ViewHolder.FeedViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -128,7 +131,7 @@ public class Feed extends Fragment {
                 feedRef
         ) {
             @Override
-            protected void populateViewHolder(final FeedViewHolder viewHolder, final HopdateModel model, int position) {
+            protected void populateViewHolder(final FeedViewHolder viewHolder, final HopdateModel model, final int position) {
 
                 if (model.getSender().equals(currentUid)){
 
@@ -231,6 +234,8 @@ public class Feed extends Fragment {
                     feedRef.child(feedId).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            /*---   LIKES   ---*/
                             if (dataSnapshot.child("Likes").exists()){
 
                                 feedRef.child(feedId).child("Likes").addValueEventListener(new ValueEventListener() {
@@ -311,6 +316,68 @@ public class Feed extends Fragment {
 
                                         }
 
+
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                            }
+
+
+                            /*---   COMMENTS   ---*/
+                            if (dataSnapshot.child("Comments").exists()){
+
+                                feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                                        int countComment = (int) dataSnapshot.getChildrenCount();
+
+                                        viewHolder.commentCount.setText(String.valueOf(countComment));
+
+                                        viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                                                startActivity(feedDetail);
+                                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            }
+                                        });
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                            } else {
+
+                                feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                                        int countComment = (int) dataSnapshot.getChildrenCount();
+
+                                        viewHolder.commentCount.setText(String.valueOf(countComment));
+
+                                        viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                                                startActivity(feedDetail);
+                                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            }
+                                        });
+
                                     }
 
                                     @Override
@@ -328,9 +395,79 @@ public class Feed extends Fragment {
                         }
                     });
 
+                    /*---   FEED COMMENT CLICK   ---*/
+                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                            startActivity(feedDetail);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   FEED IMAGE CLICK   ---*/
+                    viewHolder.postImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                            startActivity(feedDetail);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   FEED TEXT CLICK   ---*/
+                    viewHolder.postText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                            startActivity(feedDetail);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   POSTER NAME CLICK   ---*/
+                    viewHolder.posterName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                            posterProfile.putExtra("UserId", model.getSender());
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   POSTER IMAGE CLICK   ---*/
+                    viewHolder.posterImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                            posterProfile.putExtra("UserId", model.getSender());
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
                 } else {
 
                     viewHolder.options.setVisibility(View.GONE);
+
 
                     /*---   POSTER DETAILS   ---*/
                     userRef.child(model.getSender()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -431,6 +568,8 @@ public class Feed extends Fragment {
                     feedRef.child(feedId).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            /*---   LIKES   ---*/
                             if (dataSnapshot.child("Likes").exists()){
 
                                 feedRef.child(feedId).child("Likes").addValueEventListener(new ValueEventListener() {
@@ -475,11 +614,186 @@ public class Feed extends Fragment {
                                     }
                                 });
 
+                            } else {
+
+                                feedRef.child(feedId).child("Likes").addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                                        int countLike = (int) dataSnapshot.getChildrenCount();
+
+                                        viewHolder.likeCount.setText(String.valueOf(countLike));
+
+                                        if (dataSnapshot.child(currentUid).exists()){
+
+                                            viewHolder.likeBtn.setImageResource(R.drawable.liked_icon);
+
+                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    feedRef.child(feedId).child("Likes").child(currentUid).removeValue();
+                                                    Snackbar.make(getView(), "Un Liked", Snackbar.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                        } else {
+
+                                            viewHolder.likeBtn.setImageResource(R.drawable.unliked_icon);
+
+                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    feedRef.child(feedId).child("Likes").child(currentUid).setValue("liked");
+                                                    Snackbar.make(getView(), "Liked", Snackbar.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                        }
+
+
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                            }
+
+
+                            /*---   COMMENTS   ---*/
+                            if (dataSnapshot.child("Comments").exists()){
+
+                                feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                                        int countComment = (int) dataSnapshot.getChildrenCount();
+
+                                        viewHolder.commentCount.setText(String.valueOf(countComment));
+
+                                        viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                                                startActivity(feedDetail);
+                                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            }
+                                        });
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                            } else {
+
+                                feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                                        int countComment = (int) dataSnapshot.getChildrenCount();
+
+                                        viewHolder.commentCount.setText(String.valueOf(countComment));
+
+                                        viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                                                startActivity(feedDetail);
+                                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                            }
+                                        });
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
                             }
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    /*---   FEED COMMENT CLICK   ---*/
+                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                            startActivity(feedDetail);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   FEED IMAGE CLICK   ---*/
+                    viewHolder.postImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                            startActivity(feedDetail);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   FEED TEXT CLICK   ---*/
+                    viewHolder.postText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                            startActivity(feedDetail);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   POSTER NAME CLICK   ---*/
+                    viewHolder.posterName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                            posterProfile.putExtra("UserId", model.getSender());
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   POSTER IMAGE CLICK   ---*/
+                    viewHolder.posterImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                            posterProfile.putExtra("UserId", model.getSender());
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
