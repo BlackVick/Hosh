@@ -285,7 +285,7 @@ public class NewEmailUser extends AppCompatActivity {
 
                         userName.setTextColor(getResources().getColor(R.color.proceed));
                         UserModel newUser = new UserModel(userNameTxt, emailTxt, "", sexTxt, "", "", "", "true", "false", dateString, "",
-                                "", "", "", "", "", "Customer", "", "", "");
+                                "", "", "", "", "", "Customer", "", "", "Hello There! I am new to Hosh. Lets get chatting");
                         if (mAuth.getCurrentUser() != null)
                             currentUid = mAuth.getCurrentUser().getUid();
 

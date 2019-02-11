@@ -354,16 +354,30 @@
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btnCart"
+        android:id="@+id/followUser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
-        android:src="@drawable/ic_add_shopping_cart_black_24dp"
+        android:src="@drawable/ic_follow_user"
         android:visibility="visible"
         app:backgroundTint="@color/ButtonAlt"
         app:elevation="6dp"
         app:layout_anchor="@id/app_bar_layout"
+        app:layout_anchorGravity="bottom|center_horizontal"
+        app:pressedTranslationZ="12dp"
+        app:useCompatPadding="true" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/messageUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:src="@drawable/ic_message_user"
+        android:visibility="visible"
+        app:backgroundTint="@color/ButtonAlt"
         app:layout_anchorGravity="bottom|right|end"
+        app:elevation="6dp"
+        app:layout_anchor="@id/app_bar_layout"
         app:pressedTranslationZ="12dp"
         app:useCompatPadding="true" />
 
