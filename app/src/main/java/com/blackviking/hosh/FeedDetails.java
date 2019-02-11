@@ -369,6 +369,34 @@ public class FeedDetails extends AppCompatActivity {
 
                                     }
 
+
+                                    /*---   POSTER NAME CLICK   ---*/
+                                    posterName.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
+                                            posterProfile.putExtra("UserId", currentHopdate.getSender());
+                                            startActivity(posterProfile);
+                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                                        }
+                                    });
+
+
+                                    /*---   POSTER IMAGE CLICK   ---*/
+                                    posterImage.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
+                                            posterProfile.putExtra("UserId", currentHopdate.getSender());
+                                            startActivity(posterProfile);
+                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                                        }
+                                    });
+
                                 }
 
                                 @Override
@@ -464,6 +492,34 @@ public class FeedDetails extends AppCompatActivity {
                             });
 
                         }
+
+
+                        /*---   POSTER NAME CLICK   ---*/
+                        posterName.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
+                                posterProfile.putExtra("UserId", currentHopdate.getSender());
+                                startActivity(posterProfile);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                            }
+                        });
+
+
+                                    /*---   POSTER IMAGE CLICK   ---*/
+                        posterImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
+                                posterProfile.putExtra("UserId", currentHopdate.getSender());
+                                startActivity(posterProfile);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                            }
+                        });
                     }
 
                     @Override

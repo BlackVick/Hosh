@@ -142,6 +142,7 @@ public class Account extends Fragment {
                     public void onClick(View v) {
                         Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
                         showUsersListIntent.putExtra("Type", "Followers");
+                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
                         startActivity(showUsersListIntent);
                         getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
@@ -175,6 +176,7 @@ public class Account extends Fragment {
                     public void onClick(View v) {
                         Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
                         showUsersListIntent.putExtra("Type", "Following");
+                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
                         startActivity(showUsersListIntent);
                         getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
@@ -208,6 +210,7 @@ public class Account extends Fragment {
                     public void onClick(View v) {
                         Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
                         showUsersListIntent.putExtra("Type", "Hookups");
+                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
                         startActivity(showUsersListIntent);
                         getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }

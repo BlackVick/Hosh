@@ -53,6 +53,7 @@ public class UserListActivity extends AppCompatActivity {
 
         /*---   INTENT DATA   ---*/
         activityType = getIntent().getStringExtra("Type");
+        currentUid = getIntent().getStringExtra("CurrentUserId");
 
 
         /*---   IMAGE FACE DETECTION   ---*/
@@ -60,9 +61,6 @@ public class UserListActivity extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
-
         userListsRef = db.getReference("Users").child(currentUid).child(activityType);
 
 

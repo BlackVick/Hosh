@@ -1,6 +1,7 @@
 package com.blackviking.hosh;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -18,13 +19,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackviking.hosh.ImageViewers.BlurImage;
+import com.blackviking.hosh.Interface.ItemClickListener;
+import com.blackviking.hosh.Model.ImageModel;
 import com.blackviking.hosh.Model.UserModel;
+import com.blackviking.hosh.ViewHolder.UserProfileGalleryViewHolder;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.leo.simplearcloader.ArcConfiguration;
 import com.leo.simplearcloader.SimpleArcDialog;
@@ -54,6 +60,7 @@ public class OtherUserProfile extends AppCompatActivity {
     private CoordinatorLayout rootLayout;
     private UserModel currentUser;
     private int BLUR_PRECENTAGE = 50;
+    private FirebaseRecyclerAdapter<ImageModel, UserProfileGalleryViewHolder> adapter;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -253,8 +260,38 @@ public class OtherUserProfile extends AppCompatActivity {
                 interest.setText(currentUser.getLookingFor());
                 dateJoined.setText(currentUser.getDateJoined());
 
-                /*---   BIO   ---*/
+                /*---   FOLLOWERS   ---*/
+                userRef.child(userId).child("Followers").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
+                        int count = (int) dataSnapshot.getChildrenCount();
+
+                        followersCount.setText(String.valueOf(count));
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                viewFollowers.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent showUsersListIntent = new Intent(OtherUserProfile.this, UserListActivity.class);
+                        showUsersListIntent.putExtra("Type", "Followers");
+                        showUsersListIntent.putExtra("CurrentUserId", userId);
+                        startActivity(showUsersListIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }
+                });
+
+
+                /*---   GALLERY   ---*/
+                loadGallery(userId);
+
+                userRef.removeEventListener(this);
             }
 
             @Override
@@ -263,5 +300,67 @@ public class OtherUserProfile extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void loadGallery(String userId) {
+
+        DatabaseReference galleryRef = userRef.child(userId).child("Gallery");
+        Query lastFour = galleryRef.limitToFirst(4);
+
+        adapter = new FirebaseRecyclerAdapter<ImageModel, UserProfileGalleryViewHolder>(
+                ImageModel.class,
+                R.layout.user_profile_gallery_item,
+                UserProfileGalleryViewHolder.class,
+                lastFour
+        ) {
+            @Override
+            protected void populateViewHolder(UserProfileGalleryViewHolder viewHolder, ImageModel model, int position) {
+
+                if (!model.getImageThumbUrl().equals("")){
+
+                    Picasso.with(getBaseContext())
+                            .load(model.getImageThumbUrl())
+                            .placeholder(R.drawable.ic_loading_animation)
+                            .transform(new FaceCenterCrop(400, 400))
+                            .into(viewHolder.galleryImage);
+
+
+                }
+
+                viewHolder.setItemClickListener(new ItemClickListener() {
+                    @Override
+                    public void onClick(View view, int position, boolean isLongClick) {
+                        Snackbar.make(rootLayout, "User Gallery Still Under Dev !", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+            }
+        };
+        userGalleryRecycler.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PicassoFaceDetector.releaseDetector();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PicassoFaceDetector.releaseDetector();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        PicassoFaceDetector.releaseDetector();
     }
 }
