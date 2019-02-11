@@ -123,7 +123,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:weightSum="10"
-                        android:layout_margin="3dp"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -141,7 +142,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
                             android:text="Online"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
 
@@ -152,7 +153,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:weightSum="10"
-                        android:layout_margin="3dp"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -170,7 +172,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
                             android:text="Female"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
 
@@ -181,7 +183,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:weightSum="10"
-                        android:layout_margin="3dp"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -206,7 +209,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:weightSum="10"
-                        android:layout_margin="3dp"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -224,7 +228,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
                             android:text="0"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
 
@@ -245,7 +249,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:weightSum="10"
-                        android:layout_margin="3dp"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -263,7 +268,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
                             android:text="Lagos"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
 
@@ -274,7 +279,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:weightSum="10"
-                        android:layout_margin="3dp"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -292,7 +298,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
                             android:text="Hookup"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
 
@@ -303,7 +309,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:weightSum="10"
-                        android:layout_margin="3dp"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -321,7 +328,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
                             android:text="10 Feb, 19"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
 
@@ -363,7 +370,7 @@
         app:backgroundTint="@color/ButtonAlt"
         app:elevation="6dp"
         app:layout_anchor="@id/app_bar_layout"
-        app:layout_anchorGravity="bottom|center_horizontal"
+        app:layout_anchorGravity="bottom|start"
         app:pressedTranslationZ="12dp"
         app:useCompatPadding="true" />
 

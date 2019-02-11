@@ -130,8 +130,78 @@ public class OtherUserProfile extends AppCompatActivity {
 
         /*---   RECYCLER CONTROLLER   ---*/
         userGalleryRecycler.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true);
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         userGalleryRecycler.setLayoutManager(layoutManager);
+
+
+        /*---   FABs   ---*/
+        messageUserFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(rootLayout, "Messaging Under Dev !", Snackbar.LENGTH_LONG).show();
+            }
+        });
+
+        userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.child("Following").child(userId).exists()){
+
+                    followUserFab.setImageResource(R.drawable.ic_unfollow_user);
+
+                    followUserFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            userRef.child(currentUid).child("Following").child(userId).removeValue()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            userRef.child(userId).child("Followers").child(currentUid).removeValue()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Snackbar.make(rootLayout, "You have un followed @"+currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                        }
+                                    });
+                        }
+                    });
+
+
+                } else {
+
+                    followUserFab.setImageResource(R.drawable.ic_follow_user);
+
+                    followUserFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            userRef.child(currentUid).child("Following").child(userId).setValue("Following")
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            userRef.child(userId).child("Followers").child(currentUid).setValue("Following")
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Snackbar.make(rootLayout, "You are now following @"+currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                        }
+                                    });
+                        }
+                    });
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         loadUserProfile(userId);
@@ -139,10 +209,6 @@ public class OtherUserProfile extends AppCompatActivity {
     }
 
     private void loadUserProfile(final String userId) {
-
-        /*---   GALLERY   ---*/
-        loadGallery(userId);
-
 
         userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -186,73 +252,13 @@ public class OtherUserProfile extends AppCompatActivity {
 
                     /*---   COVER PHOTO   ---*/
                     Picasso.with(getBaseContext())
-                            .load(currentUser.getProfilePictureThumb())
+                            .load(currentUser.getProfilePicture())
                             .placeholder(R.drawable.ic_loading_animation)
                             .into(target);
 
 
 
                 }
-
-
-                /*---   FABs   ---*/
-                messageUserFab.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Snackbar.make(rootLayout, "Messaging Under Dev !", Snackbar.LENGTH_LONG).show();
-                    }
-                });
-
-                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        if (dataSnapshot.child("Following").child(userId).exists()){
-
-                            followUserFab.setImageResource(R.drawable.ic_unfollow_user);
-
-                            followUserFab.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    userRef.child(currentUid).child("Following").child(userId).removeValue()
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Snackbar.make(rootLayout, "You have un followed @"+currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
-                                                }
-                                            });
-                                }
-                            });
-
-
-                        } else {
-
-                            followUserFab.setImageResource(R.drawable.ic_follow_user);
-
-                            followUserFab.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    userRef.child(currentUid).child("Following").child(userId).setValue("Following")
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Snackbar.make(rootLayout, "You are now following @"+currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
-                                                }
-                                            });
-                                }
-                            });
-
-                        }
-
-                        userRef.removeEventListener(this);
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
 
 
                 /*---   ONLINE, BIO, GENDER, LOCATION, INTEREST, DATE JOINED   ---*/
@@ -290,6 +296,9 @@ public class OtherUserProfile extends AppCompatActivity {
                     }
                 });
 
+                /*---   GALLERY   ---*/
+                loadGallery(userId);
+
                 userRef.removeEventListener(this);
             }
 
@@ -320,7 +329,6 @@ public class OtherUserProfile extends AppCompatActivity {
                     Picasso.with(getBaseContext())
                             .load(model.getImageThumbUrl())
                             .placeholder(R.drawable.ic_loading_animation)
-                            .transform(new FaceCenterCrop(400, 400))
                             .into(viewHolder.galleryImage);
 
 
