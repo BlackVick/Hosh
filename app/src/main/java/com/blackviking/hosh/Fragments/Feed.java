@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.blackviking.hosh.FeedDetails;
 import com.blackviking.hosh.Model.HopdateModel;
+import com.blackviking.hosh.MyProfile;
 import com.blackviking.hosh.OtherUserProfile;
 import com.blackviking.hosh.R;
 import com.blackviking.hosh.ViewHolder.FeedViewHolder;
@@ -409,32 +410,63 @@ public class Feed extends Fragment {
                 });
 
 
+                if (model.getSender().equals(currentUid)) {
+
                     /*---   POSTER NAME CLICK   ---*/
-                viewHolder.posterName.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                    viewHolder.posterName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                        Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
-                        posterProfile.putExtra("UserId", model.getSender());
-                        startActivity(posterProfile);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            Intent posterProfile = new Intent(getContext(), MyProfile.class);
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-                    }
-                });
+                        }
+                    });
 
 
                     /*---   POSTER IMAGE CLICK   ---*/
-                viewHolder.posterImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                    viewHolder.posterImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                        Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
-                        posterProfile.putExtra("UserId", model.getSender());
-                        startActivity(posterProfile);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            Intent posterProfile = new Intent(getContext(), MyProfile.class);
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-                    }
-                });
+                        }
+                    });
+
+                } else {
+
+                    /*---   POSTER NAME CLICK   ---*/
+                    viewHolder.posterName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                            posterProfile.putExtra("UserId", model.getSender());
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+
+                    /*---   POSTER IMAGE CLICK   ---*/
+                    viewHolder.posterImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                            posterProfile.putExtra("UserId", model.getSender());
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        }
+                    });
+
+                }
 
             }
         };

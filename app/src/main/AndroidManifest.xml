@@ -79,7 +79,8 @@
             android:name=".ImageViewers.MyGalleryImageView"
             android:theme="@style/ImageViewTheme" />
         <activity android:name=".FeedDetails" />
-        <activity android:name=".OtherUserProfile"></activity>
+        <activity android:name=".OtherUserProfile" />
+        <activity android:name=".MyProfile"></activity>
     </application>
 
 </manifest>
