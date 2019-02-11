@@ -91,8 +91,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:padding="12dp"
-                        android:text="Menu Name"
+                        android:padding="10dp"
+                        android:text="Username"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"/>
@@ -104,52 +104,228 @@
 
                     <TextView
                         android:id="@+id/userStatus"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:padding="12dp"
-                        android:text="Menu Name"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"/>
+                        android:text="Status"
+                        android:textSize="15sp"
+                        android:textColor="@color/offBlack"/>
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.3dp"
+                        android:background="@color/offBlack"/>
+
+                    <!-- MORE DETAILS  -->
                     <LinearLayout
-                        android:id="@+id/layout_price"
+                        android:id="@+id/onlineStatLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:weightSum="10"
+                        android:layout_margin="3dp"
                         android:orientation="horizontal">
 
-                        <ImageView
+                        <TextView
                             android:layout_width="0dp"
+                            android:layout_weight="3"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:src="@drawable/ic_attach_money_black_24dp"/>
+                            android:gravity="center_vertical"
+                            android:text="Online "
+                            android:textColor="@color/black"
+                            android:textSize="15sp"/>
 
                         <TextView
-                            android:id="@+id/food_price_dets"
-
+                            android:id="@+id/userOnlineStatus"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="9"
-                            android:text="450"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:layout_weight="7"
+                            android:text="Online"
+                            android:textSize="15sp"
+                            android:textColor="@color/offBlack"
+                            android:padding="10dp"/>
 
                     </LinearLayout>
 
-                    <com.cepheuen.elegantnumberbutton.view.ElegantNumberButton
-                        android:id="@+id/number_button"
-                        android:layout_width="100dp"
-                        android:layout_height="30dp"
-                        android:layout_marginBottom="18dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
-                        app:backGroundColor="@color/ButtonAlt"
-                        app:finalNumber="20"
+                    <LinearLayout
+                        android:id="@+id/sexLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="10"
+                        android:layout_margin="3dp"
+                        android:orientation="horizontal">
 
-                        app:initialNumber="1"
-                        app:textSize="8sp"></com.cepheuen.elegantnumberbutton.view.ElegantNumberButton>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:text="Gender"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"/>
 
+                        <TextView
+                            android:id="@+id/userGender"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="7"
+                            android:text="Female"
+                            android:textSize="15sp"
+                            android:textColor="@color/offBlack"
+                            android:padding="10dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/galleryLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="10"
+                        android:layout_margin="3dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:text="Photos"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"/>
+
+                        <android.support.v7.widget.RecyclerView
+                            android:layout_width="0dp"
+                            android:layout_weight="7"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/userGalleryRecycler"></android.support.v7.widget.RecyclerView>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/followersLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="10"
+                        android:layout_margin="3dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:text="Followers"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"/>
+
+                        <TextView
+                            android:id="@+id/userFollowers"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="4"
+                            android:text="0"
+                            android:textSize="15sp"
+                            android:textColor="@color/offBlack"
+                            android:padding="10dp"/>
+
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/white_backround_ripple"
+                            android:text="VIEW"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="17sp"
+                            android:id="@+id/viewUserFollowers"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/locationLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="10"
+                        android:layout_margin="3dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:text="Location"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"/>
+
+                        <TextView
+                            android:id="@+id/userLocation"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="7"
+                            android:text="Lagos"
+                            android:textSize="15sp"
+                            android:textColor="@color/offBlack"
+                            android:padding="10dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/interestLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="10"
+                        android:layout_margin="3dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:text="Interest"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"/>
+
+                        <TextView
+                            android:id="@+id/userInterest"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="7"
+                            android:text="Hookup"
+                            android:textSize="15sp"
+                            android:textColor="@color/offBlack"
+                            android:padding="10dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/dateJoinedLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="10"
+                        android:layout_margin="3dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:text="Joined"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"/>
+
+                        <TextView
+                            android:id="@+id/userDateJoined"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="7"
+                            android:text="10 Feb, 19"
+                            android:textSize="15sp"
+                            android:textColor="@color/offBlack"
+                            android:padding="10dp"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -165,12 +341,11 @@
                     android:layout_marginTop="12dp"
                     android:lineSpacingMultiplier="1.5"
                     android:padding="12dp"
-                    android:text="Description"
+                    android:text="Bio"
                     android:textSize="14sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/food_description_dets"
-                    />
+                    android:id="@+id/userBio"/>
 
             </android.support.v7.widget.CardView>
 

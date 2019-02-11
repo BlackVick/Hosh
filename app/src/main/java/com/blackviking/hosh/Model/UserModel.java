@@ -31,26 +31,26 @@ public class UserModel {
     }
 
     public UserModel(String userName, String email, String phone, String sex, String dateOfBirth, String occupation, String education, String onlineState, String locationVisible, String dateJoined, String twitter, String instagram, String facebook, String bio, String profilePicture, String profilePictureThumb, String userType, String location, String lookingFor, String status) {
-        this.userName = userName;
-        this.email = email;
-        this.phone = phone;
-        this.sex = sex;
-        this.dateOfBirth = dateOfBirth;
-        this.occupation = occupation;
-        this.education = education;
-        this.onlineState = onlineState;
-        this.locationVisible = locationVisible;
-        this.dateJoined = dateJoined;
-        this.twitter = twitter;
-        this.instagram = instagram;
-        this.facebook = facebook;
-        this.bio = bio;
-        this.profilePicture = profilePicture;
-        this.profilePictureThumb = profilePictureThumb;
-        this.userType = userType;
-        this.location = location;
-        this.lookingFor = lookingFor;
-        this.status = status;
+        this.userName = userName;//
+        this.email = email;//
+        this.phone = phone;//
+        this.sex = sex;//
+        this.dateOfBirth = dateOfBirth;//
+        this.occupation = occupation;//
+        this.education = education;//
+        this.onlineState = onlineState;//
+        this.locationVisible = locationVisible;//
+        this.dateJoined = dateJoined;//
+        this.twitter = twitter;//
+        this.instagram = instagram;//
+        this.facebook = facebook;//
+        this.bio = bio;//
+        this.profilePicture = profilePicture;//
+        this.profilePictureThumb = profilePictureThumb;//
+        this.userType = userType;//
+        this.location = location;//
+        this.lookingFor = lookingFor;//
+        this.status = status;//
     }
 
     public String getUserName() {
