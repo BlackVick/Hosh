@@ -508,6 +508,7 @@ public class FeedDetails extends AppCompatActivity {
                             startActivity(posterProfile);
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
+
                         }
                     });
 
