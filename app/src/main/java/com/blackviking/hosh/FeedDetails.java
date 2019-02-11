@@ -50,7 +50,7 @@ public class FeedDetails extends AppCompatActivity {
     private FirebaseRecyclerAdapter<CommentModel, CommentViewHolder> adapter;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, hopdateRef;
+    private DatabaseReference userRef, hopdateRef, likeRef;
     private String currentFeedId, currentUid;
     private HopdateModel currentHopdate;
     private CommentModel newComment;
@@ -91,6 +91,7 @@ public class FeedDetails extends AppCompatActivity {
 
         userRef = db.getReference("Users");
         hopdateRef = db.getReference("Hopdate").child(currentFeedId);
+        likeRef = db.getReference("Likes");
 
 
         /*---   WIDGETS   ---*/
@@ -270,7 +271,7 @@ public class FeedDetails extends AppCompatActivity {
                     options.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-
+                            Snackbar.make(rootLayout, "Still in dev !", Snackbar.LENGTH_LONG).show();
                         }
                     });
 
@@ -327,134 +328,56 @@ public class FeedDetails extends AppCompatActivity {
                 postTime.setText(currentHopdate.getTimestamp());
 
 
-                /*---   LIKES & COMMENTS   ---*/
-                hopdateRef.addValueEventListener(new ValueEventListener() {
+                /*---   LIKES   ---*/
+                likeRef.child(currentFeedId).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                             /*---   LIKES   ---*/
-                        if (dataSnapshot.child("Likes").exists()){
+                        int countLike = (int) dataSnapshot.getChildrenCount();
 
-                            hopdateRef.child("Likes").addValueEventListener(new ValueEventListener() {
+                        likeCount.setText(String.valueOf(countLike));
+
+                        if (dataSnapshot.child(currentUid).exists()){
+
+                            likeBtn.setImageResource(R.drawable.liked_icon);
+
+                            likeBtn.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                    int countLike = (int) dataSnapshot.getChildrenCount();
-
-                                    likeCount.setText(String.valueOf(countLike));
-
-                                    if (dataSnapshot.child(currentUid).exists()){
-
-                                        likeBtn.setImageResource(R.drawable.liked_icon);
-
-                                        likeBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                hopdateRef.child("Likes").child(currentUid).removeValue();
-                                                Snackbar.make(rootLayout, "Un Liked", Snackbar.LENGTH_SHORT).show();
-                                            }
-                                        });
-
-                                    } else {
-
-                                        likeBtn.setImageResource(R.drawable.unliked_icon);
-
-                                        likeBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                hopdateRef.child("Likes").child(currentUid).setValue("liked");
-                                                Snackbar.make(rootLayout, "Liked", Snackbar.LENGTH_SHORT).show();
-                                            }
-                                        });
-
-                                    }
-
-
-                                    /*---   POSTER NAME CLICK   ---*/
-                                    posterName.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                            Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
-                                            posterProfile.putExtra("UserId", currentHopdate.getSender());
-                                            startActivity(posterProfile);
-                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                                        }
-                                    });
-
-
-                                    /*---   POSTER IMAGE CLICK   ---*/
-                                    posterImage.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                            Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
-                                            posterProfile.putExtra("UserId", currentHopdate.getSender());
-                                            startActivity(posterProfile);
-                                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                                        }
-                                    });
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
+                                public void onClick(View v) {
+                                    likeRef.child(currentFeedId).child(currentUid).removeValue();
+                                    Snackbar.make(rootLayout, "Un Liked", Snackbar.LENGTH_SHORT).show();
                                 }
                             });
 
                         } else {
 
-                            hopdateRef.child("Likes").addValueEventListener(new ValueEventListener() {
+                            likeBtn.setImageResource(R.drawable.unliked_icon);
+
+                            likeBtn.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                    int countLike = (int) dataSnapshot.getChildrenCount();
-
-                                    likeCount.setText(String.valueOf(countLike));
-
-                                    if (dataSnapshot.child(currentUid).exists()){
-
-                                        likeBtn.setImageResource(R.drawable.liked_icon);
-
-                                        likeBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                hopdateRef.child("Likes").child(currentUid).removeValue();
-                                                Snackbar.make(rootLayout, "Un Liked", Snackbar.LENGTH_SHORT).show();
-                                            }
-                                        });
-
-                                    } else {
-
-                                        likeBtn.setImageResource(R.drawable.unliked_icon);
-
-                                        likeBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                hopdateRef.child("Likes").child(currentUid).setValue("liked");
-                                                Snackbar.make(rootLayout, "Liked", Snackbar.LENGTH_SHORT).show();
-                                            }
-                                        });
-
-                                    }
-
-
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
+                                public void onClick(View v) {
+                                    likeRef.child(currentFeedId).child(currentUid).setValue("liked");
+                                    Snackbar.make(rootLayout, "Liked", Snackbar.LENGTH_SHORT).show();
                                 }
                             });
 
                         }
 
+                    }
 
-                            /*---   COMMENTS   ---*/
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+                /*---   COMMENTS   ---*/
+                hopdateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
                         if (dataSnapshot.child("Comments").exists()){
 
                             hopdateRef.child("Comments").addValueEventListener(new ValueEventListener() {
@@ -493,33 +416,7 @@ public class FeedDetails extends AppCompatActivity {
 
                         }
 
-
-                        /*---   POSTER NAME CLICK   ---*/
-                        posterName.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
-                                posterProfile.putExtra("UserId", currentHopdate.getSender());
-                                startActivity(posterProfile);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                            }
-                        });
-
-
-                                    /*---   POSTER IMAGE CLICK   ---*/
-                        posterImage.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
-                                posterProfile.putExtra("UserId", currentHopdate.getSender());
-                                startActivity(posterProfile);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                            }
-                        });
+                        hopdateRef.removeEventListener(this);
                     }
 
                     @Override

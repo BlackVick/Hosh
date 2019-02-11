@@ -48,7 +48,7 @@ public class Feed extends Fragment {
     private String currentUid;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference feedRef, userRef;
+    private DatabaseReference feedRef, userRef, likeRef;
 
 
     public Feed() {
@@ -77,6 +77,7 @@ public class Feed extends Fragment {
         feedRef = db.getReference("Hopdate");
         feedRef.keepSynced(true);
         userRef = db.getReference("Users");
+        likeRef = db.getReference("Likes");
 
 
         /*---   WIDGETS   ---*/
@@ -133,646 +134,288 @@ public class Feed extends Fragment {
             @Override
             protected void populateViewHolder(final FeedViewHolder viewHolder, final HopdateModel model, final int position) {
 
-                if (model.getSender().equals(currentUid)){
-
-                    /*---   POSTER DETAILS   ---*/
-                    userRef.child(model.getSender()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            String imageLink = dataSnapshot.child("profilePicture").getValue().toString();
-                            final String imageThumbLink = dataSnapshot.child("profilePictureThumb").getValue().toString();
-                            String username = dataSnapshot.child("userName").getValue().toString();
-
-                            if (!imageThumbLink.equals("")){
-
-                                Picasso.with(getContext())
-                                        .load(imageThumbLink)
-                                        .networkPolicy(NetworkPolicy.OFFLINE)
-                                        .placeholder(R.drawable.ic_loading_animation)
-                                        .transform(new FaceCenterCrop(400, 400))
-                                        .into(viewHolder.posterImage, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
-
-                                            }
-
-                                            @Override
-                                            public void onError() {
-                                                Picasso.with(getContext())
-                                                        .load(imageThumbLink)
-                                                        .placeholder(R.drawable.ic_loading_animation)
-                                                        .transform(new FaceCenterCrop(400, 400))
-                                                        .into(viewHolder.posterImage);
-                                            }
-                                        });
-
-                            } else {
-
-                                viewHolder.posterImage.setImageResource(R.drawable.empty_profile);
-
-                            }
-
-                            viewHolder.posterName.setText(username);
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-
-                    /*---   POST IMAGE   ---*/
-                    if (!model.getImageThumbUrl().equals("")){
-
-                        Picasso.with(getContext())
-                                .load(model.getImageThumbUrl())
-                                .networkPolicy(NetworkPolicy.OFFLINE)
-                                .placeholder(R.drawable.post_loading_icon)
-                                .into(viewHolder.postImage, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                        Picasso.with(getContext())
-                                                .load(model.getImageThumbUrl())
-                                                .placeholder(R.drawable.post_loading_icon)
-                                                .into(viewHolder.postImage);
-                                    }
-                                });
-
-                    } else {
-
-                        viewHolder.postImage.setVisibility(View.GONE);
-
-                    }
-
-
-                    /*---   HOPDATE   ---*/
-                    if (!model.getHopdate().equals("")){
-
-                        viewHolder.postText.setText(model.getHopdate());
-
-                    } else {
-
-                        viewHolder.postText.setVisibility(View.GONE);
-
-                    }
-
-
-                    /*---  TIME   ---*/
-                    viewHolder.postTime.setText(model.getTimestamp());
-
-
-                    /*---   LIKES   ---*/
-                    final String feedId = adapter.getRef(position).getKey();
-                    feedRef.child(feedId).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            /*---   LIKES   ---*/
-                            if (dataSnapshot.child("Likes").exists()){
-
-                                feedRef.child(feedId).child("Likes").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                        int countLike = (int) dataSnapshot.getChildrenCount();
-
-                                        viewHolder.likeCount.setText(String.valueOf(countLike));
-
-                                        if (dataSnapshot.child(currentUid).exists()){
-
-                                            viewHolder.likeBtn.setImageResource(R.drawable.liked_icon);
-
-                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    feedRef.child(feedId).child("Likes").child(currentUid).removeValue();
-                                                    Snackbar.make(getView(), "Un Liked", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        } else {
-
-                                            viewHolder.likeBtn.setImageResource(R.drawable.unliked_icon);
-
-                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    feedRef.child(feedId).child("Likes").child(currentUid).setValue("liked");
-                                                    Snackbar.make(getView(), "Liked", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            } else {
-
-                                feedRef.child(feedId).child("Likes").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                        int countLike = (int) dataSnapshot.getChildrenCount();
-
-                                        viewHolder.likeCount.setText(String.valueOf(countLike));
-
-                                        if (dataSnapshot.child(currentUid).exists()){
-
-                                            viewHolder.likeBtn.setImageResource(R.drawable.liked_icon);
-
-                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    feedRef.child(feedId).child("Likes").child(currentUid).removeValue();
-                                                    Snackbar.make(getView(), "Un Liked", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        } else {
-
-                                            viewHolder.likeBtn.setImageResource(R.drawable.unliked_icon);
-
-                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    feedRef.child(feedId).child("Likes").child(currentUid).setValue("liked");
-                                                    Snackbar.make(getView(), "Liked", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        }
-
-
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            }
-
-
-                            /*---   COMMENTS   ---*/
-                            if (dataSnapshot.child("Comments").exists()){
-
-                                feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                        int countComment = (int) dataSnapshot.getChildrenCount();
-
-                                        viewHolder.commentCount.setText(String.valueOf(countComment));
-
-                                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                                                startActivity(feedDetail);
-                                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                            }
-                                        });
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            } else {
-
-                                feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                        int countComment = (int) dataSnapshot.getChildrenCount();
-
-                                        viewHolder.commentCount.setText(String.valueOf(countComment));
-
-                                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                                                startActivity(feedDetail);
-                                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                            }
-                                        });
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-
-                    /*---   FEED IMAGE CLICK   ---*/
-                    viewHolder.postImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                            startActivity(feedDetail);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                        }
-                    });
-
-
-                    /*---   FEED TEXT CLICK   ---*/
-                    viewHolder.postText.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                            startActivity(feedDetail);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                        }
-                    });
-
-
-                    /*---   POSTER NAME CLICK   ---*/
-                    viewHolder.posterName.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
-                            posterProfile.putExtra("UserId", model.getSender());
-                            startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                        }
-                    });
-
-
-                    /*---   POSTER IMAGE CLICK   ---*/
-                    viewHolder.posterImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
-                            posterProfile.putExtra("UserId", model.getSender());
-                            startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
-                        }
-                    });
-
-                } else {
+                if (!model.getSender().equals(currentUid)){
 
                     viewHolder.options.setVisibility(View.GONE);
 
+                }
 
-                    /*---   POSTER DETAILS   ---*/
-                    userRef.child(model.getSender()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            String imageLink = dataSnapshot.child("profilePicture").getValue().toString();
-                            final String imageThumbLink = dataSnapshot.child("profilePictureThumb").getValue().toString();
-                            String username = dataSnapshot.child("userName").getValue().toString();
+                viewHolder.options.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Snackbar.make(getView(), "Still in dev !", Snackbar.LENGTH_LONG).show();
+                    }
+                });
 
-                            if (!imageThumbLink.equals("")){
+                /*---   POSTER DETAILS   ---*/
+                userRef.child(model.getSender()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                Picasso.with(getContext())
-                                        .load(imageThumbLink)
-                                        .networkPolicy(NetworkPolicy.OFFLINE)
-                                        .placeholder(R.drawable.ic_loading_animation)
-                                        .transform(new FaceCenterCrop(400, 400))
-                                        .into(viewHolder.posterImage, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
+                        String imageLink = dataSnapshot.child("profilePicture").getValue().toString();
+                        final String imageThumbLink = dataSnapshot.child("profilePictureThumb").getValue().toString();
+                        String username = dataSnapshot.child("userName").getValue().toString();
 
-                                            }
+                        if (!imageThumbLink.equals("")){
 
-                                            @Override
-                                            public void onError() {
-                                                Picasso.with(getContext())
-                                                        .load(imageThumbLink)
-                                                        .placeholder(R.drawable.ic_loading_animation)
-                                                        .transform(new FaceCenterCrop(400, 400))
-                                                        .into(viewHolder.posterImage);
-                                            }
-                                        });
+                            Picasso.with(getContext())
+                                    .load(imageThumbLink)
+                                    .networkPolicy(NetworkPolicy.OFFLINE)
+                                    .placeholder(R.drawable.ic_loading_animation)
+                                    .transform(new FaceCenterCrop(400, 400))
+                                    .into(viewHolder.posterImage, new Callback() {
+                                        @Override
+                                        public void onSuccess() {
 
-                            } else {
+                                        }
 
-                                viewHolder.posterImage.setImageResource(R.drawable.empty_profile);
+                                        @Override
+                                        public void onError() {
+                                            Picasso.with(getContext())
+                                                    .load(imageThumbLink)
+                                                    .placeholder(R.drawable.ic_loading_animation)
+                                                    .transform(new FaceCenterCrop(400, 400))
+                                                    .into(viewHolder.posterImage);
+                                        }
+                                    });
 
-                            }
+                        } else {
 
-                            viewHolder.posterName.setText(username);
+                            viewHolder.posterImage.setImageResource(R.drawable.empty_profile);
 
                         }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                        viewHolder.posterName.setText(username);
 
-                        }
-                    });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
 
                     /*---   POST IMAGE   ---*/
-                    if (!model.getImageThumbUrl().equals("")){
+                if (!model.getImageThumbUrl().equals("")){
 
-                        Picasso.with(getContext())
-                                .load(model.getImageThumbUrl())
-                                .networkPolicy(NetworkPolicy.OFFLINE)
-                                .placeholder(R.drawable.post_loading_icon)
-                                .into(viewHolder.postImage, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
+                    Picasso.with(getContext())
+                            .load(model.getImageThumbUrl())
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.drawable.post_loading_icon)
+                            .into(viewHolder.postImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
 
-                                    }
+                                }
 
-                                    @Override
-                                    public void onError() {
-                                        Picasso.with(getContext())
-                                                .load(model.getImageThumbUrl())
-                                                .placeholder(R.drawable.post_loading_icon)
-                                                .into(viewHolder.postImage);
-                                    }
-                                });
+                                @Override
+                                public void onError() {
+                                    Picasso.with(getContext())
+                                            .load(model.getImageThumbUrl())
+                                            .placeholder(R.drawable.post_loading_icon)
+                                            .into(viewHolder.postImage);
+                                }
+                            });
 
-                    } else {
+                } else {
 
-                        viewHolder.postImage.setVisibility(View.GONE);
+                    viewHolder.postImage.setVisibility(View.GONE);
 
-                    }
+                }
 
 
                     /*---   HOPDATE   ---*/
-                    if (!model.getHopdate().equals("")){
+                if (!model.getHopdate().equals("")){
 
-                        viewHolder.postText.setText(model.getHopdate());
+                    viewHolder.postText.setText(model.getHopdate());
 
-                    } else {
+                } else {
 
-                        viewHolder.postText.setVisibility(View.GONE);
+                    viewHolder.postText.setVisibility(View.GONE);
 
-                    }
+                }
 
 
                     /*---  TIME   ---*/
-                    viewHolder.postTime.setText(model.getTimestamp());
+                viewHolder.postTime.setText(model.getTimestamp());
 
 
                     /*---   LIKES   ---*/
-                    final String feedId = adapter.getRef(position).getKey();
-                    feedRef.child(feedId).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                final String feedId = adapter.getRef(position).getKey();
+                likeRef.child(feedId).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
                             /*---   LIKES   ---*/
-                            if (dataSnapshot.child("Likes").exists()){
+                        int countLike = (int) dataSnapshot.getChildrenCount();
 
-                                feedRef.child(feedId).child("Likes").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+                        viewHolder.likeCount.setText(String.valueOf(countLike));
 
-                                        int countLike = (int) dataSnapshot.getChildrenCount();
+                        if (dataSnapshot.child(currentUid).exists()){
 
-                                        viewHolder.likeCount.setText(String.valueOf(countLike));
+                            viewHolder.likeBtn.setImageResource(R.drawable.liked_icon);
 
-                                        if (dataSnapshot.child(currentUid).exists()){
+                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    likeRef.child(feedId).child(currentUid).removeValue();
+                                    Snackbar.make(getView(), "Un Liked", Snackbar.LENGTH_SHORT).show();
+                                }
+                            });
 
-                                            viewHolder.likeBtn.setImageResource(R.drawable.liked_icon);
+                        } else {
 
-                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    feedRef.child(feedId).child("Likes").child(currentUid).removeValue();
-                                                    Snackbar.make(getView(), "Un Liked", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            });
+                            viewHolder.likeBtn.setImageResource(R.drawable.unliked_icon);
 
-                                        } else {
-
-                                            viewHolder.likeBtn.setImageResource(R.drawable.unliked_icon);
-
-                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    feedRef.child(feedId).child("Likes").child(currentUid).setValue("liked");
-                                                    Snackbar.make(getView(), "Liked", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            } else {
-
-                                feedRef.child(feedId).child("Likes").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                        int countLike = (int) dataSnapshot.getChildrenCount();
-
-                                        viewHolder.likeCount.setText(String.valueOf(countLike));
-
-                                        if (dataSnapshot.child(currentUid).exists()){
-
-                                            viewHolder.likeBtn.setImageResource(R.drawable.liked_icon);
-
-                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    feedRef.child(feedId).child("Likes").child(currentUid).removeValue();
-                                                    Snackbar.make(getView(), "Un Liked", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        } else {
-
-                                            viewHolder.likeBtn.setImageResource(R.drawable.unliked_icon);
-
-                                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    feedRef.child(feedId).child("Likes").child(currentUid).setValue("liked");
-                                                    Snackbar.make(getView(), "Liked", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        }
-
-
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            }
-
-
-                            /*---   COMMENTS   ---*/
-                            if (dataSnapshot.child("Comments").exists()){
-
-                                feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                        int countComment = (int) dataSnapshot.getChildrenCount();
-
-                                        viewHolder.commentCount.setText(String.valueOf(countComment));
-
-                                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                                                startActivity(feedDetail);
-                                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                            }
-                                        });
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            } else {
-
-                                feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                        int countComment = (int) dataSnapshot.getChildrenCount();
-
-                                        viewHolder.commentCount.setText(String.valueOf(countComment));
-
-                                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                                                startActivity(feedDetail);
-                                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                            }
-                                        });
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                            viewHolder.likeBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    likeRef.child(feedId).child(currentUid).setValue("liked");
+                                    Snackbar.make(getView(), "Liked", Snackbar.LENGTH_SHORT).show();
+                                }
+                            });
 
                         }
-                    });
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+                /*---   COMMENTS   ---*/
+                feedRef.child(feedId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        if (dataSnapshot.child("Comments").exists()){
+
+                            feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                                    int countComment = (int) dataSnapshot.getChildrenCount();
+
+                                    viewHolder.commentCount.setText(String.valueOf(countComment));
+
+                                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                                            startActivity(feedDetail);
+                                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                        }
+                                    });
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                        } else {
+
+                            feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                                    int countComment = (int) dataSnapshot.getChildrenCount();
+
+                                    viewHolder.commentCount.setText(String.valueOf(countComment));
+
+                                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                                            startActivity(feedDetail);
+                                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                        }
+                                    });
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                        }
+
+                        feedRef.removeEventListener(this);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
 
 
                     /*---   FEED IMAGE CLICK   ---*/
-                    viewHolder.postImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                viewHolder.postImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                            startActivity(feedDetail);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                        feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                        startActivity(feedDetail);
+                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-                        }
-                    });
+                    }
+                });
 
 
                     /*---   FEED TEXT CLICK   ---*/
-                    viewHolder.postText.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                viewHolder.postText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                            startActivity(feedDetail);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                        feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                        startActivity(feedDetail);
+                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-                        }
-                    });
+                    }
+                });
 
 
                     /*---   POSTER NAME CLICK   ---*/
-                    viewHolder.posterName.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                viewHolder.posterName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
-                            posterProfile.putExtra("UserId", model.getSender());
-                            startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                        posterProfile.putExtra("UserId", model.getSender());
+                        startActivity(posterProfile);
+                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-                        }
-                    });
+                    }
+                });
 
 
                     /*---   POSTER IMAGE CLICK   ---*/
-                    viewHolder.posterImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                viewHolder.posterImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
-                            posterProfile.putExtra("UserId", model.getSender());
-                            startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                        posterProfile.putExtra("UserId", model.getSender());
+                        startActivity(posterProfile);
+                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-                        }
-                    });
-
-                }
+                    }
+                });
 
             }
         };

@@ -61,6 +61,7 @@ public class OtherUserProfile extends AppCompatActivity {
     private UserModel currentUser;
     private int BLUR_PRECENTAGE = 50;
     private FirebaseRecyclerAdapter<ImageModel, UserProfileGalleryViewHolder> adapter;
+    private Target target;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -121,6 +122,24 @@ public class OtherUserProfile extends AppCompatActivity {
         bio = (TextView)findViewById(R.id.userBio);
         userGalleryRecycler = (RecyclerView)findViewById(R.id.userGalleryRecycler);
         viewFollowers = (Button)findViewById(R.id.viewUserFollowers);
+
+
+        /*---   BLUR COVER   ---*/
+        target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                coverPhoto.setImageBitmap(BlurImage.fastblur(bitmap, 1f,
+                        BLUR_PRECENTAGE));
+            }
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                coverPhoto.setImageResource(R.drawable.empty_profile);
+            }
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
 
 
         /*---   TOOLBAR   ---*/
@@ -210,7 +229,7 @@ public class OtherUserProfile extends AppCompatActivity {
 
     private void loadUserProfile(final String userId) {
 
-        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -232,27 +251,9 @@ public class OtherUserProfile extends AppCompatActivity {
                             .into(userProfileImage);
 
 
-                    /*---   BLUR COVER   ---*/
-                    Target target = new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            coverPhoto.setImageBitmap(BlurImage.fastblur(bitmap, 1f,
-                                    BLUR_PRECENTAGE));
-                        }
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                            coverPhoto.setImageResource(R.drawable.empty_profile);
-                        }
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                        }
-                    };
-
-
                     /*---   COVER PHOTO   ---*/
                     Picasso.with(getBaseContext())
-                            .load(currentUser.getProfilePicture())
+                            .load(currentUser.getProfilePictureThumb())
                             .placeholder(R.drawable.ic_loading_animation)
                             .into(target);
 
