@@ -1,18 +1,23 @@
 package com.blackviking.hosh.Fragments;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.blackviking.hosh.FeedDetails;
@@ -21,6 +26,7 @@ import com.blackviking.hosh.OtherUserProfile;
 import com.blackviking.hosh.R;
 import com.blackviking.hosh.ViewHolder.FeedViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -135,19 +141,77 @@ public class Feed extends Fragment {
             @Override
             protected void populateViewHolder(final FeedViewHolder viewHolder, final HopdateModel model, final int position) {
 
+                /*---   OPTIONS   ---*/
                 if (!model.getSender().equals(currentUid)){
 
                     viewHolder.options.setVisibility(View.GONE);
 
                 }
 
-
                 viewHolder.options.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Snackbar.make(getView(), "Still in dev !", Snackbar.LENGTH_LONG).show();
+                        //creating a popup menu
+                        PopupMenu popup = new PopupMenu(getContext(), viewHolder.options);
+                        //inflating menu from xml resource
+                        popup.inflate(R.menu.feed_item_menu);
+                        //adding click listener
+                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                switch (item.getItemId()) {
+                                    case R.id.action_feed_delete:
+
+                                        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                                                .setTitle("Delete Hopdate !")
+                                                .setIcon(R.drawable.ic_delete_feed)
+                                                .setMessage("Are You Sure You Want To Delete This Hopdate From Your Timeline?")
+                                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+
+                                                        feedRef.child(adapter.getRef(position).getKey()).removeValue()
+                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        Snackbar.make(getView(), "Hopdate Deleted !", Snackbar.LENGTH_LONG).show();
+                                                                    }
+                                                                });
+
+                                                    }
+                                                })
+                                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                    }
+                                                })
+                                                .create();
+
+                                        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+                                        alertDialog.show();
+
+                                        return true;
+                                    case R.id.action_feed_share:
+
+                                        Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                                        i.setType("text/plain");
+                                        i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Share");
+                                        i.putExtra(android.content.Intent.EXTRA_TEXT, "Check Out My New Story On HOSH Mobile App On PlayStore. ");
+                                        startActivity(Intent.createChooser(i,"Share via"));
+
+                                        return true;
+                                    default:
+                                        return false;
+                                }
+                            }
+                        });
+                        //displaying the popup
+                        popup.show();
                     }
                 });
+
 
                 /*---   POSTER DETAILS   ---*/
                 userRef.child(model.getSender()).addListenerForSingleValueEvent(new ValueEventListener() {

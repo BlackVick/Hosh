@@ -1,16 +1,20 @@
 package com.blackviking.hosh;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -19,6 +23,7 @@ import com.blackviking.hosh.Model.CommentModel;
 import com.blackviking.hosh.Model.HopdateModel;
 import com.blackviking.hosh.ViewHolder.CommentViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -272,7 +277,64 @@ public class FeedDetails extends AppCompatActivity {
                     options.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Snackbar.make(rootLayout, "Still in dev !", Snackbar.LENGTH_LONG).show();
+                            //creating a popup menu
+                            PopupMenu popup = new PopupMenu(FeedDetails.this, options);
+                            //inflating menu from xml resource
+                            popup.inflate(R.menu.feed_item_menu);
+                            //adding click listener
+                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem item) {
+                                    switch (item.getItemId()) {
+                                        case R.id.action_feed_delete:
+
+                                            AlertDialog alertDialog = new AlertDialog.Builder(FeedDetails.this)
+                                                    .setTitle("Delete Hopdate !")
+                                                    .setIcon(R.drawable.ic_delete_feed)
+                                                    .setMessage("Are You Sure You Want To Delete This Hopdate From Your Timeline?")
+                                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+
+                                                            hopdateRef.removeValue()
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            finish();
+                                                                        }
+                                                                    });
+
+                                                        }
+                                                    })
+                                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    })
+                                                    .create();
+
+                                            alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+                                            alertDialog.show();
+
+                                            return true;
+                                        case R.id.action_feed_share:
+
+                                            Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                                            i.setType("text/plain");
+                                            i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Share");
+                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Check Out My New Story On HOSH Mobile App On PlayStore. ");
+                                            startActivity(Intent.createChooser(i,"Share via"));
+
+                                            return true;
+                                        default:
+                                            return false;
+                                    }
+                                }
+                            });
+                            //displaying the popup
+                            popup.show();
                         }
                     });
 
