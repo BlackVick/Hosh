@@ -277,11 +277,10 @@ public class FeedDetails extends AppCompatActivity {
                     options.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            //creating a popup menu
+
+                            /*---   POPUP MENU FOR HOPDATE   ---*/
                             PopupMenu popup = new PopupMenu(FeedDetails.this, options);
-                            //inflating menu from xml resource
                             popup.inflate(R.menu.feed_item_menu);
-                            //adding click listener
                             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                                 @Override
                                 public boolean onMenuItemClick(MenuItem item) {
@@ -333,7 +332,7 @@ public class FeedDetails extends AppCompatActivity {
                                     }
                                 }
                             });
-                            //displaying the popup
+
                             popup.show();
                         }
                     });
