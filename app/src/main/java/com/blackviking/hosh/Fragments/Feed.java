@@ -48,7 +48,7 @@ public class Feed extends Fragment {
     private String currentUid;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private DatabaseReference feedRef, userRef, likeRef;
+    private DatabaseReference feedRef, userRef, likeRef, commentRef;
 
 
     public Feed() {
@@ -78,6 +78,7 @@ public class Feed extends Fragment {
         feedRef.keepSynced(true);
         userRef = db.getReference("Users");
         likeRef = db.getReference("Likes");
+        commentRef = db.getReference("HopdateComments");
 
 
         /*---   WIDGETS   ---*/
@@ -289,69 +290,24 @@ public class Feed extends Fragment {
 
 
                 /*---   COMMENTS   ---*/
-                feedRef.child(feedId).addListenerForSingleValueEvent(new ValueEventListener() {
+                commentRef.child(feedId).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        if (dataSnapshot.child("Comments").exists()){
+                        int countComment = (int) dataSnapshot.getChildrenCount();
 
-                            feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(final DataSnapshot dataSnapshot) {
+                        viewHolder.commentCount.setText(String.valueOf(countComment));
 
-                                    int countComment = (int) dataSnapshot.getChildrenCount();
+                        viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent feedDetail = new Intent(getContext(), FeedDetails.class);
+                                feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
+                                startActivity(feedDetail);
+                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            }
+                        });
 
-                                    viewHolder.commentCount.setText(String.valueOf(countComment));
-
-                                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                                            startActivity(feedDetail);
-                                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                        }
-                                    });
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                        } else {
-
-                            feedRef.child(feedId).child("Comments").addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                    int countComment = (int) dataSnapshot.getChildrenCount();
-
-                                    viewHolder.commentCount.setText(String.valueOf(countComment));
-
-                                    viewHolder.commentBtn.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent feedDetail = new Intent(getContext(), FeedDetails.class);
-                                            feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
-                                            startActivity(feedDetail);
-                                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                        }
-                                    });
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                        }
-
-                        feedRef.removeEventListener(this);
                     }
 
                     @Override

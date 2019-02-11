@@ -50,7 +50,7 @@ public class FeedDetails extends AppCompatActivity {
     private FirebaseRecyclerAdapter<CommentModel, CommentViewHolder> adapter;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, hopdateRef, likeRef;
+    private DatabaseReference userRef, hopdateRef, likeRef, commentRef;
     private String currentFeedId, currentUid;
     private HopdateModel currentHopdate;
     private CommentModel newComment;
@@ -92,6 +92,7 @@ public class FeedDetails extends AppCompatActivity {
         userRef = db.getReference("Users");
         hopdateRef = db.getReference("Hopdate").child(currentFeedId);
         likeRef = db.getReference("Likes");
+        commentRef = db.getReference("HopdateComments");
 
 
         /*---   WIDGETS   ---*/
@@ -172,7 +173,7 @@ public class FeedDetails extends AppCompatActivity {
             if (!TextUtils.isEmpty(theComment)){
 
                 newComment = new CommentModel(theComment, currentUid, dateString);
-                hopdateRef.child("Comments").push().setValue(newComment);
+                commentRef.child(currentFeedId).push().setValue(newComment);
                 commentBox.setText("");
 
             }
@@ -187,7 +188,7 @@ public class FeedDetails extends AppCompatActivity {
                 CommentModel.class,
                 R.layout.comment_item,
                 CommentViewHolder.class,
-                hopdateRef.child("Comments")
+                commentRef.child(currentFeedId)
         ) {
             @Override
             protected void populateViewHolder(final CommentViewHolder viewHolder, CommentModel model, int position) {
@@ -374,49 +375,14 @@ public class FeedDetails extends AppCompatActivity {
 
 
                 /*---   COMMENTS   ---*/
-                hopdateRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                commentRef.child(currentFeedId).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        if (dataSnapshot.child("Comments").exists()){
+                        int countComment = (int) dataSnapshot.getChildrenCount();
 
-                            hopdateRef.child("Comments").addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(final DataSnapshot dataSnapshot) {
+                        commentCount.setText(String.valueOf(countComment));
 
-                                    int countComment = (int) dataSnapshot.getChildrenCount();
-
-                                    commentCount.setText(String.valueOf(countComment));
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                        } else {
-
-                            hopdateRef.child("Comments").addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(final DataSnapshot dataSnapshot) {
-
-                                    int countComment = (int) dataSnapshot.getChildrenCount();
-
-                                    commentCount.setText(String.valueOf(countComment));
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                        }
-
-                        hopdateRef.removeEventListener(this);
                     }
 
                     @Override
