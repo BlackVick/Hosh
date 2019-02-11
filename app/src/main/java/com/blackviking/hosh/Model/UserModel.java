@@ -23,11 +23,14 @@ public class UserModel {
     private String profilePicture;
     private String profilePictureThumb;
     private String userType;
+    private String location;
+    private String lookingFor;
+    private String status;
 
     public UserModel() {
     }
 
-    public UserModel(String userName, String email, String phone, String sex, String dateOfBirth, String occupation, String education, String onlineState, String locationVisible, String dateJoined, String twitter, String instagram, String facebook, String bio, String profilePicture, String profilePictureThumb, String userType) {
+    public UserModel(String userName, String email, String phone, String sex, String dateOfBirth, String occupation, String education, String onlineState, String locationVisible, String dateJoined, String twitter, String instagram, String facebook, String bio, String profilePicture, String profilePictureThumb, String userType, String location, String lookingFor, String status) {
         this.userName = userName;
         this.email = email;
         this.phone = phone;
@@ -45,6 +48,9 @@ public class UserModel {
         this.profilePicture = profilePicture;
         this.profilePictureThumb = profilePictureThumb;
         this.userType = userType;
+        this.location = location;
+        this.lookingFor = lookingFor;
+        this.status = status;
     }
 
     public String getUserName() {
@@ -181,5 +187,29 @@ public class UserModel {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getLookingFor() {
+        return lookingFor;
+    }
+
+    public void setLookingFor(String lookingFor) {
+        this.lookingFor = lookingFor;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
