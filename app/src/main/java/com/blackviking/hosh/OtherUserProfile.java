@@ -200,7 +200,7 @@ public class OtherUserProfile extends AppCompatActivity {
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            userRef.child(userId).child("Followers").child(currentUid).setValue("Following")
+                                            userRef.child(userId).child("Followers").child(currentUid).setValue("Follows You")
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
