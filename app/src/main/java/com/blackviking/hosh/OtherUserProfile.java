@@ -140,23 +140,14 @@ public class OtherUserProfile extends AppCompatActivity {
 
     private void loadUserProfile(final String userId) {
 
-        final SimpleArcDialog mDialog = new SimpleArcDialog(this);
-        mDialog.setConfiguration(new ArcConfiguration(this));
-
-        ArcConfiguration configuration = new ArcConfiguration(this);
-        configuration.setLoaderStyle(SimpleArcLoader.STYLE.COMPLETE_ARC);
-        configuration.setText("Fetching Details . . .");
-
-        mDialog.setConfiguration(configuration);
-
-        mDialog.show();
+        /*---   GALLERY   ---*/
+        loadGallery(userId);
 
 
         userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                mDialog.dismiss();
                 currentUser = dataSnapshot.getValue(UserModel.class);
 
                 /*---   USER NAME   ---*/
@@ -197,7 +188,6 @@ public class OtherUserProfile extends AppCompatActivity {
                     Picasso.with(getBaseContext())
                             .load(currentUser.getProfilePictureThumb())
                             .placeholder(R.drawable.ic_loading_animation)
-                            .centerCrop()
                             .into(target);
 
 
@@ -213,7 +203,7 @@ public class OtherUserProfile extends AppCompatActivity {
                     }
                 });
 
-                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -221,27 +211,40 @@ public class OtherUserProfile extends AppCompatActivity {
 
                             followUserFab.setImageResource(R.drawable.ic_unfollow_user);
 
-                            userRef.child(currentUid).child("Following").child(userId).removeValue()
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Snackbar.make(rootLayout, "You have un followed @"+currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
-                                        }
-                                    });
+                            followUserFab.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    userRef.child(currentUid).child("Following").child(userId).removeValue()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Snackbar.make(rootLayout, "You have un followed @"+currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
+                                                }
+                                            });
+                                }
+                            });
+
 
                         } else {
 
                             followUserFab.setImageResource(R.drawable.ic_follow_user);
 
-                            userRef.child(currentUid).child("Following").child(userId).setValue("Following")
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Snackbar.make(rootLayout, "You are now following @"+currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
-                                        }
-                                    });
+                            followUserFab.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    userRef.child(currentUid).child("Following").child(userId).setValue("Following")
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Snackbar.make(rootLayout, "You are now following @"+currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
+                                                }
+                                            });
+                                }
+                            });
 
                         }
+
+                        userRef.removeEventListener(this);
 
                     }
 
@@ -286,10 +289,6 @@ public class OtherUserProfile extends AppCompatActivity {
                         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
-
-
-                /*---   GALLERY   ---*/
-                loadGallery(userId);
 
                 userRef.removeEventListener(this);
             }
