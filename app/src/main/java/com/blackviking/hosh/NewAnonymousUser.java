@@ -166,7 +166,7 @@ public class NewAnonymousUser extends AppCompatActivity {
 
         /*---   DATE JOINED   ---*/
         final long date = System.currentTimeMillis();
-        final SimpleDateFormat sdf = new SimpleDateFormat("dd M, yy");
+        final SimpleDateFormat sdf = new SimpleDateFormat("dd mmm, yyyy");
         final String dateString = sdf.format(date);
 
 
