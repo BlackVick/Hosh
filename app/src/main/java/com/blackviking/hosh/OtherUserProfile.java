@@ -262,13 +262,14 @@ public class OtherUserProfile extends AppCompatActivity {
                 }
 
 
-                /*---   ONLINE, BIO, GENDER, LOCATION, INTEREST, DATE JOINED   ---*/
+                /*---   ONLINE, BIO, GENDER, LOCATION, INTEREST, DATE JOINED, STATUS   ---*/
                 online.setText(currentUser.getOnlineState());
                 bio.setText(currentUser.getBio());
                 gender.setText(currentUser.getSex());
                 location.setText(currentUser.getLocation());
                 interest.setText(currentUser.getLookingFor());
                 dateJoined.setText(currentUser.getDateJoined());
+                status.setText(currentUser.getStatus());
 
                 /*---   FOLLOWERS   ---*/
                 userRef.child(userId).child("Followers").addValueEventListener(new ValueEventListener() {

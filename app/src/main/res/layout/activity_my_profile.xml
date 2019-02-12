@@ -309,7 +309,8 @@
                             android:text="View Hookups"
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="17sp"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold"
+                            android:id="@+id/viewHookups"/>
 
                     </LinearLayout>
 
