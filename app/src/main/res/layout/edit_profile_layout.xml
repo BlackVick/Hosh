@@ -35,21 +35,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <com.jaredrummler.materialspinner.MaterialSpinner
+        <Spinner
             android:id="@+id/genderSpinner"
             android:layout_width="match_parent"
             android:layout_margin="3dp"
             android:textSize="18sp"
-            android:layout_height="wrap_content"
-            android:hint="Gender"/>
+            android:layout_height="50dp"/>
 
-        <com.jaredrummler.materialspinner.MaterialSpinner
+        <Spinner
             android:id="@+id/interestSpinner"
             android:layout_width="match_parent"
             android:layout_margin="3dp"
             android:textSize="18sp"
-            android:layout_height="wrap_content"
-            android:hint="Looking For"/>
+            android:layout_height="50dp"/>
 
         <EditText
             android:layout_width="match_parent"

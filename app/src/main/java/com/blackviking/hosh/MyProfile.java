@@ -20,9 +20,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.blackviking.hosh.Common.Common;
@@ -48,7 +51,9 @@ import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetect
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import dmax.dialog.SpotsDialog;
@@ -71,6 +76,8 @@ public class MyProfile extends AppCompatActivity {
     private int BLUR_PRECENTAGE = 50;
     private Target target;
     private Button openGallery;
+    private String selectedGender = "";
+    private String selectedInterest = "";
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -198,16 +205,80 @@ public class MyProfile extends AppCompatActivity {
         View viewOptions = inflater.inflate(R.layout.edit_profile_layout,null);
 
         final MaterialEditText statusEdt = (MaterialEditText) viewOptions.findViewById(R.id.editYourStatus);
-        final MaterialSpinner genderChange = (MaterialSpinner) viewOptions.findViewById(R.id.genderSpinner);
-        final MaterialSpinner interestChange = (MaterialSpinner) viewOptions.findViewById(R.id.interestSpinner);
+        final Spinner genderChange = (Spinner) viewOptions.findViewById(R.id.genderSpinner);
+        final Spinner interestChange = (Spinner) viewOptions.findViewById(R.id.interestSpinner);
         final EditText editBio = (EditText) viewOptions.findViewById(R.id.changeYourBio);
         final Button saveChanges = (Button) viewOptions.findViewById(R.id.saveProfileChanges);
 
 
+        /*---   FILL GENDER SPINNER   ---*/
+        List<String> genderList = new ArrayList<>();
+        genderList.add(0, "Gender");
+        genderList.add("Male");
+        genderList.add("Female");
+        genderList.add("I am not sure");
+        genderList.add("Indifferent");
 
-        /*---   SPINNERS   ---*/
-        genderChange.setItems("Male", "Female", "I am not sure", "Indifferent", "Not Specified");
-        interestChange.setItems("Dating", "Friendship", "Hookup", "Not Specified");
+
+        /*---   FILL INTEREST SPINNER   ---*/
+        List<String> interestList = new ArrayList<>();
+        interestList.add(0, "Looking For . .");
+        interestList.add("Friendship");
+        interestList.add("Dating");
+        interestList.add("Hookup");
+
+
+        ArrayAdapter<String> dataAdapterGender;
+        dataAdapterGender = new ArrayAdapter(this, android.R.layout.simple_spinner_item, genderList);
+
+        ArrayAdapter<String> dataAdapterInterest;
+        dataAdapterInterest = new ArrayAdapter(this, android.R.layout.simple_spinner_item, interestList);
+
+        dataAdapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dataAdapterInterest.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        genderChange.setAdapter(dataAdapterGender);
+        interestChange.setAdapter(dataAdapterInterest);
+
+
+        /*---    GENDER SPINNER   ---*/
+        genderChange.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (!parent.getItemAtPosition(position).equals("Gender")){
+
+                    selectedGender = parent.getItemAtPosition(position).toString();
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        /*---   INTEREST SPINNER   ---*/
+        interestChange.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (!parent.getItemAtPosition(position).equals("Looking For . .")){
+
+                    selectedInterest = parent.getItemAtPosition(position).toString();
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
 
         /*---   TEXT   ---*/
@@ -228,7 +299,6 @@ public class MyProfile extends AppCompatActivity {
             }
         });
 
-
         alertDialog.setView(viewOptions);
 
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
@@ -247,61 +317,23 @@ public class MyProfile extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String selectedGender = "";
-                String selectedInterest = "";
+
                 final String newStatus = statusEdt.getText().toString();
                 final String newBio = editBio.getText().toString();
 
-                /*---   SPINNERS GENDER   ---*/
-                switch (genderChange.getSelectedIndex()){
-                    case 0:
-                        selectedGender = "Male";
 
-                    case 1:
-                        selectedGender = "Female";
-
-                    case 2:
-                        selectedGender = "I am not sure";
-
-                    case 3:
-                        selectedGender = "Indifferent";
-
-                    case 4:
-                        selectedGender = "Not Specified";
-                }
-
-
-                /*---   SPINNER INTEREST   ---*/
-                switch (interestChange.getSelectedIndex()){
-                    case 0:
-                        selectedInterest = "Dating";
-
-                    case 1:
-                        selectedInterest = "Friendship";
-
-                    case 2:
-                        selectedInterest = "Hookup";
-
-                    case 3:
-                        selectedInterest = "Not Specified";
-
-
-                }
-
-                final String finalSelectedGender = selectedGender;
-                final String finalSelectedInterest = selectedInterest;
                 userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         UserModel currentUserUpdate2 = dataSnapshot.getValue(UserModel.class);
 
-                        if (!newStatus.equals(currentUserUpdate2.getStatus()) || !finalSelectedGender.equals(currentUserUpdate2.getSex())
-                                || !newBio.equals(currentUserUpdate2.getBio()) || !finalSelectedInterest.equals(currentUserUpdate2.getLookingFor())){
+                        if (!newStatus.equals(currentUserUpdate2.getStatus()) || !selectedGender.equals(currentUserUpdate2.getSex())
+                                || !newBio.equals(currentUserUpdate2.getBio()) || !selectedInterest.equals(currentUserUpdate2.getLookingFor())){
 
                             final Map<String, Object> profileUpdate = new HashMap<>();
                             profileUpdate.put("status", newStatus);
-                            profileUpdate.put("sex", finalSelectedGender);
-                            profileUpdate.put("lookingFor", finalSelectedInterest);
+                            profileUpdate.put("sex", selectedGender);
+                            profileUpdate.put("lookingFor", selectedInterest);
                             profileUpdate.put("bio", newBio);
 
                             final android.app.AlertDialog waitingDialog = new SpotsDialog(MyProfile.this, "Update Processing . . .");
