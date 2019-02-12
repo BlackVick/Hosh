@@ -151,11 +151,47 @@ public class MyProfile extends AppCompatActivity {
         });
 
 
+        /*---   CHANGE PROFILE PICTURE   ---*/
+        changeProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+        /*---   VIEW FOLLOWERS   ---*/
+        viewFollowers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+        /*---   VIEW FOLLOWING   ---*/
+        viewFollowing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+        /*---   VIEW HOOKUPS   ---*/
+        viewHookups.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
         /*---   LOAD PROFILE   ---*/
         loadMyProfile(currentUid);
     }
 
-    private void loadMyProfile(String currentUid) {
+    private void loadMyProfile(final String currentUid) {
 
         userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
             @Override
@@ -195,17 +231,52 @@ public class MyProfile extends AppCompatActivity {
                 gender.setText(currentUser.getSex());
                 location.setText(currentUser.getLocation());
                 interest.setText(currentUser.getLookingFor());
-                dateJoined.setText(currentUser.getDateJoined());
                 status.setText(currentUser.getStatus());
 
                 /*---   FOLLOWERS   ---*/
-                userRef.child(userId).child("Followers").addValueEventListener(new ValueEventListener() {
+                userRef.child(currentUid).child("Followers").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                         int count = (int) dataSnapshot.getChildrenCount();
 
                         followersCount.setText(String.valueOf(count));
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+                /*---   FOLLOWING   ---*/
+                userRef.child(currentUid).child("Following").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        int count = (int) dataSnapshot.getChildrenCount();
+
+                        followingCount.setText(String.valueOf(count));
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+                /*---   HOOKUPS   ---*/
+                userRef.child(currentUid).child("Hookups").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        int count = (int) dataSnapshot.getChildrenCount();
+
+                        hookupCount.setText(String.valueOf(count));
 
                     }
 
