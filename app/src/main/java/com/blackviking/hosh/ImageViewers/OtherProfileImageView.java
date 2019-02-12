@@ -73,7 +73,7 @@ public class OtherProfileImageView extends AppCompatActivity {
                         @Override
                         public void onSuccess() {
                             Picasso.with(getBaseContext())
-                                    .load(imageLink) // image url goes here
+                                    .load(imageThumbLink) // image url goes here
                                     .placeholder(image.getDrawable())
                                     .into(image);
 

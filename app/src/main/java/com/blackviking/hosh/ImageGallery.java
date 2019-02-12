@@ -397,13 +397,13 @@ public class ImageGallery extends AppCompatActivity {
 
                 try {
                     Bitmap thumb_bitmap = new Compressor(this)
-                            .setMaxWidth(300)
-                            .setMaxHeight(300)
-                            .setQuality(60)
+                            .setMaxWidth(400)
+                            .setMaxHeight(400)
+                            .setQuality(65)
                             .compressToBitmap(thumb_filepath);
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos);
+                    thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 65, baos);
                     final byte[] thumb_byte = baos.toByteArray();
 
                     final StorageReference imageRef1 = imageRef.child("FullImages").child(currentUid+dateShitFmt + ".jpg");
@@ -425,7 +425,6 @@ public class ImageGallery extends AppCompatActivity {
                                         thumbDownloadUrl = Objects.requireNonNull(thumb_task.getResult().getDownloadUrl()).toString();
 
                                         if (thumb_task.isSuccessful()){
-
 
                                             mDialog.dismiss();
                                             ImageModel newImage = new ImageModel(originalImageUrl, thumbDownloadUrl, "Unsecured");
