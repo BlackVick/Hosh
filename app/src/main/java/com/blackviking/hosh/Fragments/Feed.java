@@ -381,7 +381,6 @@ public class Feed extends Fragment {
                 });
 
 
-
                     /*---   FEED IMAGE CLICK   ---*/
                 viewHolder.postImage.setOnClickListener(new View.OnClickListener() {
                     @Override
