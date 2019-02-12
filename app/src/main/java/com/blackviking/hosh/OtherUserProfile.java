@@ -284,12 +284,21 @@ public class OtherUserProfile extends AppCompatActivity {
                 }
 
                 /*---   GALLERY   ---*/
-                openGallery.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Snackbar.make(rootLayout, "Under Dev", Snackbar.LENGTH_LONG).show();
-                    }
-                });
+                if (Common.isConnectedToInternet(getBaseContext())) {
+                    openGallery.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent goToUserGallery = new Intent(OtherUserProfile.this, UserImageGallery.class);
+                            goToUserGallery.putExtra("UserId", userId);
+                            startActivity(goToUserGallery);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        }
+                    });
+                } else {
+
+                    openGallery.setVisibility(View.GONE);
+
+                }
 
 
                 /*---   ONLINE, BIO, GENDER, LOCATION, INTEREST, DATE JOINED, STATUS   ---*/

@@ -379,14 +379,20 @@ public class MyProfile extends AppCompatActivity {
 
 
                 /*---   GALLERY   ---*/
-                openGallery.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent newProfilePic = new Intent(MyProfile.this, ImageGallery.class);
-                        startActivity(newProfilePic);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    }
-                });
+                if (Common.isConnectedToInternet(getBaseContext())) {
+                    openGallery.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent newProfilePic = new Intent(MyProfile.this, ImageGallery.class);
+                            startActivity(newProfilePic);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        }
+                    });
+                } else {
+
+                    openGallery.setVisibility(View.GONE);
+
+                }
 
 
                 /*---   BIO, GENDER, LOCATION, INTEREST, DATE JOINED, STATUS   ---*/

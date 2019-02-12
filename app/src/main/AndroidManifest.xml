@@ -83,7 +83,8 @@
         <activity android:name=".MyProfile" />
         <activity
             android:name=".ImageViewers.OtherProfileImageView"
-            android:theme="@style/ImageViewTheme" ></activity>
+            android:theme="@style/ImageViewTheme" />
+        <activity android:name=".UserImageGallery"></activity>
     </application>
 
 </manifest>

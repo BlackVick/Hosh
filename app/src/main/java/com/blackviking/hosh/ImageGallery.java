@@ -294,7 +294,6 @@ public class ImageGallery extends AppCompatActivity {
                                 public void onError() {
                                     Picasso.with(getBaseContext())
                                             .load(model.getImageThumbUrl())
-                                            .transform(new FaceCenterCrop(400, 400))
                                             .placeholder(R.drawable.ic_loading_animation)
                                             .into(viewHolder.galleryImage);
                                 }
