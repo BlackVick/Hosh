@@ -122,7 +122,7 @@ public class MyProfile extends AppCompatActivity {
         status = (TextView)findViewById(R.id.myStatus);
         gender = (TextView)findViewById(R.id.myGender);
         viewFollowers = (TextView)findViewById(R.id.viewFollowers);
-        followersCount = (TextView)findViewById(R.id.userFollowers);
+        followersCount = (TextView)findViewById(R.id.followersCount);
         viewFollowing = (TextView)findViewById(R.id.viewFollowing);
         followingCount = (TextView)findViewById(R.id.followingCount);
         viewHookups = (TextView)findViewById(R.id.viewHookups);
@@ -202,8 +202,6 @@ public class MyProfile extends AppCompatActivity {
     private void openEditProfileDialog() {
 
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("Edit Your Profile . . .");
-        alertDialog.setIcon(R.drawable.ic_edit_profile);
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.edit_profile_layout,null);
 

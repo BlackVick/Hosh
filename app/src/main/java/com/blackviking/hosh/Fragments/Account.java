@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.blackviking.hosh.ImageViewers.ProfileImageView;
 import com.blackviking.hosh.Model.UserModel;
+import com.blackviking.hosh.MyProfile;
 import com.blackviking.hosh.R;
 import com.blackviking.hosh.UserListActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -261,7 +262,9 @@ public class Account extends Fragment {
                 profileSetting.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        Intent posterProfile = new Intent(getContext(), MyProfile.class);
+                        startActivity(posterProfile);
+                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
 

@@ -81,7 +81,9 @@
         <activity android:name=".FeedDetails" />
         <activity android:name=".OtherUserProfile" />
         <activity android:name=".MyProfile" />
-        <activity android:name=".ImageViewers.OtherProfileImageView"></activity>
+        <activity
+            android:name=".ImageViewers.OtherProfileImageView"
+            android:theme="@style/ImageViewTheme" ></activity>
     </application>
 
 </manifest>

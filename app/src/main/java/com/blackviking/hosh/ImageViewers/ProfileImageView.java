@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.blackviking.hosh.ImageGallery;
 import com.blackviking.hosh.Model.ImageModel;
+import com.blackviking.hosh.MyProfile;
 import com.blackviking.hosh.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +25,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import dmax.dialog.SpotsDialog;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -91,6 +93,9 @@ public class ProfileImageView extends AppCompatActivity {
 
 
         /*---   LOAD PROFILE IMAGE   ---*/
+        final android.app.AlertDialog waitingDialog = new SpotsDialog(ProfileImageView.this, "Please Wait . . .");
+        waitingDialog.show();
+
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -100,6 +105,7 @@ public class ProfileImageView extends AppCompatActivity {
 
                 if (!profilePicture.equals("") && !profilePictureThumb.equals("")){
 
+                    waitingDialog.dismiss();
                     Picasso.with(getBaseContext())
                             .load(profilePictureThumb) // thumbnail url goes here
                             .into(image, new Callback() {
@@ -107,36 +113,8 @@ public class ProfileImageView extends AppCompatActivity {
                                 public void onSuccess() {
                                     Picasso.with(getBaseContext())
                                             .load(profilePicture) // image url goes here
-                                            .networkPolicy(NetworkPolicy.OFFLINE)
                                             .placeholder(image.getDrawable())
-                                            .into(image, new Callback() {
-                                                @Override
-                                                public void onSuccess() {
-
-                                                }
-
-                                                @Override
-                                                public void onError() {
-
-                                                    Picasso.with(getBaseContext())
-                                                            .load(profilePictureThumb) // thumbnail url goes here
-                                                            .into(image, new Callback() {
-                                                                @Override
-                                                                public void onSuccess() {
-                                                                    Picasso.with(getBaseContext())
-                                                                            .load(profilePicture) // image url goes here
-                                                                            .placeholder(image.getDrawable())
-                                                                            .into(image);
-                                                                }
-                                                                @Override
-                                                                public void onError() {
-
-                                                                }
-                                                            });
-
-
-                                                }
-                                            });
+                                            .into(image);
                                 }
                                 @Override
                                 public void onError() {

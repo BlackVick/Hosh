@@ -283,7 +283,6 @@ public class ImageGallery extends AppCompatActivity {
                     Picasso.with(getBaseContext())
                             .load(model.getImageThumbUrl())
                             .networkPolicy(NetworkPolicy.OFFLINE)
-                            .transform(new FaceCenterCrop(400, 400))
                             .placeholder(R.drawable.ic_loading_animation)
                             .into(viewHolder.galleryImage, new Callback() {
                                 @Override
