@@ -177,11 +177,18 @@
                             android:textColor="@color/black"
                             android:textSize="15sp"/>
 
-                        <android.support.v7.widget.RecyclerView
+                        <Button
                             android:layout_width="0dp"
                             android:layout_weight="7"
                             android:layout_height="wrap_content"
-                            android:id="@+id/myGalleryRecycler"></android.support.v7.widget.RecyclerView>
+                            android:background="@drawable/buttons"
+                            android:text="OPEN GALLERY"
+                            android:textColor="@color/white"
+                            android:textSize="17sp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:id="@+id/openGalleryButton"
+                            android:drawableStart="@drawable/ic_menu_gallery"/>
 
                     </LinearLayout>
 

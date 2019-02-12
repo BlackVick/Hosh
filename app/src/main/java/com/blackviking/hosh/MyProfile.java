@@ -63,16 +63,14 @@ public class MyProfile extends AppCompatActivity {
     private String currentUid;
     private ImageView userProfileImage, coverPhoto, changeProfilePic;
     private TextView username, status, gender, followersCount, viewFollowers, followingCount, viewFollowing, hookupCount, viewHookups, location, interest, bio;
-    private RecyclerView myGalleryRecycler;
-    private LinearLayoutManager layoutManager;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef;
     private CoordinatorLayout rootLayout;
     private UserModel currentUser;
     private int BLUR_PRECENTAGE = 50;
-    private FirebaseRecyclerAdapter<ImageModel, UserProfileGalleryViewHolder> adapter;
     private Target target;
+    private Button openGallery;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -130,7 +128,7 @@ public class MyProfile extends AppCompatActivity {
         location = (TextView)findViewById(R.id.myLocation);
         interest = (TextView)findViewById(R.id.myInterest);
         bio = (TextView)findViewById(R.id.myBio);
-        myGalleryRecycler = (RecyclerView)findViewById(R.id.myGalleryRecycler);
+        openGallery = (Button)findViewById(R.id.openGalleryButton);
 
 
         /*---   BLUR COVER   ---*/
@@ -154,12 +152,6 @@ public class MyProfile extends AppCompatActivity {
         /*---   TOOLBAR   ---*/
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppbar);
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppbar);
-
-
-        /*---   RECYCLER CONTROLLER   ---*/
-        myGalleryRecycler.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        myGalleryRecycler.setLayoutManager(layoutManager);
 
 
         /*---   FAB   ---*/
@@ -387,7 +379,14 @@ public class MyProfile extends AppCompatActivity {
 
 
                 /*---   GALLERY   ---*/
-                loadGallery();
+                openGallery.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent newProfilePic = new Intent(MyProfile.this, ImageGallery.class);
+                        startActivity(newProfilePic);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }
+                });
 
 
                 /*---   BIO, GENDER, LOCATION, INTEREST, DATE JOINED, STATUS   ---*/
@@ -490,46 +489,6 @@ public class MyProfile extends AppCompatActivity {
 
             }
         });
-
-    }
-
-    private void loadGallery() {
-
-        DatabaseReference galleryRef = userRef.child(currentUid).child("Gallery");
-        Query lastFour = galleryRef.limitToFirst(4);
-
-        adapter = new FirebaseRecyclerAdapter<ImageModel, UserProfileGalleryViewHolder>(
-                ImageModel.class,
-                R.layout.user_profile_gallery_item,
-                UserProfileGalleryViewHolder.class,
-                lastFour
-        ) {
-            @Override
-            protected void populateViewHolder(UserProfileGalleryViewHolder viewHolder, ImageModel model, int position) {
-
-                if (!model.getImageThumbUrl().equals("")){
-
-                    Picasso.with(getBaseContext())
-                            .load(model.getImageThumbUrl())
-                            .placeholder(R.drawable.ic_loading_animation)
-                            .into(viewHolder.galleryImage);
-
-
-                }
-
-                viewHolder.setItemClickListener(new ItemClickListener() {
-                    @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
-                        Intent newProfilePic = new Intent(MyProfile.this, ImageGallery.class);
-                        startActivity(newProfilePic);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    }
-                });
-
-            }
-        };
-        myGalleryRecycler.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
 
     }
 
