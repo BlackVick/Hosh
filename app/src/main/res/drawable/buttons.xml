@@ -2,20 +2,17 @@
 <ripple
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:color="@color/rippleEffectColor"
-    tools:targetApi="o"
-    >
+    android:color="@color/offWhite"
+    tools:targetApi="o">
 
     <item>
 
         <shape android:shape="rectangle">
 
-            <solid android:color="@color/colorPrimary"></solid>
-            <stroke
-                android:color="@color/btnSignIn"
-                android:width="0.2dp"></stroke>
+            <solid android:color="@color/colorPrimary"/>
+
             <corners
-                android:radius="6dp"></corners>
+                android:radius="6dp"/>
 
         </shape>
 

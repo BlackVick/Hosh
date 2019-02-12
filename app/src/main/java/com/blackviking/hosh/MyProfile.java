@@ -1,37 +1,57 @@
 package com.blackviking.hosh;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.ImageViewers.BlurImage;
+import com.blackviking.hosh.ImageViewers.ProfileImageView;
+import com.blackviking.hosh.Interface.ItemClickListener;
 import com.blackviking.hosh.Model.ImageModel;
 import com.blackviking.hosh.Model.UserModel;
 import com.blackviking.hosh.ViewHolder.UserProfileGalleryViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -143,9 +163,16 @@ public class MyProfile extends AppCompatActivity {
 
 
         /*---   FAB   ---*/
+        if (Common.isConnectedToInternet(getBaseContext())){
+            editProfileFab.setVisibility(View.VISIBLE);
+        } else {
+            editProfileFab.setVisibility(View.GONE);
+        }
         editProfileFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                openEditProfileDialog();
 
             }
         });
@@ -156,39 +183,167 @@ public class MyProfile extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-            }
-        });
-
-
-        /*---   VIEW FOLLOWERS   ---*/
-        viewFollowers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-
-        /*---   VIEW FOLLOWING   ---*/
-        viewFollowing.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-
-        /*---   VIEW HOOKUPS   ---*/
-        viewHookups.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                Intent newProfilePic = new Intent(MyProfile.this, ImageGallery.class);
+                startActivity(newProfilePic);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
             }
         });
 
 
         /*---   LOAD PROFILE   ---*/
-        loadMyProfile(currentUid);
+        if (Common.isConnectedToInternet(getBaseContext())) {
+            loadMyProfile(currentUid);
+        } else {
+            Snackbar.make(rootLayout, "Could not Load Your Profile. . .   No Internet Access !", Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private void openEditProfileDialog() {
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Edit Your Profile . . .");
+        alertDialog.setIcon(R.drawable.ic_edit_profile);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.edit_profile_layout,null);
+
+        final MaterialEditText statusEdt = (MaterialEditText) viewOptions.findViewById(R.id.editYourStatus);
+        final MaterialSpinner genderChange = (MaterialSpinner) viewOptions.findViewById(R.id.genderSpinner);
+        final MaterialSpinner interestChange = (MaterialSpinner) viewOptions.findViewById(R.id.interestSpinner);
+        final EditText editBio = (EditText) viewOptions.findViewById(R.id.changeYourBio);
+        final Button saveChanges = (Button) viewOptions.findViewById(R.id.saveProfileChanges);
+
+
+
+        /*---   SPINNERS   ---*/
+        genderChange.setItems("Male", "Female", "I am not sure", "Indifferent", "Not Specified");
+        interestChange.setItems("Dating", "Friendship", "Hookup", "Not Specified");
+
+
+        /*---   TEXT   ---*/
+        userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                UserModel currentUserUpdate = dataSnapshot.getValue(UserModel.class);
+
+                statusEdt.setText(currentUserUpdate.getStatus());
+                editBio.setText(currentUserUpdate.getBio());
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 100; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+        /*---   SAVE BUTTON   ---*/
+        saveChanges.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String selectedGender = "";
+                String selectedInterest = "";
+                final String newStatus = statusEdt.getText().toString();
+                final String newBio = editBio.getText().toString();
+
+                /*---   SPINNERS GENDER   ---*/
+                switch (genderChange.getSelectedIndex()){
+                    case 0:
+                        selectedGender = "Male";
+
+                    case 1:
+                        selectedGender = "Female";
+
+                    case 2:
+                        selectedGender = "I am not sure";
+
+                    case 3:
+                        selectedGender = "Indifferent";
+
+                    case 4:
+                        selectedGender = "Not Specified";
+                }
+
+
+                /*---   SPINNER INTEREST   ---*/
+                switch (interestChange.getSelectedIndex()){
+                    case 0:
+                        selectedInterest = "Dating";
+
+                    case 1:
+                        selectedInterest = "Friendship";
+
+                    case 2:
+                        selectedInterest = "Hookup";
+
+                    case 3:
+                        selectedInterest = "Not Specified";
+
+
+                }
+
+                final String finalSelectedGender = selectedGender;
+                final String finalSelectedInterest = selectedInterest;
+                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        UserModel currentUserUpdate2 = dataSnapshot.getValue(UserModel.class);
+
+                        if (!newStatus.equals(currentUserUpdate2.getStatus()) || !finalSelectedGender.equals(currentUserUpdate2.getSex())
+                                || !newBio.equals(currentUserUpdate2.getBio()) || !finalSelectedInterest.equals(currentUserUpdate2.getLookingFor())){
+
+                            final Map<String, Object> profileUpdate = new HashMap<>();
+                            profileUpdate.put("status", newStatus);
+                            profileUpdate.put("sex", finalSelectedGender);
+                            profileUpdate.put("lookingFor", finalSelectedInterest);
+                            profileUpdate.put("bio", newBio);
+
+                            final android.app.AlertDialog waitingDialog = new SpotsDialog(MyProfile.this, "Update Processing . . .");
+                            waitingDialog.show();
+
+                            userRef.child(currentUid).updateChildren(profileUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    waitingDialog.dismiss();
+                                    alertDialog.dismiss();
+                                    Snackbar.make(rootLayout, "Profile Updated !", Snackbar.LENGTH_LONG).show();
+                                }
+                            });
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+
     }
 
     private void loadMyProfile(final String currentUid) {
@@ -222,8 +377,19 @@ public class MyProfile extends AppCompatActivity {
                             .into(target);
 
 
-
+                    userProfileImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent profileImgIntent = new Intent(MyProfile.this, ProfileImageView.class);
+                            startActivity(profileImgIntent);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        }
+                    });
                 }
+
+
+                /*---   GALLERY   ---*/
+                loadGallery();
 
 
                 /*---   BIO, GENDER, LOCATION, INTEREST, DATE JOINED, STATUS   ---*/
@@ -250,6 +416,17 @@ public class MyProfile extends AppCompatActivity {
                     }
                 });
 
+                viewFollowers.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent showUsersListIntent = new Intent(MyProfile.this, UserListActivity.class);
+                        showUsersListIntent.putExtra("Type", "Followers");
+                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
+                        startActivity(showUsersListIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }
+                });
+
 
                 /*---   FOLLOWING   ---*/
                 userRef.child(currentUid).child("Following").addValueEventListener(new ValueEventListener() {
@@ -265,6 +442,17 @@ public class MyProfile extends AppCompatActivity {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
 
+                    }
+                });
+
+                viewFollowing.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent showUsersListIntent = new Intent(MyProfile.this, UserListActivity.class);
+                        showUsersListIntent.putExtra("Type", "Following");
+                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
+                        startActivity(showUsersListIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
 
@@ -286,6 +474,17 @@ public class MyProfile extends AppCompatActivity {
                     }
                 });
 
+                viewHookups.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent showUsersListIntent = new Intent(MyProfile.this, UserListActivity.class);
+                        showUsersListIntent.putExtra("Type", "Hookups");
+                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
+                        startActivity(showUsersListIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }
+                });
+
             }
 
             @Override
@@ -294,5 +493,68 @@ public class MyProfile extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void loadGallery() {
+
+        DatabaseReference galleryRef = userRef.child(currentUid).child("Gallery");
+        Query lastFour = galleryRef.limitToFirst(4);
+
+        adapter = new FirebaseRecyclerAdapter<ImageModel, UserProfileGalleryViewHolder>(
+                ImageModel.class,
+                R.layout.user_profile_gallery_item,
+                UserProfileGalleryViewHolder.class,
+                lastFour
+        ) {
+            @Override
+            protected void populateViewHolder(UserProfileGalleryViewHolder viewHolder, ImageModel model, int position) {
+
+                if (!model.getImageThumbUrl().equals("")){
+
+                    Picasso.with(getBaseContext())
+                            .load(model.getImageThumbUrl())
+                            .placeholder(R.drawable.ic_loading_animation)
+                            .into(viewHolder.galleryImage);
+
+
+                }
+
+                viewHolder.setItemClickListener(new ItemClickListener() {
+                    @Override
+                    public void onClick(View view, int position, boolean isLongClick) {
+                        Intent newProfilePic = new Intent(MyProfile.this, ImageGallery.class);
+                        startActivity(newProfilePic);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }
+                });
+
+            }
+        };
+        myGalleryRecycler.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PicassoFaceDetector.releaseDetector();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PicassoFaceDetector.releaseDetector();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        PicassoFaceDetector.releaseDetector();
     }
 }

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="18dp"
+    android:layout_margin="15dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:orientation="vertical">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/editYourStatus"
+            android:hint="Status"
+            android:textColorHint="@color/colorAccent"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:inputType="text"
+            android:layout_margin="3dp"
+            android:maxLength="70"
+            android:padding="5dp"
+            app:met_clearButton="true"
+            app:met_maxCharacters="70"
+            app:met_baseColor="@color/colorAccent"
+            app:met_floatingLabelAnimating="true"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/colorPrimary"
+            app:met_singleLineEllipsis="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:id="@+id/genderSpinner"
+            android:layout_width="match_parent"
+            android:layout_margin="3dp"
+            android:textSize="18sp"
+            android:layout_height="wrap_content"
+            android:hint="Gender"/>
+
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:id="@+id/interestSpinner"
+            android:layout_width="match_parent"
+            android:layout_margin="3dp"
+            android:textSize="18sp"
+            android:layout_height="wrap_content"
+            android:hint="Looking For"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/changeYourBio"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:maxLines="5"
+            android:background="@drawable/white_backround_ripple_chats"
+            android:hint="Bio"
+            android:padding="5dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/saveProfileChanges"
+            android:layout_gravity="end"
+            android:text="SAVE"
+            android:textSize="17sp"
+            android:textColor="@color/white"
+            android:layout_margin="5dp"
+            android:background="@drawable/buttons"/>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

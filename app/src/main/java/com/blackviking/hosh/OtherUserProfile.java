@@ -18,7 +18,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.ImageViewers.BlurImage;
+import com.blackviking.hosh.ImageViewers.OtherProfileImageView;
+import com.blackviking.hosh.ImageViewers.ProfileImageView;
 import com.blackviking.hosh.Interface.ItemClickListener;
 import com.blackviking.hosh.Model.ImageModel;
 import com.blackviking.hosh.Model.UserModel;
@@ -153,6 +156,16 @@ public class OtherUserProfile extends AppCompatActivity {
         userGalleryRecycler.setLayoutManager(layoutManager);
 
 
+        /*---   FAB VISIBILITY   ---*/
+        if (Common.isConnectedToInternet(getBaseContext())){
+            messageUserFab.setVisibility(View.VISIBLE);
+            followUserFab.setVisibility(View.VISIBLE);
+        } else {
+            messageUserFab.setVisibility(View.GONE);
+            followUserFab.setVisibility(View.GONE);
+        }
+
+
         /*---   FABs   ---*/
         messageUserFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -223,7 +236,12 @@ public class OtherUserProfile extends AppCompatActivity {
         });
 
 
-        loadUserProfile(userId);
+        /*---   LOAD PROFILE   ---*/
+        if (Common.isConnectedToInternet(getBaseContext())){
+            loadUserProfile(userId);
+        } else {
+            Snackbar.make(rootLayout, "Could not Load This Profile. . .   No Internet Access !", Snackbar.LENGTH_LONG).show();
+        }
 
     }
 
@@ -258,6 +276,18 @@ public class OtherUserProfile extends AppCompatActivity {
                             .into(target);
 
 
+                    /*---   PROFILE IMAGE CLICK   ---*/
+                    userProfileImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent profileImgIntent = new Intent(OtherUserProfile.this, OtherProfileImageView.class);
+                            profileImgIntent.putExtra("UserId", userId);
+                            profileImgIntent.putExtra("ImageUrl", currentUser.getProfilePicture());
+                            profileImgIntent.putExtra("ImageThumbUrl", currentUser.getProfilePictureThumb());
+                            startActivity(profileImgIntent);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        }
+                    });
 
                 }
 

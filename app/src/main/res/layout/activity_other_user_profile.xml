@@ -92,7 +92,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:padding="10dp"
-                        android:text="Username"
+                        android:text=". . ."
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"/>
@@ -108,7 +108,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:padding="12dp"
-                        android:text="Status"
+                        android:text=". . ."
                         android:textSize="15sp"
                         android:textColor="@color/offBlack"/>
 
@@ -141,7 +141,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
-                            android:text="Online"
+                            android:text=". . ."
                             android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
@@ -171,7 +171,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
-                            android:text="Female"
+                            android:text=". . ."
                             android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
@@ -267,7 +267,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
-                            android:text="Lagos"
+                            android:text=". . ."
                             android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
@@ -297,7 +297,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
-                            android:text="Hookup"
+                            android:text=". . ."
                             android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
@@ -327,7 +327,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="7"
-                            android:text="10 Feb, 19"
+                            android:text=". . ."
                             android:textSize="17sp"
                             android:textColor="@color/offBlack"
                             android:padding="10dp"/>
