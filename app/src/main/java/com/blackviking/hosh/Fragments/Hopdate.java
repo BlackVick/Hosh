@@ -32,6 +32,7 @@ import com.blackviking.hosh.Common.Permissions;
 import com.blackviking.hosh.Home;
 import com.blackviking.hosh.Model.HopdateModel;
 import com.blackviking.hosh.R;
+import com.blackviking.hosh.Settings.Faq;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -88,7 +89,6 @@ public class Hopdate extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -132,7 +132,9 @@ public class Hopdate extends Fragment {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(getView(), "Help Function Under Dev ", Snackbar.LENGTH_LONG).show();
+                Intent faqIntent = new Intent(getContext(), Faq.class);
+                startActivity(faqIntent);
+                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 

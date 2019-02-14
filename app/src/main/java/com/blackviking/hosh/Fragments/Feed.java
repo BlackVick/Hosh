@@ -25,6 +25,7 @@ import com.blackviking.hosh.Model.HopdateModel;
 import com.blackviking.hosh.MyProfile;
 import com.blackviking.hosh.OtherUserProfile;
 import com.blackviking.hosh.R;
+import com.blackviking.hosh.Settings.Faq;
 import com.blackviking.hosh.ViewHolder.FeedViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -57,11 +58,9 @@ public class Feed extends Fragment {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference feedRef, userRef, likeRef, commentRef;
 
-
     public Feed() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,7 +112,9 @@ public class Feed extends Fragment {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(getView(), "Help Function Under Dev ", Snackbar.LENGTH_LONG).show();
+                Intent faqIntent = new Intent(getContext(), Faq.class);
+                startActivity(faqIntent);
+                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -197,8 +198,8 @@ public class Feed extends Fragment {
 
                                         Intent i = new Intent(android.content.Intent.ACTION_SEND);
                                         i.setType("text/plain");
-                                        i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Share");
-                                        i.putExtra(android.content.Intent.EXTRA_TEXT, "Check Out My New Story On HOSH Mobile App On PlayStore. ");
+                                        i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
+                                        i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
                                         startActivity(Intent.createChooser(i,"Share via"));
 
                                         return true;
@@ -474,4 +475,21 @@ public class Feed extends Fragment {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        PicassoFaceDetector.releaseDetector();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        PicassoFaceDetector.releaseDetector();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        PicassoFaceDetector.releaseDetector();
+    }
 }

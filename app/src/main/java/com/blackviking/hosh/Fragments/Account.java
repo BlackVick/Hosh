@@ -14,10 +14,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.blackviking.hosh.AccountSettings;
 import com.blackviking.hosh.ImageViewers.ProfileImageView;
 import com.blackviking.hosh.Model.UserModel;
 import com.blackviking.hosh.MyProfile;
 import com.blackviking.hosh.R;
+import com.blackviking.hosh.Settings.Faq;
 import com.blackviking.hosh.UserListActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -51,11 +53,9 @@ public class Account extends Fragment {
     private String currentUid;
     private UserModel currentUser;
 
-
     public Account() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -242,8 +242,6 @@ public class Account extends Fragment {
                                 }
                             });
 
-
-
                 }
 
                 profileImage.setOnClickListener(new View.OnClickListener() {
@@ -273,7 +271,9 @@ public class Account extends Fragment {
                 accountSetting.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        Intent accountIntent = new Intent(getContext(), AccountSettings.class);
+                        startActivity(accountIntent);
+                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
 
@@ -300,7 +300,9 @@ public class Account extends Fragment {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(getView(), "Help Function Under Dev ", Snackbar.LENGTH_LONG).show();
+                Intent faqIntent = new Intent(getContext(), Faq.class);
+                startActivity(faqIntent);
+                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 

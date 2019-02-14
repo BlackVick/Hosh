@@ -35,6 +35,7 @@ import com.blackviking.hosh.Fragments.Hopdate;
 import com.blackviking.hosh.ImageViewers.MyGalleryImageView;
 import com.blackviking.hosh.Interface.ItemClickListener;
 import com.blackviking.hosh.Model.ImageModel;
+import com.blackviking.hosh.Settings.Faq;
 import com.blackviking.hosh.ViewHolder.GalleryViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -142,7 +143,9 @@ public class ImageGallery extends AppCompatActivity {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(rootLayout, "Help Function Still Under Dev !", Snackbar.LENGTH_LONG).show();
+                Intent helpIntent = new Intent(ImageGallery.this, Faq.class);
+                startActivity(helpIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 

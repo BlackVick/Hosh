@@ -1,16 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.blackviking.hosh.Fragments.HookUp">
+    tools:context="com.blackviking.hosh.Settings.Faq">
 
     <include layout="@layout/snippet_for_general"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <ExpandableListView
         android:layout_marginTop="?attr/actionBarSize"
-        android:id="@+id/hookupRecycler"></android.support.v7.widget.RecyclerView>
+        android:id="@+id/faqExpandable"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

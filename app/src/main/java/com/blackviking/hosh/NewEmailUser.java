@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Model.UserModel;
+import com.blackviking.hosh.Settings.Faq;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -135,10 +136,9 @@ public class NewEmailUser extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Snackbar.make(rootLayout, "Help Function Still Under Dev !", Snackbar.LENGTH_LONG).show();
-                /*Intent helpIntent = new Intent(NewEmailUser.this, Faqs.class);
+                Intent helpIntent = new Intent(NewEmailUser.this, Faq.class);
                 startActivity(helpIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);*/
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 

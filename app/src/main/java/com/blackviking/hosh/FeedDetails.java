@@ -21,6 +21,8 @@ import android.widget.TextView;
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Model.CommentModel;
 import com.blackviking.hosh.Model.HopdateModel;
+import com.blackviking.hosh.Settings.Faq;
+import com.blackviking.hosh.Settings.Help;
 import com.blackviking.hosh.ViewHolder.CommentViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -136,7 +138,9 @@ public class FeedDetails extends AppCompatActivity {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(rootLayout, "Help Function Still Under Dev !", Snackbar.LENGTH_LONG).show();
+                Intent helpIntent = new Intent(FeedDetails.this, Faq.class);
+                startActivity(helpIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 

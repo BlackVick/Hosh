@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.blackviking.hosh.Settings.Help"
+    android:id="@+id/helpRootLayout">
+
+    <include layout="@layout/snippet_for_general"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:paddingTop="3dp"
+        android:orientation="vertical"
+        android:animateLayoutChanges="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_backround_ripple_chats"
+            android:id="@+id/faq"
+            android:text="FAQ"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:padding="15dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.2dp"
+            android:background="@color/offBlack"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_backround_ripple_chats"
+            android:id="@+id/contactUs"
+            android:text="Contact Us"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:padding="15dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.2dp"
+            android:background="@color/offBlack"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_backround_ripple_chats"
+            android:id="@+id/privacyPolicy"
+            android:text="Terms and Privacy Policy"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:padding="15dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.2dp"
+            android:background="@color/offBlack"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_backround_ripple_chats"
+            android:id="@+id/appInfo"
+            android:text="App Info"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:padding="15dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.2dp"
+            android:background="@color/offBlack"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

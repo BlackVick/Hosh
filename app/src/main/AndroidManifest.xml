@@ -28,7 +28,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".Splash"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,32 +61,92 @@
 
         <activity
             android:name=".Login"
-            android:theme="@style/LoginBackground" />
+            android:theme="@style/LoginBackground"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".NewGoogleUser"
-            android:theme="@style/AppBackground" />
+            android:theme="@style/AppBackground"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".NewEmailUser"
-            android:theme="@style/AppBackground" />
+            android:theme="@style/AppBackground"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".NewAnonymousUser"
-            android:theme="@style/AppBackground" />
-        <activity android:name=".Home" />
+            android:theme="@style/AppBackground"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Home"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ImageViewers.ProfileImageView"
-            android:theme="@style/ImageViewTheme" />
-        <activity android:name=".UserListActivity" />
-        <activity android:name=".ImageGallery" />
+            android:theme="@style/ImageViewTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".UserListActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ImageGallery"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ImageViewers.MyGalleryImageView"
-            android:theme="@style/ImageViewTheme" />
-        <activity android:name=".FeedDetails" />
-        <activity android:name=".OtherUserProfile" />
-        <activity android:name=".MyProfile" />
+            android:theme="@style/ImageViewTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".FeedDetails"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".OtherUserProfile"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".MyProfile"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ImageViewers.OtherProfileImageView"
-            android:theme="@style/ImageViewTheme" />
-        <activity android:name=".UserImageGallery"></activity>
+            android:theme="@style/ImageViewTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".UserImageGallery"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".AccountSettings"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Settings.Help"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Settings.Faq"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Settings.AppInfo"
+            android:theme="@style/ImageViewTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Settings.NotificationSetting"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Settings.AccountSetting"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

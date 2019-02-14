@@ -1,6 +1,7 @@
 package com.blackviking.hosh;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blackviking.hosh.Settings.Faq;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -89,7 +91,9 @@ public class UserListActivity extends AppCompatActivity {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(rootLayout, "Help Function Still Under Dev !", Snackbar.LENGTH_LONG).show();
+                Intent helpIntent = new Intent(UserListActivity.this, Faq.class);
+                startActivity(helpIntent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
