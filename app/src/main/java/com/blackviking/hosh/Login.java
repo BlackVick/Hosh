@@ -399,7 +399,7 @@ public class Login extends AppCompatActivity {
 
             if (signInChoice.equals("Google")){
 
-                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()){
@@ -428,7 +428,7 @@ public class Login extends AppCompatActivity {
 
             } else if (signInChoice.equals("EMail")){
 
-                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()){
@@ -457,7 +457,7 @@ public class Login extends AppCompatActivity {
 
             } else if (signInChoice.equals("Anonymous")){
 
-                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()){
