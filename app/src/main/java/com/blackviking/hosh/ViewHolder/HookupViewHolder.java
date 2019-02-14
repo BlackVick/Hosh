@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.blackviking.hosh.Interface.ItemClickListener;
@@ -18,14 +19,15 @@ public class HookupViewHolder extends RecyclerView.ViewHolder implements View.On
 
     private ItemClickListener itemClickListener;
     public ImageView hookUpImage, onlineIndicator;
-    public RelativeLayout theLayout;
+    public RoundKornerRelativeLayout theLayout, myLayout;
 
     public HookupViewHolder(View itemView) {
         super(itemView);
 
         hookUpImage = (ImageView)itemView.findViewById(R.id.hookupImage);
         onlineIndicator = (ImageView)itemView.findViewById(R.id.onlineIndicator);
-        theLayout = (RelativeLayout)itemView.findViewById(R.id.hookupsLayout);
+        theLayout = (RoundKornerRelativeLayout) itemView.findViewById(R.id.hookupsLayout);
+        myLayout = (RoundKornerRelativeLayout) itemView.findViewById(R.id.myLayout);
 
         itemView.setOnClickListener(this);
 

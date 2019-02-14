@@ -216,16 +216,15 @@ public class MyProfile extends AppCompatActivity {
         genderList.add(0, "Gender");
         genderList.add("Male");
         genderList.add("Female");
-        genderList.add("I am not sure");
         genderList.add("Indifferent");
 
 
         /*---   FILL INTEREST SPINNER   ---*/
         List<String> interestList = new ArrayList<>();
-        interestList.add(0, "Looking For . .");
-        interestList.add("Friendship");
-        interestList.add("Dating");
-        interestList.add("Hookup");
+        interestList.add(0, "Interested In . .");
+        interestList.add("Men");
+        interestList.add("Women");
+        interestList.add("Groupie");
 
 
         ArrayAdapter<String> dataAdapterGender;
@@ -265,7 +264,7 @@ public class MyProfile extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if (!parent.getItemAtPosition(position).equals("Looking For . .")){
+                if (!parent.getItemAtPosition(position).equals("Interested In . .")){
 
                     selectedInterest = parent.getItemAtPosition(position).toString();
 

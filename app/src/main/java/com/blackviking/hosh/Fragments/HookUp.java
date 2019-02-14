@@ -31,8 +31,11 @@ import com.blackviking.hosh.ViewHolder.FeedViewHolder;
 import com.blackviking.hosh.ViewHolder.HookupViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
 import com.squareup.picasso.Picasso;
@@ -50,7 +53,7 @@ public class HookUp extends Fragment {
     private RecyclerView hookupRecycler;
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<UserModel, HookupViewHolder> adapter;
-    private String currentUid;
+    private String currentUid, sexToHaunt;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference userRef;
@@ -102,6 +105,9 @@ public class HookUp extends Fragment {
         activityName.setText("Hookup");
 
 
+
+
+
         /*---   HELP   ---*/
         help.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +127,53 @@ public class HookUp extends Fragment {
 
         if (Common.isConnectedToInternet(getContext())) {
 
-            loadHookups(currentUid);
+            /*---   INTERESTED IN   ---*/
+            userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    String myInterest = dataSnapshot.child("lookingFor").getValue().toString();
+                    String mySex = dataSnapshot.child("sex").getValue().toString();
+
+                    if (myInterest.equalsIgnoreCase("Women")){
+
+                        sexToHaunt = "Men";
+                        loadHookups(currentUid);
+
+                    } else if (myInterest.equalsIgnoreCase("Men")){
+
+                        sexToHaunt = "Women";
+                        loadHookups(currentUid);
+
+                    } else if (myInterest.equalsIgnoreCase("Groupie")){
+
+                        sexToHaunt = "Groupie";
+                        loadHookups(currentUid);
+
+                    } else if (mySex.equalsIgnoreCase("Male")){
+
+                        sexToHaunt = "Men";
+                        loadHookups(currentUid);
+
+                    } else if (mySex.equalsIgnoreCase("Female")){
+
+                        sexToHaunt = "Female";
+                        loadHookups(currentUid);
+
+                    } else if (mySex.equalsIgnoreCase("Indifferent")){
+
+                        sexToHaunt = "Groupie";
+                        loadHookups(currentUid);
+
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
 
         } else {
 
@@ -167,7 +219,7 @@ public class HookUp extends Fragment {
                 UserModel.class,
                 R.layout.hookup_item,
                 HookupViewHolder.class,
-                userRef
+                userRef.orderByChild("lookingFor").equalTo(sexToHaunt)
         ) {
             @Override
             protected void populateViewHolder(HookupViewHolder viewHolder, UserModel model, int position) {
@@ -206,21 +258,23 @@ public class HookUp extends Fragment {
 
                     }
 
+                    viewHolder.setItemClickListener(new ItemClickListener() {
+                        @Override
+                        public void onClick(View view, int position, boolean isLongClick) {
+                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                            posterProfile.putExtra("UserId", ids);
+                            startActivity(posterProfile);
+                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        }
+                    });
+
                 } else {
 
                     viewHolder.theLayout.setVisibility(View.GONE);
 
                 }
 
-                viewHolder.setItemClickListener(new ItemClickListener() {
-                    @Override
-                    public void onClick(View view, int position, boolean isLongClick) {
-                        Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
-                        posterProfile.putExtra("UserId", ids);
-                        startActivity(posterProfile);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    }
-                });
+
 
             }
         };
