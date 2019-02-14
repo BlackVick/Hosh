@@ -115,7 +115,7 @@ public class HookUp extends Fragment {
 
         /*---   RECYCLER CONTROLLER   ---*/
         hookupRecycler.setHasFixedSize(true);
-        layoutManager = new GridLayoutManager(getContext(), 6);
+        layoutManager = new GridLayoutManager(getContext(), 5);
         hookupRecycler.setLayoutManager(layoutManager);
 
 
@@ -178,6 +178,8 @@ public class HookUp extends Fragment {
 
                 if (!ids.equals(currentUid)){
 
+                    viewHolder.theLayout.setVisibility(View.VISIBLE);
+
                     if (!model.getProfilePictureThumb().equals("")){
 
                         Picasso.with(getContext())
@@ -185,6 +187,10 @@ public class HookUp extends Fragment {
                                 .placeholder(R.drawable.ic_loading_animation)
                                 .transform(new FaceCenterCrop(400, 400))
                                 .into(viewHolder.hookUpImage);
+
+                    } else {
+
+                        viewHolder.hookUpImage.setImageResource(R.drawable.empty_profile);
 
                     }
 

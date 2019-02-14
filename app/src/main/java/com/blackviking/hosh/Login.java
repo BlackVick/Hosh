@@ -199,7 +199,7 @@ public class Login extends AppCompatActivity {
         });
 
 
-        /*---   FACEBOOK   ---*/
+        /*---   ANONYMOUS   ---*/
         anonymous.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -7,13 +7,16 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,19 +24,34 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.ImageGallery;
 import com.blackviking.hosh.Login;
 import com.blackviking.hosh.Model.UserModel;
 import com.blackviking.hosh.R;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,6 +60,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.paperdb.Paper;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -58,6 +78,9 @@ public class AccountSetting extends AppCompatActivity {
     private DatabaseReference userRef;
     private String signUpChoice, currentUid, selectedLocation;
     private UserModel currentUser;
+    private static final int RC_SIGN_IN = 1;
+    private GoogleApiClient mGoogleApiClient;
+    private static final int PER_LOGIN = 1000;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -119,6 +142,23 @@ public class AccountSetting extends AppCompatActivity {
 
         /*---   HELP   ---*/
         help.setVisibility(View.GONE);
+
+
+        /*---   GOOGLE API INITIALIZATION   ---*/
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Snackbar.make(rootLayout, "Unknown Error Occurred", Snackbar.LENGTH_LONG).show();
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
 
 
         /*---   LOGOUT   ---*/
@@ -314,35 +354,13 @@ public class AccountSetting extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                userRef.child(currentUid).child("location").setValue(selectedLocation).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        if (!selectedLocation.equals(dataSnapshot.child("location").getValue().toString())){
-
-                            userRef.child(currentUid).child("location").setValue(selectedLocation).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Snackbar.make(rootLayout, "Location changes might take a few minutes to reflect !", Snackbar.LENGTH_LONG).show();
-                                    alertDialog.dismiss();
-                                }
-                            });
-
-                        } else {
-
-                            alertDialog.dismiss();
-
-                        }
-
-                        userRef.removeEventListener(this);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
+                    public void onSuccess(Void aVoid) {
+                        Snackbar.make(rootLayout, "Location changes might take a few minutes to reflect !", Snackbar.LENGTH_LONG).show();
+                        alertDialog.dismiss();
                     }
                 });
-
 
             }
         });
@@ -358,8 +376,16 @@ public class AccountSetting extends AppCompatActivity {
         LayoutInflater inflater = this.getLayoutInflater();
         View viewOptions = inflater.inflate(R.layout.account_choice,null);
 
-        final ImageView google = (ImageView) viewOptions.findViewById(R.id.googleAccount);
-        final ImageView email = (ImageView) viewOptions.findViewById(R.id.emailAccount);
+        final LinearLayout google = (LinearLayout) viewOptions.findViewById(R.id.googleAccount);
+        final LinearLayout email = (LinearLayout) viewOptions.findViewById(R.id.emailAccount);
+        final EditText emailEdt = (EditText) viewOptions.findViewById(R.id.conversionMail);
+        final EditText passwordEdt = (EditText) viewOptions.findViewById(R.id.conversionPassword);
+        final Button convertBtn = (Button) viewOptions.findViewById(R.id.convertButton);
+        final LinearLayout emailConversionLayout = (LinearLayout)viewOptions.findViewById(R.id.emailConvertLayout);
+
+
+        final String newEmail = emailEdt.getText().toString();
+        final String newPassword = passwordEdt.getText().toString();
 
         alertDialog.setView(viewOptions);
 
@@ -382,7 +408,8 @@ public class AccountSetting extends AppCompatActivity {
 
                 if (Common.isConnectedToInternet(AccountSetting.this)){
 
-
+                    Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                    startActivityForResult(signInIntent, RC_SIGN_IN);
 
                 }else {
 
@@ -398,16 +425,113 @@ public class AccountSetting extends AppCompatActivity {
             public void onClick(View v) {
                 if (Common.isConnectedToInternet(AccountSetting.this)){
 
-
+                    emailConversionLayout.setVisibility(View.VISIBLE);
+                    google.setVisibility(View.GONE);
 
                 }else {
 
                     Snackbar.make(rootLayout, "No Internet Access !", Snackbar.LENGTH_LONG).show();
                 }
-                alertDialog.dismiss();
+            }
+        });
+
+        convertBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (Common.isConnectedToInternet(getBaseContext())){
+
+                    if (TextUtils.isEmpty(emailEdt.getText().toString()) || TextUtils.isEmpty(passwordEdt.getText().toString())){
+
+                        Snackbar.make(rootLayout, "Field Can Not Be Empty", Snackbar.LENGTH_SHORT).show();
+
+                    } else if (!isValidEmail(emailEdt.getText().toString())){
+
+                        Snackbar.make(rootLayout, "Invalid Email", Snackbar.LENGTH_SHORT).show();
+
+                    } else if (passwordEdt.getText().toString().length() < 6){
+
+                        Snackbar.make(rootLayout, "Password Too Weak", Snackbar.LENGTH_SHORT).show();
+
+                    } else {
+
+                        /*---   STORE CHOICE   ---*/
+                        Paper.book().write(Common.SIGN_UP_CHOICE, "EMail");
+
+                        AuthCredential credential = EmailAuthProvider.getCredential(emailEdt.getText().toString(), passwordEdt.getText().toString());
+                        resignIn(credential);
+
+                        alertDialog.dismiss();
+
+                    }
+
+                }
+
             }
         });
         alertDialog.show();
 
     }
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (target == null)
+            return false;
+
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
+            if (result.isSuccess()){
+
+                /*---   STORE CHOICE   ---*/
+                Paper.book().write(Common.SIGN_UP_CHOICE, "Google");
+
+
+                GoogleSignInAccount account = result.getSignInAccount();
+                AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+                resignIn(credential);
+
+            } else {
+
+                Snackbar.make(rootLayout, "Conversion Failed !", Snackbar.LENGTH_SHORT).show();
+
+            }
+        }
+    }
+
+    private void resignIn(AuthCredential credential) {
+
+        mAuth.getCurrentUser().linkWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+
+                            Intent reload = new Intent(AccountSetting.this, AccountSetting.class);
+                            startActivity(reload);
+                            finish();
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                        } else {
+
+                            Snackbar.make(rootLayout, "Conversion Failed", Snackbar.LENGTH_SHORT).show();
+
+                        }
+
+                        // ...
+                    }
+                });
+
+    }
+
+
 }

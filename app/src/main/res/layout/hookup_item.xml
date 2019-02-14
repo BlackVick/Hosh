@@ -3,13 +3,14 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="2dp">
+    android:id="@+id/hookupsLayout"
+    android:visibility="gone">
 
     <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        app:corner_radius="3dp"
-        android:id="@+id/hookupsLayout">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        app:corner_radius="3dp">
 
         <ImageView
             android:layout_width="match_parent"

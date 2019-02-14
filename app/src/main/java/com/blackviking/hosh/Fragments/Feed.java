@@ -229,7 +229,6 @@ public class Feed extends Fragment {
                                     .load(imageThumbLink)
                                     .networkPolicy(NetworkPolicy.OFFLINE)
                                     .placeholder(R.drawable.ic_loading_animation)
-                                    .transform(new FaceCenterCrop(400, 400))
                                     .into(viewHolder.posterImage, new Callback() {
                                         @Override
                                         public void onSuccess() {
@@ -241,7 +240,6 @@ public class Feed extends Fragment {
                                             Picasso.with(getContext())
                                                     .load(imageThumbLink)
                                                     .placeholder(R.drawable.ic_loading_animation)
-                                                    .transform(new FaceCenterCrop(400, 400))
                                                     .into(viewHolder.posterImage);
                                         }
                                     });
@@ -473,23 +471,5 @@ public class Feed extends Fragment {
         feedRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        PicassoFaceDetector.releaseDetector();
     }
 }

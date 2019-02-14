@@ -9,66 +9,118 @@
     android:layout_margin="25dp">
 
     <LinearLayout
-        android:layout_margin="20dp"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="2">
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_weight="1"
-            android:layout_width="0dp"
+            android:layout_margin="20dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:animateLayoutChanges="true"
+            android:weightSum="2">
 
-            <ImageView
+            <LinearLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:id="@+id/googleAccount"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@drawable/google_account"
-                android:adjustViewBounds="true"/>
+                android:gravity="center">
 
-            <TextView
-                android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/google_account"
+                    android:adjustViewBounds="true"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Google"
+                    android:textSize="15sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:fontFamily="casual"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Google"
-                android:textSize="15sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:fontFamily="casual"/>
+                android:id="@+id/emailAccount"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/email_account"
+                    android:adjustViewBounds="true"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="E-Mail"
+                    android:textSize="15sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:fontFamily="casual"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_weight="1"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:id="@+id/emailConvertLayout"
+            android:animateLayoutChanges="true"
+            android:visibility="gone"
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/emailAccount"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@drawable/email_account"
-                android:adjustViewBounds="true"/>
-
-            <TextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="E-Mail"
-                android:textSize="15sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:fontFamily="casual"/>
+                android:id="@+id/conversionMail"
+                android:hint="E-Mail"
+                android:drawableStart="@drawable/ic_email"
+                android:drawablePadding="10dp"
+                android:padding="7dp"
+                android:layout_margin="5dp"
+                android:inputType="textEmailAddress"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/conversionPassword"
+                android:hint="Password"
+                android:drawableStart="@drawable/ic_password"
+                android:drawablePadding="10dp"
+                android:padding="7dp"
+                android:layout_margin="5dp"
+                android:inputType="textPassword"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_margin="5dp"
+                android:background="@drawable/buttons"
+                android:text="CONVERT"
+                android:textColor="@color/white"
+                android:id="@+id/convertButton"/>
 
         </LinearLayout>
-
-
-
 
     </LinearLayout>
 
