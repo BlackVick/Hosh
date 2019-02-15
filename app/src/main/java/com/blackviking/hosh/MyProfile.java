@@ -320,45 +320,29 @@ public class MyProfile extends AppCompatActivity {
                 final String newStatus = statusEdt.getText().toString();
                 final String newBio = editBio.getText().toString();
 
+                if (!newStatus.equalsIgnoreCase("")){
 
-                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        UserModel currentUserUpdate2 = dataSnapshot.getValue(UserModel.class);
+                    userRef.child(currentUid).child("status").setValue(newStatus);
 
-                        if (!newStatus.equals(currentUserUpdate2.getStatus()) || !selectedGender.equals(currentUserUpdate2.getSex())
-                                || !newBio.equals(currentUserUpdate2.getBio()) || !selectedInterest.equals(currentUserUpdate2.getLookingFor())){
+                }
 
-                            final Map<String, Object> profileUpdate = new HashMap<>();
-                            profileUpdate.put("status", newStatus);
-                            profileUpdate.put("sex", selectedGender);
-                            profileUpdate.put("lookingFor", selectedInterest);
-                            profileUpdate.put("bio", newBio);
+                if (!selectedGender.equalsIgnoreCase("")){
 
-                            final android.app.AlertDialog waitingDialog = new SpotsDialog(MyProfile.this, "Update Processing . . .");
-                            waitingDialog.show();
+                    userRef.child(currentUid).child("sex").setValue(selectedGender);
 
-                            userRef.child(currentUid).updateChildren(profileUpdate).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    waitingDialog.dismiss();
-                                    alertDialog.dismiss();
-                                    Snackbar.make(rootLayout, "Profile Updated !", Snackbar.LENGTH_LONG).show();
-                                }
-                            });
+                }
 
-                        }
+                if (!selectedInterest.equalsIgnoreCase("")){
 
-                    }
+                    userRef.child(currentUid).child("lookingFor").setValue(selectedInterest);
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                }
 
-                    }
-                });
+                if (!newBio.equalsIgnoreCase("")){
 
+                    userRef.child(currentUid).child("bio").setValue(newBio);
 
-
+                }
                 alertDialog.dismiss();
             }
         });

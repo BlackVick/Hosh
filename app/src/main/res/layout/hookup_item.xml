@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/hookupsLayout"
         android:layout_margin="2dp"
-        app:corner_radius="3dp">
+        app:corner_radius="3dp"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="match_parent"
@@ -35,7 +36,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/myLayout"
         android:layout_margin="2dp"
-        app:corner_radius="3dp">
+        app:corner_radius="3dp"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="match_parent"
@@ -43,8 +45,6 @@
             android:adjustViewBounds="true"
             android:src="@drawable/hosh_logo_faded_white"
             android:scaleType="centerInside"/>
-
-
 
     </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
 
