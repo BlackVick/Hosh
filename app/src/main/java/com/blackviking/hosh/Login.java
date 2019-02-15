@@ -35,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout;
 
+import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -53,6 +54,7 @@ public class Login extends AppCompatActivity {
     private static final int REVEAL_BUTTONS_TIME = 2500;
     private Button google, email, anonymous;
     private RoundKornerRelativeLayout buttonSLayout;
+    private android.app.AlertDialog mDialog;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -414,6 +416,9 @@ public class Login extends AppCompatActivity {
 
         if (FirebaseAuth.getInstance().getCurrentUser() !=  null){
 
+            mDialog = new SpotsDialog(Login.this, "Processing . . .");
+            mDialog.show();
+
             final String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
             final String signInChoice = Paper.book().read(Common.SIGN_UP_CHOICE);
 
@@ -425,6 +430,7 @@ public class Login extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()){
 
+                            mDialog.dismiss();
                             Intent newGoogleUser = new Intent(Login.this, NewGoogleUser.class);
                             startActivity(newGoogleUser);
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -432,6 +438,7 @@ public class Login extends AppCompatActivity {
 
                         } else {
 
+                            mDialog.dismiss();
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);
@@ -456,6 +463,7 @@ public class Login extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()){
 
+                            mDialog.dismiss();
                             Intent newGoogleUser = new Intent(Login.this, NewEmailUser.class);
                             startActivity(newGoogleUser);
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -463,6 +471,7 @@ public class Login extends AppCompatActivity {
 
                         } else {
 
+                            mDialog.dismiss();
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);
@@ -487,6 +496,7 @@ public class Login extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.exists()){
 
+                            mDialog.dismiss();
                             Intent newFacebookUser = new Intent(Login.this, NewAnonymousUser.class);
                             startActivity(newFacebookUser);
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -494,6 +504,7 @@ public class Login extends AppCompatActivity {
 
                         } else {
 
+                            mDialog.dismiss();
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);

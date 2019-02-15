@@ -212,7 +212,7 @@ public class HookUp extends Fragment {
 
     private void loadHookups(final String currentUid) {
 
-        mDialog = new SpotsDialog(getContext(), "Getting Potential Hookups Close To You . . .");
+        mDialog = new SpotsDialog(getContext(), "Searching . . .");
         mDialog.show();
 
         adapter = new FirebaseRecyclerAdapter<UserModel, HookupViewHolder>(

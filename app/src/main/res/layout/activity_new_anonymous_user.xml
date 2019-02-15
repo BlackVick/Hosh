@@ -74,55 +74,52 @@
                 android:drawableTint="@color/colorPrimaryDark"
                 android:drawablePadding="15dp"/>
 
-            <RadioGroup
+            <Spinner
+                android:id="@+id/genderSpinner"
+                android:layout_width="match_parent"
+                android:layout_margin="10dp"
+                android:textSize="18sp"
+                android:layout_height="50dp"
+                android:background="@drawable/white_backround_ripple_news"/>
+
+            <Spinner
+                android:id="@+id/interestSpinner"
+                android:layout_width="match_parent"
+                android:layout_margin="10dp"
+                android:textSize="18sp"
+                android:layout_height="50dp"
+                android:background="@drawable/white_backround_ripple_news"/>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="2"
-                android:id="@+id/sexGroup">
+                android:weightSum="10"
+                android:layout_margin="5dp">
 
-                <RadioButton
+                <com.rey.material.widget.CheckBox
+                    android:id="@+id/privacyPolicyCheck"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.5"
                     android:layout_height="wrap_content"
-                    android:text="Male"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="18sp"
-                    android:layout_margin="4dp"
-                    android:id="@+id/maleRadio"/>
+                    style="@style/Material.Drawable.CheckBox"
+                    android:gravity="center_vertical|center_horizontal"
+                    app:cbd_strokeColor="@color/white"
+                    app:cbd_tickColor="@color/colorPrimaryDark"/>
 
-                <RadioButton
+                <TextView
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="8.5"
                     android:layout_height="wrap_content"
-                    android:text="Female"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="18sp"
-                    android:layout_margin="4dp"
-                    android:id="@+id/femaleRadio"/>
+                    android:id="@+id/policyTextView"
+                    android:text=""
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:gravity="start"
+                    android:layout_gravity="center_vertical"/>
 
-            </RadioGroup>
+            </LinearLayout>
 
-            <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/userSexRegEdt"
-                android:inputType="text"
-                android:hint="Sex"
-                android:text=""
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
-                android:textSize="18sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:met_singleLineEllipsis="true"
-                app:met_baseColor="@color/white"
-                app:met_floatingLabelAnimating="true"
-                app:met_floatingLabel="highlight"
-                app:met_primaryColor="@color/white"
-                app:met_clearButton="true"
-                android:drawableStart="@drawable/ic_person_hollow"
-                android:drawableTint="@color/colorPrimaryDark"
-                android:drawablePadding="15dp"
-                android:visibility="gone"/>
 
         </LinearLayout>
 
