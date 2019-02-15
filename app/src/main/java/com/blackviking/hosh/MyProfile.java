@@ -78,6 +78,7 @@ public class MyProfile extends AppCompatActivity {
     private Button openGallery;
     private String selectedGender = "";
     private String selectedInterest = "";
+    private android.app.AlertDialog mDialog;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -316,6 +317,9 @@ public class MyProfile extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                mDialog = new SpotsDialog(MyProfile.this, "Updating . . .");
+                mDialog.show();
+
 
                 final String newStatus = statusEdt.getText().toString();
                 final String newBio = editBio.getText().toString();
@@ -343,6 +347,8 @@ public class MyProfile extends AppCompatActivity {
                     userRef.child(currentUid).child("bio").setValue(newBio);
 
                 }
+
+                mDialog.dismiss();
                 alertDialog.dismiss();
             }
         });
