@@ -246,11 +246,16 @@ public class Login extends AppCompatActivity {
 
     private void signInAnonymously() {
 
+        mDialog = new SpotsDialog(Login.this, "Processing . . .");
+        mDialog.show();
+
         mAuth.signInAnonymously()
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+
+                            mDialog.dismiss();
 
                             Log.d(TAG, "signInAnonymously:success");
 
@@ -272,6 +277,7 @@ public class Login extends AppCompatActivity {
 
                         } else {
 
+                            mDialog.dismiss();
                             Snackbar.make(rootLayout, "Anonymous Authentication failed.", Snackbar.LENGTH_LONG).show();
 
                         }
@@ -329,6 +335,9 @@ public class Login extends AppCompatActivity {
 
     private void handleSignInResponse(int resultCode, Intent data) {
 
+        mDialog = new SpotsDialog(Login.this, "Processing . . .");
+        mDialog.show();
+
         if (resultCode == RESULT_OK) {
 
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
@@ -343,6 +352,7 @@ public class Login extends AppCompatActivity {
 
                         if (!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
 
+                            mDialog.dismiss();
                             FirebaseAuth.getInstance().getCurrentUser()
                                     .sendEmailVerification();
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -350,6 +360,7 @@ public class Login extends AppCompatActivity {
 
                         } else {
 
+                            mDialog.dismiss();
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             updateUI(user);
 
@@ -358,12 +369,17 @@ public class Login extends AppCompatActivity {
                     }
                 });
 
+            } else {
+
+                mDialog.dismiss();
+
             }
 
 
 
         } else {
 
+            mDialog.dismiss();
             Snackbar.make(rootLayout, "Login Failed !", Snackbar.LENGTH_LONG).show();
             finish();
 
@@ -372,6 +388,10 @@ public class Login extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+
+        mDialog = new SpotsDialog(Login.this, "Processing . . .");
+        mDialog.show();
+
         Log.d("LOGIN", "firebaseAuthWithGoogle:" + acct.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -383,6 +403,7 @@ public class Login extends AppCompatActivity {
 
                             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
 
+                                mDialog.dismiss();
                                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                                 authed.child(uid).setValue("true").addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
@@ -400,10 +421,15 @@ public class Login extends AppCompatActivity {
 
 
 
+                            } else {
+
+                                mDialog.dismiss();
+
                             }
 
                         } else {
 
+                            mDialog.dismiss();
                             Snackbar.make(rootLayout, "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                         }
 
