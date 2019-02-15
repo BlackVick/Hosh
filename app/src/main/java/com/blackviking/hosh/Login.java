@@ -559,7 +559,7 @@ public class Login extends AppCompatActivity {
         super.onStart();
 
         final String localUser = Paper.book().read(Common.USER_ID);
-        if (localUser != null){
+        if (localUser != null && mAuth.getCurrentUser() != null){
 
             if (!localUser.isEmpty()){
 
