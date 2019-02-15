@@ -21,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -252,13 +253,20 @@ public class Login extends AppCompatActivity {
                             Log.d(TAG, "signInAnonymously:success");
 
                             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                            authed.child(uid).setValue("true");
+                            authed.child(uid).setValue("true").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
 
-                            /*---   STORE CHOICE   ---*/
-                            Paper.book().write(Common.SIGN_UP_CHOICE, "Anonymous");
+                                    /*---   STORE CHOICE   ---*/
+                                    Paper.book().write(Common.SIGN_UP_CHOICE, "Anonymous");
 
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    updateUI(user);
+
+                                }
+                            });
+
+
 
                         } else {
 
@@ -324,24 +332,29 @@ public class Login extends AppCompatActivity {
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
 
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                authed.child(uid).setValue("true");
+                authed.child(uid).setValue("true").addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
 
-                /*---   STORE CHOICE   ---*/
-                Paper.book().write(Common.SIGN_UP_CHOICE, "EMail");
+                        /*---   STORE CHOICE   ---*/
+                        Paper.book().write(Common.SIGN_UP_CHOICE, "EMail");
 
-                if (!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+                        if (!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
 
-                    FirebaseAuth.getInstance().getCurrentUser()
-                            .sendEmailVerification();
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    updateUI(user);
+                            FirebaseAuth.getInstance().getCurrentUser()
+                                    .sendEmailVerification();
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            updateUI(user);
 
-                } else {
+                        } else {
 
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    updateUI(user);
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            updateUI(user);
 
-                }
+                        }
+
+                    }
+                });
 
             }
 
@@ -369,14 +382,21 @@ public class Login extends AppCompatActivity {
                             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
 
                                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                                authed.child(uid).setValue("true");
+                                authed.child(uid).setValue("true").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        /*---   STORE CHOICE   ---*/
+                                        Paper.book().write(Common.SIGN_UP_CHOICE, "Google");
+
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        updateUI(user);
+
+                                    }
+                                });
 
 
-                                /*---   STORE CHOICE   ---*/
-                                Paper.book().write(Common.SIGN_UP_CHOICE, "Google");
 
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                updateUI(user);
 
                             }
 
@@ -397,12 +417,20 @@ public class Login extends AppCompatActivity {
             final String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
             final String signInChoice = Paper.book().read(Common.SIGN_UP_CHOICE);
 
+
             if (signInChoice.equals("Google")){
 
-                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()){
+                        if (!dataSnapshot.exists()){
+
+                            Intent newGoogleUser = new Intent(Login.this, NewGoogleUser.class);
+                            startActivity(newGoogleUser);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            finish();
+
+                        } else {
 
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
@@ -410,14 +438,9 @@ public class Login extends AppCompatActivity {
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
-                        } else {
-
-                            Intent newGoogleUser = new Intent(Login.this, NewGoogleUser.class);
-                            startActivity(newGoogleUser);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                            finish();
-
                         }
+
+                        userRef.removeEventListener(this);
                     }
 
                     @Override
@@ -428,10 +451,17 @@ public class Login extends AppCompatActivity {
 
             } else if (signInChoice.equals("EMail")){
 
-                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()){
+                        if (!dataSnapshot.exists()){
+
+                            Intent newGoogleUser = new Intent(Login.this, NewEmailUser.class);
+                            startActivity(newGoogleUser);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            finish();
+
+                        } else {
 
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
@@ -439,14 +469,9 @@ public class Login extends AppCompatActivity {
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
-                        } else {
-
-                            Intent newGoogleUser = new Intent(Login.this, NewEmailUser.class);
-                            startActivity(newGoogleUser);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                            finish();
-
                         }
+
+                        userRef.removeEventListener(this);
                     }
 
                     @Override
@@ -457,10 +482,17 @@ public class Login extends AppCompatActivity {
 
             } else if (signInChoice.equals("Anonymous")){
 
-                userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()){
+                        if (!dataSnapshot.exists()){
+
+                            Intent newFacebookUser = new Intent(Login.this, NewAnonymousUser.class);
+                            startActivity(newFacebookUser);
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            finish();
+
+                        } else {
 
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
@@ -468,14 +500,9 @@ public class Login extends AppCompatActivity {
                             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
-                        } else {
-
-                            Intent newFacebookUser = new Intent(Login.this, NewAnonymousUser.class);
-                            startActivity(newFacebookUser);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                            finish();
-
                         }
+
+                        userRef.removeEventListener(this);
                     }
 
                     @Override

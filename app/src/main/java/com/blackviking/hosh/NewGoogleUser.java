@@ -166,7 +166,7 @@ public class NewGoogleUser extends AppCompatActivity {
 
         /*---   DATE JOINED   ---*/
         final long date = System.currentTimeMillis();
-        final SimpleDateFormat sdf = new SimpleDateFormat("dd mmm, yyyy");
+        final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM, yyyy");
         final String dateString = sdf.format(date);
 
 
