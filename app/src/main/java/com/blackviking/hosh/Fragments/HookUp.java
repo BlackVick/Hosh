@@ -2,6 +2,7 @@ package com.blackviking.hosh.Fragments;
 
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -30,6 +31,7 @@ import com.blackviking.hosh.Settings.Faq;
 import com.blackviking.hosh.ViewHolder.FeedViewHolder;
 import com.blackviking.hosh.ViewHolder.HookupViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,7 +55,7 @@ public class HookUp extends Fragment {
     private RecyclerView hookupRecycler;
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<UserModel, HookupViewHolder> adapter;
-    private String currentUid, sexToHaunt;
+    private String currentUid, sexToHaunt = "";
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference userRef;
@@ -70,7 +72,7 @@ public class HookUp extends Fragment {
 
 
         /*---   IMAGE FACE DETECTION   ---*/
-        PicassoFaceDetector.initialize(getContext());
+        PicassoFaceDetector.initialize(getActivity().getApplicationContext());
 
 
         /*---   PAPER DB   ---*/
@@ -105,7 +107,9 @@ public class HookUp extends Fragment {
         activityName.setText("Hookup");
 
 
-
+        /*---   DIALOG   ---*/
+        mDialog = new SpotsDialog(getContext(), "Searching . . .");
+        mDialog.show();
 
 
         /*---   HELP   ---*/
@@ -138,34 +142,96 @@ public class HookUp extends Fragment {
                     if (myInterest.equalsIgnoreCase("Women")){
 
                         sexToHaunt = "Men";
-                        loadHookups(currentUid);
+
+                        /*---   LOAD   ---*/
+                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                if (dataSnapshot.exists()){
+
+                                    mDialog.dismiss();
+                                    loadHookups(currentUid);
+
+                                } else {
+
+                                    mDialog.dismiss();
+                                    openNoMatchFound();
+
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
 
                     } else if (myInterest.equalsIgnoreCase("Men")){
 
                         sexToHaunt = "Women";
-                        loadHookups(currentUid);
+
+                        /*---   LOAD   ---*/
+                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                if (dataSnapshot.exists()){
+
+                                    mDialog.dismiss();
+                                    loadHookups(currentUid);
+
+                                } else {
+
+                                    mDialog.dismiss();
+                                    openNoMatchFound();
+
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
 
                     } else if (myInterest.equalsIgnoreCase("Groupie")){
 
                         sexToHaunt = "Groupie";
-                        loadHookups(currentUid);
 
-                    } else if (mySex.equalsIgnoreCase("Male")){
+                        /*---   LOAD   ---*/
+                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        sexToHaunt = "Men";
-                        loadHookups(currentUid);
+                                if (dataSnapshot.exists()){
 
-                    } else if (mySex.equalsIgnoreCase("Female")){
+                                    mDialog.dismiss();
+                                    loadHookups(currentUid);
 
-                        sexToHaunt = "Female";
-                        loadHookups(currentUid);
+                                } else {
 
-                    } else if (mySex.equalsIgnoreCase("Indifferent")){
+                                    mDialog.dismiss();
+                                    openNoMatchFound();
 
-                        sexToHaunt = "Groupie";
-                        loadHookups(currentUid);
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
 
                     }
+
+                    userRef.removeEventListener(this);
 
                 }
 
@@ -212,9 +278,6 @@ public class HookUp extends Fragment {
 
     private void loadHookups(final String currentUid) {
 
-        mDialog = new SpotsDialog(getContext(), "Searching . . .");
-        mDialog.show();
-
         adapter = new FirebaseRecyclerAdapter<UserModel, HookupViewHolder>(
                 UserModel.class,
                 R.layout.hookup_item,
@@ -222,17 +285,15 @@ public class HookUp extends Fragment {
                 userRef.orderByChild("lookingFor").equalTo(sexToHaunt)
         ) {
             @Override
-            protected void populateViewHolder(HookupViewHolder viewHolder, UserModel model, int position) {
+            protected void populateViewHolder(final HookupViewHolder viewHolder, final UserModel model, int position) {
 
                 final String ids = adapter.getRef(position).getKey();
 
-                mDialog.dismiss();
-
-                if (!ids.equals(currentUid)){
+                if (!ids.equals(currentUid)) {
 
                     viewHolder.theLayout.setVisibility(View.VISIBLE);
 
-                    if (!model.getProfilePictureThumb().equals("")){
+                    if (!model.getProfilePictureThumb().equals("")) {
 
                         Picasso.with(getContext())
                                 .load(model.getProfilePictureThumb())
@@ -248,7 +309,7 @@ public class HookUp extends Fragment {
 
 
                     /*---    ONLINE STATUS   ---*/
-                    if (model.getOnlineState().equalsIgnoreCase("Online")){
+                    if (model.getOnlineState().equalsIgnoreCase("Online")) {
 
                         viewHolder.onlineIndicator.setVisibility(View.VISIBLE);
 
@@ -274,12 +335,32 @@ public class HookUp extends Fragment {
 
                 }
 
-
-
             }
         };
         hookupRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+
+    }
+
+    private void openNoMatchFound() {
+
+        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getContext())
+                .setTitle("No Match !")
+                .setIcon(R.drawable.ic_action_account)
+                .setMessage("There are no more matches in your area")
+                .setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+
+                    }
+                })
+                .create();
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.show();
 
     }
 

@@ -122,6 +122,11 @@ public class ProfileImageView extends AppCompatActivity {
                                 }
                             });
 
+                } else {
+
+                    waitingDialog.dismiss();
+                    image.setImageResource(R.drawable.empty_profile);
+
                 }
 
             }

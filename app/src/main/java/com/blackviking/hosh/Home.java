@@ -21,15 +21,27 @@ import com.blackviking.hosh.Fragments.Feed;
 import com.blackviking.hosh.Fragments.HookUp;
 import com.blackviking.hosh.Fragments.Hopdate;
 import com.blackviking.hosh.Fragments.Messaging;
+import com.blackviking.hosh.Settings.AccountSetting;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Field;
 
+import io.paperdb.Paper;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class Home extends AppCompatActivity {
 
     private ImageView feed, hookup, hopdate, messaging, account;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private FirebaseDatabase db = FirebaseDatabase.getInstance();
+    private DatabaseReference userRef;
+    private String currentUid;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -47,6 +59,40 @@ public class Home extends AppCompatActivity {
                 .build());
 
         setContentView(R.layout.activity_home);
+
+
+        /*---   FIREBASE   ---*/
+        if (mAuth.getCurrentUser() != null)
+            currentUid = mAuth.getCurrentUser().getUid();
+        userRef = db.getReference("Users");
+
+
+        /*---   SECURITY MEASURE   ---*/
+        userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String status = dataSnapshot.child("userType").getValue().toString();
+
+                if (status.equalsIgnoreCase("Watched")){
+
+                    FirebaseAuth.getInstance().signOut();
+                    Paper.book().destroy();
+                    Intent signoutIntent = new Intent(Home.this, Login.class);
+                    signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(signoutIntent);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    finish();
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         /*---   FRAGMENTS   ---*/
@@ -161,6 +207,8 @@ public class Home extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+
+    /*---   SUBJECT TO REMOVAL IF ALL FARES WELL   ---*/
     @SuppressLint("RestrictedApi")
     public static void disableShiftMode(BottomNavigationView view) {
         BottomNavigationMenuView menuView = (BottomNavigationMenuView) view.getChildAt(0);
