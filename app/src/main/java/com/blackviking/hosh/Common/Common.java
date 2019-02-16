@@ -12,6 +12,11 @@ public class Common {
     public static final String GOOD_TO_GO = "GoToGo";
 
 
+    /*---   CONTEXT MENU   ---*/
+    public static final String DELETE_BOTH = "Retract Message";
+    public static final String DELETE_SINGLE = "Delete Message";
+
+
     /*---   CHECK FOR INTERNET   ---*/
     public static boolean isConnectedToInternet(Context context)    {
         ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);

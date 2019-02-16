@@ -387,7 +387,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
         android:src="@drawable/ic_message_user"
-        android:visibility="visible"
+        android:visibility="gone"
         app:backgroundTint="@color/ButtonAlt"
         app:layout_anchorGravity="bottom|right|end"
         app:elevation="6dp"

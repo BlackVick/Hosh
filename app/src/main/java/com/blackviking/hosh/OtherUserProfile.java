@@ -150,21 +150,37 @@ public class OtherUserProfile extends AppCompatActivity {
 
         /*---   FAB VISIBILITY   ---*/
         if (Common.isConnectedToInternet(getBaseContext())){
-            messageUserFab.setVisibility(View.VISIBLE);
             followUserFab.setVisibility(View.VISIBLE);
         } else {
-            messageUserFab.setVisibility(View.GONE);
             followUserFab.setVisibility(View.GONE);
         }
 
 
-        /*---   FABs   ---*/
-        messageUserFab.setOnClickListener(new View.OnClickListener() {
+
+        /*---   MESSAGING FAB   ---*/
+        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                Snackbar.make(rootLayout, "Messaging Under Dev !", Snackbar.LENGTH_LONG).show();
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                messageUserFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent messagingIntent = new Intent(OtherUserProfile.this, Messaging.class);
+                        messagingIntent.putExtra("UserId", userId);
+                        messagingIntent.putExtra("UserName", dataSnapshot.child("userName").getValue().toString());
+                        startActivity(messagingIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
+
+
+
 
         userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
             @Override
@@ -193,6 +209,8 @@ public class OtherUserProfile extends AppCompatActivity {
                         }
                     });
 
+                    /*---   FABs   ---*/
+                    messageUserFab.setVisibility(View.VISIBLE);
 
                 } else {
 

@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.blackviking.hosh.Fragments.Messaging">
+    tools:context="com.blackviking.hosh.Fragments.Messages">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_centerInParent="true"
+    <include layout="@layout/snippet_for_general"/>
+
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Messaging" />
+        android:layout_marginTop="?attr/actionBarSize"
+        android:id="@+id/chatRecycler"/>
 
 </RelativeLayout>

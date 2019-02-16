@@ -3,7 +3,6 @@ package com.blackviking.hosh;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
@@ -12,7 +11,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -20,8 +18,7 @@ import com.blackviking.hosh.Fragments.Account;
 import com.blackviking.hosh.Fragments.Feed;
 import com.blackviking.hosh.Fragments.HookUp;
 import com.blackviking.hosh.Fragments.Hopdate;
-import com.blackviking.hosh.Fragments.Messaging;
-import com.blackviking.hosh.Settings.AccountSetting;
+import com.blackviking.hosh.Fragments.Messages;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -99,7 +96,7 @@ public class Home extends AppCompatActivity {
         final Feed feedFragment = new Feed();
         final HookUp hookupFragment = new HookUp();
         final Hopdate hopdateFragment = new Hopdate();
-        final Messaging messagingFragment = new Messaging();
+        final Messages messagesFragment = new Messages();
         final Account accountFragment = new Account();
 
 
@@ -161,7 +158,7 @@ public class Home extends AppCompatActivity {
                 messaging.setBackgroundResource(R.color.bottom_nav_clicked);
                 account.setBackgroundResource(R.drawable.white_grey_border_top);
 
-                setFragment(messagingFragment);
+                setFragment(messagesFragment);
             }
         });
 

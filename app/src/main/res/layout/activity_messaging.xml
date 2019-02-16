@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.blackviking.hosh.Messaging"
+    android:animateLayoutChanges="true"
+    android:id="@+id/messagingRootLayout">
+
+    <include layout="@layout/snippet_for_chat"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/messagingRecycler"
+            android:layout_margin="5dp"
+            android:layout_above="@id/chatInputController"></android.support.v7.widget.RecyclerView>
+
+        <include
+            layout="@layout/chat_input_box"
+            android:id="@+id/chatInputController"
+            android:layout_alignParentBottom="true"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_margin="4dp"/>
+
+
+    </RelativeLayout>
+
+</RelativeLayout>
