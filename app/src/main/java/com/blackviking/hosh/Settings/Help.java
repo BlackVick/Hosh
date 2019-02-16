@@ -21,7 +21,7 @@ public class Help extends AppCompatActivity {
     private ImageView exitActivity, help;
     private TextView activityName;
     private RelativeLayout rootLayout;
-    private TextView faq, contactUs, privacyPolicy, appInfo;
+    private TextView faq, contactUs, privacyPolicy, appInfo, terms;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -50,6 +50,7 @@ public class Help extends AppCompatActivity {
         contactUs = (TextView)findViewById(R.id.contactUs);
         privacyPolicy = (TextView)findViewById(R.id.privacyPolicy);
         appInfo = (TextView)findViewById(R.id.appInfo);
+        terms = (TextView)findViewById(R.id.termOfUse);
 
 
         /*---   ACTIVITY NAME   ---*/
@@ -86,7 +87,7 @@ public class Help extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setData(Uri.parse("mailto:"));
-                String[] to = {"bv.inc@gmail.com"};
+                String[] to = {"blackvikinc@gmail.com"};
                 intent.putExtra(Intent.EXTRA_EMAIL, to);
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Hosh !");
                 intent.putExtra(Intent.EXTRA_TEXT, "Please Describe Your Enquiry Below, Also Provide Screenshots If Available As Well For Complaints");
@@ -102,10 +103,25 @@ public class Help extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String policyUrl = "http://www.teenqtech.com/customer-service-privacy-policy";
+                String policyUrl = "https://www.freeprivacypolicy.com/privacy/view/2fedeaa03584b40c4de4f0f6c6f09f2b";
 
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(policyUrl));
+                startActivity(i);
+
+            }
+        });
+
+
+        /*---   TERMS OF USE   ---*/
+        terms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String termsUrl = "https://www.freeprivacypolicy.com/terms/view/9ed4017380d75a141eec8651ca9c2a5d";
+
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(termsUrl));
                 startActivity(i);
 
             }

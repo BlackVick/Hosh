@@ -52,8 +52,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/white_backround_ripple_chats"
+            android:id="@+id/termOfUse"
+            android:text="Terms of Use"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:padding="15dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.2dp"
+            android:background="@color/offBlack"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_backround_ripple_chats"
             android:id="@+id/privacyPolicy"
-            android:text="Terms and Privacy Policy"
+            android:text="Privacy Policy"
             android:textSize="16sp"
             android:textColor="@color/colorPrimaryDark"
             android:padding="15dp"/>
