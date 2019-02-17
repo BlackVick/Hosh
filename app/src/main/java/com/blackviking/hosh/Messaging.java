@@ -95,6 +95,7 @@ public class Messaging extends AppCompatActivity {
     private android.app.AlertDialog mDialog;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference imageRef, imageThumbRef;
+    private String charSequence = "1234567890-=!@#$%^&*()_+QWERTYUIOPASDFGHJKLZXCVBNM<>?:{}|qwertyuiop[];lkjhgfdsazxcvbnm,./";
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -270,6 +271,10 @@ public class Messaging extends AppCompatActivity {
 
                     stg.replace(" ", "");
 
+                } else  if (stg.length() > 0 && stg.contains(charSequence)){
+
+                    sendMessageBtn.setVisibility(View.VISIBLE);
+
                 } else if (stg.length() > 0){
 
                     sendMessageBtn.setVisibility(View.VISIBLE);
@@ -340,8 +345,8 @@ public class Messaging extends AppCompatActivity {
 
                         if (model.getRead().equals("false")){
 
-                            messageRef.child(adapter.getRef(position).getKey()).child("read").setValue("true");
-                            messageListRef.child(adapter.getRef(position).getKey()).child("read").setValue("true");
+                            messageRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
+                            messageListRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
 
                         }
 
@@ -427,8 +432,8 @@ public class Messaging extends AppCompatActivity {
 
                         if (model.getRead().equals("false")){
 
-                            messageRef.child(adapter.getRef(position).getKey()).child("read").setValue("true");
-                            messageListRef.child(adapter.getRef(position).getKey()).child("read").setValue("true");
+                            messageRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
+                            messageListRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
 
                         }
 
@@ -476,11 +481,11 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.otherTextTimeStamp.setText(model.getTimeStamp());
 
 
-                        if (model.getRead().equals("false")){
+                        /*if (model.getRead().equals("false")){
 
                             messageRef.child(adapter.getRef(position).getKey()).child("read").setValue("true");
 
-                        }
+                        }*/
 
                     }
 
@@ -924,8 +929,8 @@ public class Messaging extends AppCompatActivity {
                                             final MessageModel newChatFriend = new MessageModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Image", currentUid);
 
 
-                                            final MessageListModel newChatList = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl, dateString, "true", "Text", currentUid, currentUid, currentUid, friendId);
-                                            final MessageListModel newChatListFriend = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Text", currentUid, friendId, friendId, currentUid);
+                                            final MessageListModel newChatList = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl, dateString, "true", "Image", currentUid, currentUid, currentUid, friendId);
+                                            final MessageListModel newChatListFriend = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Image", currentUid, friendId, friendId, currentUid);
 
 
                                             messageRef.child(pushId).setValue(newChat).addOnSuccessListener(new OnSuccessListener<Void>() {
