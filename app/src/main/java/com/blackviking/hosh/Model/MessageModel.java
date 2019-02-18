@@ -9,11 +9,12 @@ public class MessageModel {
     private String read;
     private String type;
     private String from;
+    private String sessionId;
 
     public MessageModel() {
     }
 
-    public MessageModel(String id, String message, String messageThumb, String timeStamp, String read, String type, String from) {
+    public MessageModel(String id, String message, String messageThumb, String timeStamp, String read, String type, String from, String sessionId) {
         this.id = id;
         this.message = message;
         this.messageThumb = messageThumb;
@@ -21,6 +22,7 @@ public class MessageModel {
         this.read = read;
         this.type = type;
         this.from = from;
+        this.sessionId = sessionId;
     }
 
     public String getId() {
@@ -77,5 +79,13 @@ public class MessageModel {
 
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

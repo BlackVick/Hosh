@@ -243,6 +243,7 @@ public class HookUp extends Fragment {
 
         } else {
 
+            mDialog.dismiss();
             showNoInternetDialog();
 
         }

@@ -14,11 +14,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blackviking.hosh.Interface.ItemClickListener;
+import com.blackviking.hosh.Model.UserModel;
 import com.blackviking.hosh.Settings.Faq;
+import com.blackviking.hosh.ViewHolder.UserListViewHolder;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
+import com.squareup.picasso.Picasso;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -32,8 +40,9 @@ public class UserListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userListsRef;
+    private DatabaseReference userListsRef, userRef;
     private String currentUid, activityType;
+    private FirebaseRecyclerAdapter<UserModel, UserListViewHolder> adapter;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -64,6 +73,7 @@ public class UserListActivity extends AppCompatActivity {
 
         /*---   FIREBASE   ---*/
         userListsRef = db.getReference("Users").child(currentUid).child(activityType);
+        userRef = db.getReference("Users");
 
 
         /*---   WIDGETS   ---*/
@@ -101,6 +111,71 @@ public class UserListActivity extends AppCompatActivity {
         /*---   RECYCLER CONTROLLER   ---*/
         userListsRecycler.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
         userListsRecycler.setLayoutManager(layoutManager);
+
+        if (mAuth.getCurrentUser() != null)
+            loadUserList();
+    }
+
+    private void loadUserList() {
+
+        adapter = new FirebaseRecyclerAdapter<UserModel, UserListViewHolder>(
+                UserModel.class,
+                R.layout.user_item_layout,
+                UserListViewHolder.class,
+                userListsRef
+        ) {
+            @Override
+            protected void populateViewHolder(final UserListViewHolder viewHolder, UserModel model, int position) {
+
+                final String userId = adapter.getRef(position).getKey();
+
+                userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        String theUserName = dataSnapshot.child("userName").getValue().toString();
+                        String theUserStatus = dataSnapshot.child("status").getValue().toString();
+                        String theUserOnlineStatus = dataSnapshot.child("onlineState").getValue().toString();
+                        String theUserImage = dataSnapshot.child("profilePictureThumb").getValue().toString();
+
+                        viewHolder.name.setText("@"+theUserName);
+                        viewHolder.status.setText(theUserStatus);
+                        viewHolder.onlineStat.setText(theUserOnlineStatus);
+
+                        if (!theUserImage.equals("")){
+
+                            Picasso.with(getBaseContext())
+                                    .load(theUserImage)
+                                    .placeholder(R.drawable.ic_loading_animation)
+                                    .into(viewHolder.userImage);
+
+                        }
+
+                        viewHolder.setItemClickListener(new ItemClickListener() {
+                            @Override
+                            public void onClick(View view, int position, boolean isLongClick) {
+                                Intent userIntent = new Intent(UserListActivity.this, OtherUserProfile.class);
+                                userIntent.putExtra("UserId", userId);
+                                startActivity(userIntent);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+        };
+        userListsRecycler.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
     }
 }

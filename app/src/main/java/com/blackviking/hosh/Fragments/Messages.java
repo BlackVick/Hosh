@@ -40,7 +40,7 @@ public class Messages extends Fragment {
     private RecyclerView chatRecycler;
     private LinearLayoutManager layoutManager;
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference chatRef, userRef, chatListRef;
+    private DatabaseReference chatRef, userRef, chatListRef, sessionIdRef;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseRecyclerAdapter<MessageListModel, MessagesViewHolder> adapter;
     private String currentUid;
@@ -61,6 +61,7 @@ public class Messages extends Fragment {
 
         chatRef = db.getReference("Users").child(currentUid).child("Messages");
         chatListRef = db.getReference("Users").child(currentUid).child("MessageList");
+        sessionIdRef = db.getReference("Users").child(currentUid).child("MessageSessions");
         userRef = db.getReference("Users");
 
 
@@ -116,7 +117,7 @@ public class Messages extends Fragment {
                 MessageListModel.class,
                 R.layout.messages_item,
                 MessagesViewHolder.class,
-                chatListRef.orderByChild("to").equalTo(currentUid)
+                chatListRef
         ) {
             @Override
             protected void populateViewHolder(final MessagesViewHolder viewHolder, final MessageListModel model, final int position) {
@@ -149,8 +150,9 @@ public class Messages extends Fragment {
 
 
 
-                if (model.getYou() != null) {
-                    userRef.child(model.getYou()).addListenerForSingleValueEvent(new ValueEventListener() {
+                if (!model.getFrom().equals(currentUid)) {
+
+                    userRef.child(model.getFrom()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -186,14 +188,81 @@ public class Messages extends Fragment {
                                 @Override
                                 public void onClick(View view, int position, boolean isLongClick) {
                                     Intent messagingIntent = new Intent(getContext(), Messaging.class);
-                                    messagingIntent.putExtra("UserId", model.getYou());
+                                    messagingIntent.putExtra("UserId", model.getFrom());
                                     messagingIntent.putExtra("UserName", userName);
-                                    messagingIntent.putExtra("UserImage", image);
                                     startActivity(messagingIntent);
                                     getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 }
                             });
 
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                } else {
+
+                    sessionIdRef.child(model.getSessionId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            final String friendId = dataSnapshot.child("friendId").getValue().toString();
+
+                            userRef.child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    final String userName = dataSnapshot.child("userName").getValue().toString();
+                                    final String image = dataSnapshot.child("profilePictureThumb").getValue().toString();
+
+                                    viewHolder.friendUsername.setText(userName);
+
+                                    if (!image.equals("")) {
+
+                                        Picasso.with(getContext())
+                                                .load(image)
+                                                .networkPolicy(NetworkPolicy.OFFLINE)
+                                                .placeholder(R.drawable.empty_profile)
+                                                .into(viewHolder.friendsPicture, new Callback() {
+                                                    @Override
+                                                    public void onSuccess() {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError() {
+                                                        Picasso.with(getContext())
+                                                                .load(image)
+                                                                .noPlaceholder()
+                                                                .into(viewHolder.friendsPicture);
+                                                    }
+                                                });
+
+                                    }
+
+                                    viewHolder.setItemClickListener(new ItemClickListener() {
+                                        @Override
+                                        public void onClick(View view, int position, boolean isLongClick) {
+                                            Intent messagingIntent = new Intent(getContext(), Messaging.class);
+                                            messagingIntent.putExtra("UserId", friendId);
+                                            messagingIntent.putExtra("UserName", userName);
+                                            startActivity(messagingIntent);
+                                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                                        }
+                                    });
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                            sessionIdRef.removeEventListener(this);
                         }
 
                         @Override
