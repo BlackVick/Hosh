@@ -178,4 +178,10 @@ public class UserListActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
     }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+    }
 }
