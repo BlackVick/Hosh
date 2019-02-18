@@ -18,7 +18,7 @@ public class MessagesViewHolder extends RecyclerView.ViewHolder implements View.
 
     public CircleImageView friendsPicture;
     public ImageView pictureMsg;
-    public TextView friendUsername, theLastMessage;
+    public TextView friendUsername, theLastMessage, messageTimeStamp;
     private ItemClickListener itemClickListener;
 
 
@@ -28,6 +28,7 @@ public class MessagesViewHolder extends RecyclerView.ViewHolder implements View.
         friendsPicture = (CircleImageView)itemView.findViewById(R.id.msgListImage);
         friendUsername = (TextView)itemView.findViewById(R.id.msgListUserName);
         theLastMessage = (TextView)itemView.findViewById(R.id.msgListMessage);
+        messageTimeStamp = (TextView)itemView.findViewById(R.id.msgListTime);
         pictureMsg = (ImageView)itemView.findViewById(R.id.msgListPictureMessage);
 
         itemView.setOnClickListener(this);

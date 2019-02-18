@@ -70,7 +70,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class AccountSetting extends AppCompatActivity {
 
     private ImageView exitActivity, help;
-    private TextView activityName, anonymousType, anonymousWarning, normalType, logout, username, location;
+    private TextView activityName, anonymousType, anonymousWarning, normalType, logout, delete, username, location;
     private LinearLayout normalLayout, anonymousLayout, locationLayout;
     private RelativeLayout rootLayout;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -125,6 +125,7 @@ public class AccountSetting extends AppCompatActivity {
         normalLayout = (LinearLayout)findViewById(R.id.accountTypeNormalLayout);
         anonymousLayout = (LinearLayout)findViewById(R.id.accountTypeAnonymousLayout);
         locationLayout = (LinearLayout)findViewById(R.id.locationLayout);
+        //delete = (TextView) findViewById(R.id.deleteAccount);
 
 
         /*---   ACTIVITY NAME   ---*/
@@ -161,6 +162,15 @@ public class AccountSetting extends AppCompatActivity {
                 .build();
 
 
+        /*---   DELETE ACCOUNT   ---*/
+        /*delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialogForDeleteAccount(currentUid);
+            }
+        });*/
+
+
         /*---   LOGOUT   ---*/
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,6 +181,40 @@ public class AccountSetting extends AppCompatActivity {
 
 
         loadAccount(currentUid, signUpChoice);
+    }
+
+    private void openDialogForDeleteAccount(String currentUid) {
+
+        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this)
+                .setTitle("Permanently Delete Account !")
+                .setIcon(R.drawable.ic_delete_feed)
+                .setMessage("Are You Really Sure You Want To Delete Your Account Permanently? \n \n Please Note That All Your Details Will Be Cleared From The Database")
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        FirebaseAuth.getInstance().signOut();
+                        Paper.book().destroy();
+                        Intent signoutIntent = new Intent(AccountSetting.this, Login.class);
+                        signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(signoutIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        finish();
+
+                    }
+                })
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.show();
+
     }
 
     private void openDialogForLogout() {

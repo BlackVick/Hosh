@@ -68,10 +68,6 @@ public class Feed extends Fragment {
         View v = inflater.inflate(R.layout.fragment_feed, container, false);
 
 
-        /*---   IMAGE FACE DETECTION   ---*/
-        PicassoFaceDetector.initialize(getContext());
-
-
         /*---   PAPER DB   ---*/
         Paper.init(getContext());
 

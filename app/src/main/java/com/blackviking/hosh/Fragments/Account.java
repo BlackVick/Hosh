@@ -67,10 +67,6 @@ public class Account extends Fragment {
         Paper.init(getContext());
 
 
-        /*---   IMAGE FACE DETECTION   ---*/
-        PicassoFaceDetector.initialize(getContext());
-
-
         /*---   CURRENT USER TOKEN   ---*/
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
@@ -225,7 +221,6 @@ public class Account extends Fragment {
                             .load(currentUser.getProfilePictureThumb())
                             .networkPolicy(NetworkPolicy.OFFLINE)
                             .placeholder(R.drawable.ic_loading_animation)
-                            .transform(new FaceCenterCrop(400, 400))
                             .into(profileImage, new Callback() {
                                 @Override
                                 public void onSuccess() {
@@ -237,7 +232,6 @@ public class Account extends Fragment {
                                     Picasso.with(getContext())
                                             .load(currentUser.getProfilePictureThumb())
                                             .placeholder(R.drawable.ic_loading_animation)
-                                            .transform(new FaceCenterCrop(400, 400))
                                             .into(profileImage);
                                 }
                             });
@@ -308,23 +302,5 @@ public class Account extends Fragment {
 
 
         return v;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        PicassoFaceDetector.releaseDetector();
     }
 }

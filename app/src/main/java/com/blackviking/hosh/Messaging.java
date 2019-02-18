@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackviking.hosh.Common.Common;
+import com.blackviking.hosh.Common.GetTimeAgo;
 import com.blackviking.hosh.Common.Permissions;
 import com.blackviking.hosh.ImageViewers.MessageImageView;
 import com.blackviking.hosh.Model.MessageListModel;
@@ -52,6 +53,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -66,6 +68,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -146,16 +150,24 @@ public class Messaging extends AppCompatActivity {
             currentUid = mAuth.getCurrentUser().getUid();
 
         userRef = db.getReference("Users");
+
+        /*---   MESSAGE REF   ---*/
         messageRef = db.getReference("Users").child(currentUid).child("Messages").child(friendId);
         messageRef.keepSynced(true);
         friendMessageRef = db.getReference("Users").child(friendId).child("Messages").child(currentUid);
 
+
+        /*---   MESSAGE LIST REF   ---*/
         messageListRef = db.getReference("Users").child(currentUid).child("MessageList");
         friendMessageListRef = db.getReference("Users").child(friendId).child("MessageList");
 
+
+        /*---   SESSION REF   ---*/
         messageSessionRef = db.getReference("Users").child(currentUid).child("MessageSessions");
         messageSessionFriendRef = db.getReference("Users").child(friendId).child("MessageSessions");
 
+
+        /*---   STORAGE REF   ---*/
         imageRef = storage.getReference("ChatImages");
         imageThumbRef = storage.getReference("ChatImages");
 
@@ -388,6 +400,13 @@ public class Messaging extends AppCompatActivity {
             @Override
             protected void populateViewHolder(final MessagingViewHolder viewHolder, final MessageModel model, int position) {
 
+                /*---   GET TIME AGO ALGORITHM   ---*/
+                GetTimeAgo getTimeAgo = new GetTimeAgo();
+                long lastTime = model.getTimeStamp();
+                String lastSeenTime = getTimeAgo.getTimeAgo(lastTime, getApplicationContext());
+
+
+
                 if (model.getFrom().equals(currentUid)){
 
                     if (model.getType().equals("Text")){
@@ -397,15 +416,8 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.yourMsgImage.setVisibility(View.GONE);
 
                         viewHolder.myText.setText(model.getMessage());
-                        viewHolder.myTextTimeStamp.setText(model.getTimeStamp());
+                        viewHolder.myTextTimeStamp.setText(lastSeenTime);
 
-
-                        if (model.getRead().equals("false")){
-
-                            messageRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
-                            messageListRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
-
-                        }
 
                     } else if (model.getType().equals("Image")){
 
@@ -448,32 +460,9 @@ public class Messaging extends AppCompatActivity {
 
                         }
 
-                        viewHolder.myTextTimeStamp.setText(model.getTimeStamp());
+                        viewHolder.myTextTimeStamp.setText(lastSeenTime);
 
                     }
-
-
-
-                    /*messageListRef.orderByChild("to").equalTo(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()){
-
-                                for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                                    String clubkey = childSnapshot.getKey();
-
-                                    messageRef
-
-                                }
-
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });*/
 
 
                 } else if (model.getFrom().equals(friendId)){
@@ -485,14 +474,16 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.otherMsgImage.setVisibility(View.GONE);
 
                         viewHolder.otherText.setText(model.getMessage());
-                        viewHolder.otherTextTimeStamp.setText(model.getTimeStamp());
+                        viewHolder.otherTextTimeStamp.setText(lastSeenTime);
 
                         if (model.getRead().equals("false")){
 
                             messageRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
-                            messageListRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
+                            messageListRef.child(friendId).child("read").setValue("true");
 
                         }
+
+                        messageListRef.child(friendId).child("read").setValue("true");
 
                     } else if (model.getType().equals("Image")){
 
@@ -535,14 +526,7 @@ public class Messaging extends AppCompatActivity {
 
                         }
 
-                        viewHolder.otherTextTimeStamp.setText(model.getTimeStamp());
-
-
-                        /*if (model.getRead().equals("false")){
-
-                            messageRef.child(adapter.getRef(position).getKey()).child("read").setValue("true");
-
-                        }*/
+                        viewHolder.otherTextTimeStamp.setText(lastSeenTime);
 
                     }
 
@@ -678,29 +662,66 @@ public class Messaging extends AppCompatActivity {
 
             if (Common.isConnectedToInternet(getBaseContext())){
 
-                final long date = System.currentTimeMillis();
-                final SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yy HH:mm");
-                final String dateString = sdf.format(date);
-
                 userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        final String sender = dataSnapshot.child("userName").getValue().toString();
+                        /*---   PUSH   ---*/
                         final DatabaseReference pushIdRef = messageRef.push();
-
-
                         final String pushId = pushIdRef.getKey();
 
-                        final MessageModel newChat = new MessageModel(pushId, message, "", dateString, "true", "Text", currentUid, messageSessionId);
-                        final MessageModel newChatFriend = new MessageModel(pushId, message, "",dateString, "false", "Text", currentUid, messageSessionId);
+
+                        /*---   MODEL FOR CHAT LIST   ---*/
+                        final Map<String, Object> messageListMap = new HashMap<>();
+                        messageListMap.put("id", pushId);
+                        messageListMap.put("message", message);
+                        messageListMap.put("messageThumb", "");
+                        messageListMap.put("timeStamp", ServerValue.TIMESTAMP);
+                        messageListMap.put("read", "true");
+                        messageListMap.put("type", "Text");
+                        messageListMap.put("from", currentUid);
+                        messageListMap.put("sessionId", messageSessionId);
 
 
-                        final MessageListModel newChatList = new MessageListModel(pushId, message, "", dateString, "true", "Text", currentUid, messageSessionId);
-                        final MessageListModel newChatListFriend = new MessageListModel(pushId, message, "",dateString, "false", "Text", currentUid, messageSessionId);
+                        /*---   FRIEND MODEL FOR CHAT LIST   ---*/
+                        final Map<String, Object> messageListMapFriend = new HashMap<>();
+                        messageListMapFriend.put("id", pushId);
+                        messageListMapFriend.put("message", message);
+                        messageListMapFriend.put("messageThumb", "");
+                        messageListMapFriend.put("timeStamp", ServerValue.TIMESTAMP);
+                        messageListMapFriend.put("read", "false");
+                        messageListMapFriend.put("type", "Text");
+                        messageListMapFriend.put("from", currentUid);
+                        messageListMapFriend.put("sessionId", messageSessionId);
 
 
-                        messageRef.child(pushId).setValue(newChat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        /*---   MODEL FOR MESSAGES   ---*/
+                        /*---   MODEL FOR MESSAGE   ---*/
+                        final Map<String, Object> messageMap = new HashMap<>();
+                        messageMap.put("id", pushId);
+                        messageMap.put("message", message);
+                        messageMap.put("messageThumb", "");
+                        messageMap.put("timeStamp", ServerValue.TIMESTAMP);
+                        messageMap.put("read", "true");
+                        messageMap.put("type", "Text");
+                        messageMap.put("from", currentUid);
+                        messageMap.put("sessionId", messageSessionId);
+
+
+
+                        /*---   FRIEND MODEL FOR MESSAGE   ---*/
+                        final Map<String, Object> messageMapFriend = new HashMap<>();
+                        messageMapFriend.put("id", pushId);
+                        messageMapFriend.put("message", message);
+                        messageMapFriend.put("messageThumb", "");
+                        messageMapFriend.put("timeStamp", ServerValue.TIMESTAMP);
+                        messageMapFriend.put("read", "false");
+                        messageMapFriend.put("type", "Text");
+                        messageMapFriend.put("from", currentUid);
+                        messageMapFriend.put("sessionId", messageSessionId);
+
+
+                        messageRef.child(pushId).setValue(messageMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 chatBox.setText("");
@@ -708,82 +729,23 @@ public class Messaging extends AppCompatActivity {
                         }).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                friendMessageRef.child(pushId).setValue(newChatFriend);
+                                friendMessageRef.child(pushId).setValue(messageMapFriend);
                             }
                         }).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                messageListRef.orderByChild("sessionId").equalTo(messageSessionId).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.exists()){
 
-                                            for (DataSnapshot child: dataSnapshot.getChildren()) {
-                                                String messageListId = child.getKey();
-
-                                                messageListRef.child(messageListId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        messageListRef.child(pushId).setValue(newChatList);
-                                                    }
-                                                });
-
+                                messageListRef.child(friendId).updateChildren(messageListMap).addOnSuccessListener(
+                                        new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                friendMessageListRef.child(currentUid).updateChildren(messageListMapFriend);
                                             }
-
-
-
-
-
-                                        } else {
-
-                                            messageListRef.child(pushId).setValue(newChatList);
-
                                         }
+                                );
 
-                                        messageListRef.removeEventListener(this);
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                friendMessageListRef.orderByChild("sessionId").equalTo(messageSessionId).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.exists()){
-
-                                            for (DataSnapshot child: dataSnapshot.getChildren()) {
-                                                String friendMessageListId = child.getKey();
-
-                                                friendMessageListRef.child(friendMessageListId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        friendMessageListRef.child(pushId).setValue(newChatListFriend);
-                                                    }
-                                                });
-
-                                            }
-                                        } else {
-
-                                            friendMessageListRef.child(pushId).setValue(newChatListFriend);
-
-                                        }
-                                        friendMessageListRef.removeEventListener(this);
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
                             }
                         });
-
 
                     }
 
@@ -935,22 +897,62 @@ public class Messaging extends AppCompatActivity {
 
                                             mDialog.dismiss();
 
-                                            final long date = System.currentTimeMillis();
-                                            final SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yy HH:mm");
-                                            final String dateString = sdf.format(date);
-
+                                            /*---   PUSH   ---*/
                                             final DatabaseReference pushIdRef = messageRef.push();
                                             final String pushId = pushIdRef.getKey();
 
-                                            final MessageModel newChat = new MessageModel(pushId, originalImageUrl, thumbDownloadUrl, dateString, "true", "Image", currentUid, messageSessionId);
-                                            final MessageModel newChatFriend = new MessageModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Image", currentUid, messageSessionId);
+
+                                            /*---   MODEL FOR CHAT LIST   ---*/
+                                            final Map<String, Object> messageListMap = new HashMap<>();
+                                            messageListMap.put("id", pushId);
+                                            messageListMap.put("message", originalImageUrl);
+                                            messageListMap.put("messageThumb", thumbDownloadUrl);
+                                            messageListMap.put("timeStamp", ServerValue.TIMESTAMP);
+                                            messageListMap.put("read", "true");
+                                            messageListMap.put("type", "Image");
+                                            messageListMap.put("from", currentUid);
+                                            messageListMap.put("sessionId", messageSessionId);
 
 
-                                            final MessageListModel newChatList = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl, dateString, "true", "Image", currentUid, messageSessionId);
-                                            final MessageListModel newChatListFriend = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Image", currentUid, messageSessionId);
+                                            /*---   FRIEND MODEL FOR CHAT LIST   ---*/
+                                            final Map<String, Object> messageListMapFriend = new HashMap<>();
+                                            messageListMapFriend.put("id", pushId);
+                                            messageListMapFriend.put("message", originalImageUrl);
+                                            messageListMapFriend.put("messageThumb", thumbDownloadUrl);
+                                            messageListMapFriend.put("timeStamp", ServerValue.TIMESTAMP);
+                                            messageListMapFriend.put("read", "false");
+                                            messageListMapFriend.put("type", "Image");
+                                            messageListMapFriend.put("from", currentUid);
+                                            messageListMapFriend.put("sessionId", messageSessionId);
 
 
-                                            messageRef.child(pushId).setValue(newChat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            /*---   MODEL FOR MESSAGES   ---*/
+                                            /*---   MODEL FOR MESSAGE   ---*/
+                                            final Map<String, Object> messageMap = new HashMap<>();
+                                            messageMap.put("id", pushId);
+                                            messageMap.put("message", originalImageUrl);
+                                            messageMap.put("messageThumb", thumbDownloadUrl);
+                                            messageMap.put("timeStamp", ServerValue.TIMESTAMP);
+                                            messageMap.put("read", "true");
+                                            messageMap.put("type", "Image");
+                                            messageMap.put("from", currentUid);
+                                            messageMap.put("sessionId", messageSessionId);
+
+
+
+                                            /*---   FRIEND MODEL FOR MESSAGE   ---*/
+                                            final Map<String, Object> messageMapFriend = new HashMap<>();
+                                            messageMapFriend.put("id", pushId);
+                                            messageMapFriend.put("message", originalImageUrl);
+                                            messageMapFriend.put("messageThumb", thumbDownloadUrl);
+                                            messageMapFriend.put("timeStamp", ServerValue.TIMESTAMP);
+                                            messageMapFriend.put("read", "false");
+                                            messageMapFriend.put("type", "Image");
+                                            messageMapFriend.put("from", currentUid);
+                                            messageMapFriend.put("sessionId", messageSessionId);
+
+
+                                            messageRef.child(pushId).setValue(messageMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     chatBox.setText("");
@@ -958,67 +960,21 @@ public class Messaging extends AppCompatActivity {
                                             }).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    friendMessageRef.child(pushId).setValue(newChatFriend);
+                                                    friendMessageRef.child(pushId).setValue(messageMapFriend);
                                                 }
                                             }).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    messageListRef.orderByChild("sessionId").equalTo(messageSessionId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                                            if (dataSnapshot.exists()){
 
-                                                                String messageListId = dataSnapshot.getKey();
-
-                                                                messageListRef.child(messageListId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
-                                                                        messageListRef.child(pushId).setValue(newChatList);
-                                                                    }
-                                                                });
-
-                                                            } else {
-
-                                                                messageListRef.child(pushId).setValue(newChatList);
-
+                                                    messageListRef.child(friendId).updateChildren(messageListMap).addOnSuccessListener(
+                                                            new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    friendMessageListRef.child(currentUid).updateChildren(messageListMapFriend);
+                                                                }
                                                             }
-                                                        }
+                                                    );
 
-                                                        @Override
-                                                        public void onCancelled(DatabaseError databaseError) {
-
-                                                        }
-                                                    });
-                                                }
-                                            }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    friendMessageListRef.orderByChild("sessionId").equalTo(messageSessionId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                                            if (dataSnapshot.exists()){
-
-                                                                String friendMessageListId = dataSnapshot.getKey();
-
-                                                                friendMessageListRef.child(friendMessageListId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
-                                                                        friendMessageListRef.child(pushId).setValue(newChatListFriend);
-                                                                    }
-                                                                });
-
-                                                            } else {
-
-                                                                friendMessageListRef.child(pushId).setValue(newChatListFriend);
-
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(DatabaseError databaseError) {
-
-                                                        }
-                                                    });
                                                 }
                                             });
 

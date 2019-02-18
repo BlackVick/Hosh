@@ -5,7 +5,7 @@ public class MessageModel {
     private String id;
     private String message;
     private String messageThumb;
-    private String timeStamp;
+    private long timeStamp;
     private String read;
     private String type;
     private String from;
@@ -14,7 +14,7 @@ public class MessageModel {
     public MessageModel() {
     }
 
-    public MessageModel(String id, String message, String messageThumb, String timeStamp, String read, String type, String from, String sessionId) {
+    public MessageModel(String id, String message, String messageThumb, long timeStamp, String read, String type, String from, String sessionId) {
         this.id = id;
         this.message = message;
         this.messageThumb = messageThumb;
@@ -49,11 +49,11 @@ public class MessageModel {
         this.messageThumb = messageThumb;
     }
 
-    public String getTimeStamp() {
+    public long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(String timeStamp) {
+    public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
 

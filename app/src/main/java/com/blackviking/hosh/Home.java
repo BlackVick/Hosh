@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
 
 import java.lang.reflect.Field;
 
@@ -204,7 +205,6 @@ public class Home extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
     /*---   SUBJECT TO REMOVAL IF ALL FARES WELL   ---*/
     @SuppressLint("RestrictedApi")
     public static void disableShiftMode(BottomNavigationView view) {
@@ -228,4 +228,5 @@ public class Home extends AppCompatActivity {
             Log.e("BNVHelper", "Unable to change value of shift mode", e);
         }
     }
+
 }

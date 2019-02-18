@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blackviking.hosh.Common.GetTimeAgo;
 import com.blackviking.hosh.Interface.ItemClickListener;
 import com.blackviking.hosh.Messaging;
 import com.blackviking.hosh.Model.MessageListModel;
@@ -113,17 +114,24 @@ public class Messages extends Fragment {
 
     private void loadMessages() {
 
+        Query newestShit = chatListRef.orderByChild("timeStamp");
+
         adapter = new FirebaseRecyclerAdapter<MessageListModel, MessagesViewHolder>(
                 MessageListModel.class,
                 R.layout.messages_item,
                 MessagesViewHolder.class,
-                chatListRef
+                newestShit
         ) {
             @Override
             protected void populateViewHolder(final MessagesViewHolder viewHolder, final MessageListModel model, final int position) {
 
                 final String messageId = adapter.getRef(position).getKey();
-                final Query lastMessageQuery = chatRef.child(messageId).limitToLast(1);
+
+
+                /*---   GET TIME AGO ALGORITHM   ---*/
+                GetTimeAgo getTimeAgo = new GetTimeAgo();
+                long lastTime = model.getTimeStamp();
+                String lastSeenTime = getTimeAgo.getTimeAgo(lastTime, getActivity().getApplicationContext());
 
 
                 if (model.getType().equals("Text")) {
@@ -131,6 +139,7 @@ public class Messages extends Fragment {
                     viewHolder.pictureMsg.setVisibility(View.GONE);
                     viewHolder.theLastMessage.setVisibility(View.VISIBLE);
                     viewHolder.theLastMessage.setText(model.getMessage());
+                    viewHolder.messageTimeStamp.setText(lastSeenTime);
 
                     if (model.getRead().equals("false")) {
 
@@ -152,7 +161,7 @@ public class Messages extends Fragment {
 
                 if (!model.getFrom().equals(currentUid)) {
 
-                    userRef.child(model.getFrom()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    userRef.child(model.getFrom()).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -194,6 +203,8 @@ public class Messages extends Fragment {
                                     getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 }
                             });
+
+                            userRef.removeEventListener(this);
 
                         }
 

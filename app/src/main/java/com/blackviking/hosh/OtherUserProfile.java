@@ -88,10 +88,6 @@ public class OtherUserProfile extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        /*---   IMAGE FACE DETECTION   ---*/
-        PicassoFaceDetector.initialize(this);
-
-
         /*---   LOCAL   ---*/
         Paper.init(this);
 
@@ -276,7 +272,6 @@ public class OtherUserProfile extends AppCompatActivity {
                     Picasso.with(getBaseContext())
                             .load(currentUser.getProfilePictureThumb())
                             .placeholder(R.drawable.ic_loading_animation)
-                            .transform(new FaceCenterCrop(400, 400))
                             .into(userProfileImage);
 
 
@@ -369,23 +364,5 @@ public class OtherUserProfile extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        PicassoFaceDetector.releaseDetector();
     }
 }

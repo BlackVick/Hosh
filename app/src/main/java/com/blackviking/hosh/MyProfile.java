@@ -48,6 +48,8 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -101,10 +103,6 @@ public class MyProfile extends AppCompatActivity {
         /*---   TOOLBAR   ---*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-        /*---   IMAGE FACE DETECTION   ---*/
-        PicassoFaceDetector.initialize(this);
 
 
         /*---   LOCAL   ---*/
@@ -376,14 +374,28 @@ public class MyProfile extends AppCompatActivity {
                     /*---   PROFILE IMAGE   ---*/
                     Picasso.with(getBaseContext())
                             .load(currentUser.getProfilePictureThumb())
+                            .networkPolicy(NetworkPolicy.OFFLINE)
                             .placeholder(R.drawable.ic_loading_animation)
-                            .transform(new FaceCenterCrop(400, 400))
-                            .into(userProfileImage);
+                            .into(userProfileImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError() {
+                                    Picasso.with(getBaseContext())
+                                            .load(currentUser.getProfilePictureThumb())
+                                            .placeholder(R.drawable.ic_loading_animation)
+                                            .into(userProfileImage);
+                                }
+                            });
 
 
                     /*---   COVER PHOTO   ---*/
                     Picasso.with(getBaseContext())
                             .load(currentUser.getProfilePictureThumb())
+                            .networkPolicy(NetworkPolicy.OFFLINE)
                             .placeholder(R.drawable.ic_loading_animation)
                             .into(target);
 
@@ -524,21 +536,4 @@ public class MyProfile extends AppCompatActivity {
         finish();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        PicassoFaceDetector.releaseDetector();
-    }
 }

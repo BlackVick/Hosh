@@ -71,10 +71,6 @@ public class HookUp extends Fragment {
         View v = inflater.inflate(R.layout.fragment_hook_up, container, false);
 
 
-        /*---   IMAGE FACE DETECTION   ---*/
-        PicassoFaceDetector.initialize(getActivity().getApplicationContext());
-
-
         /*---   PAPER DB   ---*/
         Paper.init(getContext());
 
@@ -299,7 +295,6 @@ public class HookUp extends Fragment {
                         Picasso.with(getContext())
                                 .load(model.getProfilePictureThumb())
                                 .placeholder(R.drawable.ic_loading_animation)
-                                .transform(new FaceCenterCrop(400, 400))
                                 .into(viewHolder.hookUpImage);
 
                     } else {
@@ -363,24 +358,6 @@ public class HookUp extends Fragment {
 
         alertDialog.show();
 
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        PicassoFaceDetector.releaseDetector();
     }
 
 }
