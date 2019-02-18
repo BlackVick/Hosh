@@ -34,6 +34,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.leo.simplearcloader.ArcConfiguration;
 import com.leo.simplearcloader.SimpleArcDialog;
@@ -219,11 +220,11 @@ public class OtherUserProfile extends AppCompatActivity {
                     followUserFab.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            userRef.child(currentUid).child("Following").child(userId).setValue("Following")
+                            userRef.child(currentUid).child("Following").child(userId).child("date").setValue(ServerValue.TIMESTAMP)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            userRef.child(userId).child("Followers").child(currentUid).setValue("Follows You")
+                                            userRef.child(userId).child("Followers").child(currentUid).child("date").setValue(ServerValue.TIMESTAMP)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {

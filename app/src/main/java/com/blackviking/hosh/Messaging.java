@@ -34,12 +34,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Common.Permissions;
 import com.blackviking.hosh.ImageViewers.MessageImageView;
 import com.blackviking.hosh.Model.MessageListModel;
 import com.blackviking.hosh.Model.MessageModel;
+import com.blackviking.hosh.Model.MessageSessionModel;
 import com.blackviking.hosh.ViewHolder.MessagingViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -84,7 +86,7 @@ public class Messaging extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
-    private DatabaseReference userRef, messageRef, friendMessageRef, messageListRef, friendMessageListRef;
+    private DatabaseReference userRef, messageRef, friendMessageRef, messageListRef, friendMessageListRef, messageSessionRef, messageSessionFriendRef, sessionPushIdRef;
     private String currentUid, friendId, friendUserName;
     private FirebaseRecyclerAdapter<MessageModel, MessagingViewHolder> adapter;
     private static final int GALLERY_REQUEST_CODE = 686;
@@ -96,6 +98,8 @@ public class Messaging extends AppCompatActivity {
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference imageRef, imageThumbRef;
     private String charSequence = "1234567890-=!@#$%^&*()_+QWERTYUIOPASDFGHJKLZXCVBNM<>?:{}|qwertyuiop[];lkjhgfdsazxcvbnm,./";
+    private String messageSessionId = "";
+    private String sessionId = "";
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -148,6 +152,9 @@ public class Messaging extends AppCompatActivity {
 
         messageListRef = db.getReference("Users").child(currentUid).child("MessageList");
         friendMessageListRef = db.getReference("Users").child(friendId).child("MessageList");
+
+        messageSessionRef = db.getReference("Users").child(currentUid).child("MessageSessions");
+        messageSessionFriendRef = db.getReference("Users").child(friendId).child("MessageSessions");
 
         imageRef = storage.getReference("ChatImages");
         imageThumbRef = storage.getReference("ChatImages");
@@ -244,6 +251,60 @@ public class Messaging extends AppCompatActivity {
         });
 
 
+        /*---   CREATE MESSAGE SESSION KEY   ---*/
+        messageSessionRef.orderByChild("friendId").equalTo(friendId).addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        sessionPushIdRef = messageSessionRef.push();
+
+                        final String sessionPushId = sessionPushIdRef.getKey();
+
+                        if (!dataSnapshot.exists()){
+
+                            MessageSessionModel newMessageSession = new MessageSessionModel(currentUid, friendId);
+                            final MessageSessionModel newMessageSessionFriend = new MessageSessionModel(friendId, currentUid);
+
+                            messageSessionRef.child(sessionPushId).setValue(newMessageSession)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+
+                                            messageSessionFriendRef.child(sessionPushId).setValue(newMessageSessionFriend)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            messageSessionId = sessionPushId;
+                                                            System.out.println("Done");
+                                                        }
+                                                    });
+
+                                        }
+                                    });
+
+                        } else {
+
+                            for (DataSnapshot child: dataSnapshot.getChildren()) {
+
+                                sessionId = child.getKey();
+                                messageSessionId = sessionId;
+
+                            }
+
+                        }
+
+                        messageSessionRef.removeEventListener(this);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                }
+        );
+
+
         /*---   PERMISSIONS HANDLER   ---*/
         if (checkPermissionsArray(Permissions.PERMISSIONS)){
 
@@ -267,11 +328,7 @@ public class Messaging extends AppCompatActivity {
 
                 String stg = s.toString();
 
-                if (stg.length() > 0 && stg.startsWith(" ")){
-
-                    stg.replace(" ", "");
-
-                } else  if (stg.length() > 0 && stg.contains(charSequence)){
+                if (stg.length() > 0){
 
                     sendMessageBtn.setVisibility(View.VISIBLE);
 
@@ -635,12 +692,12 @@ public class Messaging extends AppCompatActivity {
 
                         final String pushId = pushIdRef.getKey();
 
-                        final MessageModel newChat = new MessageModel(pushId, message, "", dateString, "true", "Text", currentUid);
-                        final MessageModel newChatFriend = new MessageModel(pushId, message, "",dateString, "false", "Text", currentUid);
+                        final MessageModel newChat = new MessageModel(pushId, message, "", dateString, "true", "Text", currentUid, messageSessionId);
+                        final MessageModel newChatFriend = new MessageModel(pushId, message, "",dateString, "false", "Text", currentUid, messageSessionId);
 
 
-                        final MessageListModel newChatList = new MessageListModel(pushId, message, "", dateString, "true", "Text", currentUid, currentUid, currentUid, friendId);
-                        final MessageListModel newChatListFriend = new MessageListModel(pushId, message, "",dateString, "false", "Text", currentUid, friendId, friendId, currentUid);
+                        final MessageListModel newChatList = new MessageListModel(pushId, message, "", dateString, "true", "Text", currentUid, messageSessionId);
+                        final MessageListModel newChatListFriend = new MessageListModel(pushId, message, "",dateString, "false", "Text", currentUid, messageSessionId);
 
 
                         messageRef.child(pushId).setValue(newChat).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -656,43 +713,25 @@ public class Messaging extends AppCompatActivity {
                         }).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                messageListRef.orderByChild("to").equalTo(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                                messageListRef.orderByChild("sessionId").equalTo(messageSessionId).addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         if (dataSnapshot.exists()){
 
-                                            for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                                                final String clubkey = childSnapshot.getKey();
+                                            for (DataSnapshot child: dataSnapshot.getChildren()) {
+                                                String messageListId = child.getKey();
 
-                                                messageListRef.child(clubkey).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                messageListRef.child(messageListId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                        if (dataSnapshot.child("you").getValue().toString().equals(friendId)) {
-
-                                                            messageListRef.child(clubkey).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    messageListRef.child(pushId).setValue(newChatList);
-                                                                }
-                                                            });
-
-                                                        } else {
-
-                                                            messageListRef.child(pushId).setValue(newChatList);
-
-                                                        }
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-
+                                                    public void onSuccess(Void aVoid) {
+                                                        messageListRef.child(pushId).setValue(newChatList);
                                                     }
                                                 });
 
-
                                             }
+
+
+
 
 
                                         } else {
@@ -700,6 +739,8 @@ public class Messaging extends AppCompatActivity {
                                             messageListRef.child(pushId).setValue(newChatList);
 
                                         }
+
+                                        messageListRef.removeEventListener(this);
                                     }
 
                                     @Override
@@ -711,52 +752,28 @@ public class Messaging extends AppCompatActivity {
                         }).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                friendMessageListRef.orderByChild("to").equalTo(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                friendMessageListRef.orderByChild("sessionId").equalTo(messageSessionId).addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         if (dataSnapshot.exists()){
 
-                                            for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                                                final String clubkey = childSnapshot.getKey();
+                                            for (DataSnapshot child: dataSnapshot.getChildren()) {
+                                                String friendMessageListId = child.getKey();
 
-
-                                                friendMessageListRef.child(clubkey).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                friendMessageListRef.child(friendMessageListId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                        if (dataSnapshot.child("you").getValue().toString().equals(currentUid)){
-
-                                                            friendMessageListRef.child(clubkey).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    friendMessageListRef.child(pushId).setValue(newChatListFriend);
-                                                                }
-                                                            });
-
-                                                        } else {
-
-                                                            friendMessageListRef.child(pushId).setValue(newChatListFriend);
-
-                                                        }
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-
+                                                    public void onSuccess(Void aVoid) {
+                                                        friendMessageListRef.child(pushId).setValue(newChatListFriend);
                                                     }
                                                 });
 
-
-
-
                                             }
-
                                         } else {
 
                                             friendMessageListRef.child(pushId).setValue(newChatListFriend);
 
                                         }
+                                        friendMessageListRef.removeEventListener(this);
                                     }
 
                                     @Override
@@ -925,15 +942,20 @@ public class Messaging extends AppCompatActivity {
                                             final DatabaseReference pushIdRef = messageRef.push();
                                             final String pushId = pushIdRef.getKey();
 
-                                            final MessageModel newChat = new MessageModel(pushId, originalImageUrl, thumbDownloadUrl, dateString, "true", "Image", currentUid);
-                                            final MessageModel newChatFriend = new MessageModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Image", currentUid);
+                                            final MessageModel newChat = new MessageModel(pushId, originalImageUrl, thumbDownloadUrl, dateString, "true", "Image", currentUid, messageSessionId);
+                                            final MessageModel newChatFriend = new MessageModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Image", currentUid, messageSessionId);
 
 
-                                            final MessageListModel newChatList = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl, dateString, "true", "Image", currentUid, currentUid, currentUid, friendId);
-                                            final MessageListModel newChatListFriend = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Image", currentUid, friendId, friendId, currentUid);
+                                            final MessageListModel newChatList = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl, dateString, "true", "Image", currentUid, messageSessionId);
+                                            final MessageListModel newChatListFriend = new MessageListModel(pushId, originalImageUrl, thumbDownloadUrl,dateString, "false", "Image", currentUid, messageSessionId);
 
 
                                             messageRef.child(pushId).setValue(newChat).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    chatBox.setText("");
+                                                }
+                                            }).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     friendMessageRef.child(pushId).setValue(newChatFriend);
@@ -941,44 +963,19 @@ public class Messaging extends AppCompatActivity {
                                             }).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    messageListRef.orderByChild("to").equalTo(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    messageListRef.orderByChild("sessionId").equalTo(messageSessionId).addListenerForSingleValueEvent(new ValueEventListener() {
                                                         @Override
                                                         public void onDataChange(DataSnapshot dataSnapshot) {
                                                             if (dataSnapshot.exists()){
 
-                                                                for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                                                                    final String clubkey = childSnapshot.getKey();
+                                                                String messageListId = dataSnapshot.getKey();
 
-                                                                    messageListRef.child(clubkey).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                        @Override
-                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                                            if (dataSnapshot.child("you").getValue().toString().equals(friendId)) {
-
-                                                                                messageListRef.child(clubkey).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onSuccess(Void aVoid) {
-                                                                                        messageListRef.child(pushId).setValue(newChatList);
-                                                                                    }
-                                                                                });
-
-                                                                            } else {
-
-                                                                                messageListRef.child(pushId).setValue(newChatList);
-
-                                                                            }
-
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onCancelled(DatabaseError databaseError) {
-
-                                                                        }
-                                                                    });
-
-
-                                                                }
-
+                                                                messageListRef.child(messageListId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        messageListRef.child(pushId).setValue(newChatList);
+                                                                    }
+                                                                });
 
                                                             } else {
 
@@ -996,43 +993,19 @@ public class Messaging extends AppCompatActivity {
                                             }).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    friendMessageListRef.orderByChild("to").equalTo(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    friendMessageListRef.orderByChild("sessionId").equalTo(messageSessionId).addListenerForSingleValueEvent(new ValueEventListener() {
                                                         @Override
                                                         public void onDataChange(DataSnapshot dataSnapshot) {
                                                             if (dataSnapshot.exists()){
 
-                                                                for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                                                                    final String clubkey = childSnapshot.getKey();
+                                                                String friendMessageListId = dataSnapshot.getKey();
 
-
-                                                                    friendMessageListRef.child(clubkey).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                        @Override
-                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                                            if (dataSnapshot.child("you").getValue().toString().equals(currentUid)){
-
-                                                                                friendMessageListRef.child(clubkey).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onSuccess(Void aVoid) {
-                                                                                        friendMessageListRef.child(pushId).setValue(newChatListFriend);
-                                                                                    }
-                                                                                });
-
-                                                                            } else {
-
-                                                                                friendMessageListRef.child(pushId).setValue(newChatListFriend);
-
-                                                                            }
-
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onCancelled(DatabaseError databaseError) {
-
-                                                                        }
-                                                                    });
-
-                                                                }
+                                                                friendMessageListRef.child(friendMessageListId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        friendMessageListRef.child(pushId).setValue(newChatListFriend);
+                                                                    }
+                                                                });
 
                                                             } else {
 
