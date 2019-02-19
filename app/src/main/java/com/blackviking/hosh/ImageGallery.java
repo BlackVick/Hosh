@@ -176,7 +176,6 @@ public class ImageGallery extends AppCompatActivity {
         galleryRecycler.setLayoutManager(layoutManager);
 
 
-        if (mAuth.getCurrentUser() != null)
             loadGallery();
 
     }

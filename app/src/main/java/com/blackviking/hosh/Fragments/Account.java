@@ -316,7 +316,7 @@ public class Account extends Fragment {
         });
 
 
-        if (mAuth.getCurrentUser() != null)
+
             loadMyTimeline();
 
 

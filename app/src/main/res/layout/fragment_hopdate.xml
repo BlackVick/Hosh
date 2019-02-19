@@ -45,6 +45,7 @@
                 android:drawableStart="@drawable/ic_action_hookup"
                 android:drawableTint="@color/grey"
                 android:drawablePadding="7dp"
+                android:maxLength="150"
                 android:maxLines="4"
                 android:minLines="2"/>
 

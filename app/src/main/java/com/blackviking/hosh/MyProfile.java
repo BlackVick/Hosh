@@ -193,7 +193,6 @@ public class MyProfile extends AppCompatActivity {
         /*---   LOAD PROFILE   ---*/
         if (Common.isConnectedToInternet(getBaseContext())) {
 
-            if (mAuth.getCurrentUser() != null)
                 loadMyProfile(currentUid);
 
         } else {

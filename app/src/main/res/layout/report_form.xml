@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="18dp"
+    android:layout_margin="15dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:orientation="vertical">
+
+        <Spinner
+            android:id="@+id/reportTypeSpinner"
+            android:layout_width="match_parent"
+            android:layout_margin="3dp"
+            android:textSize="18sp"
+            android:layout_height="50dp"/>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/reportDetails"
+            android:hint="Report Details"
+            android:textColorHint="@color/colorAccent"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:inputType="text"
+            android:layout_margin="3dp"
+            android:maxLength="100"
+            android:padding="5dp"
+            app:met_clearButton="true"
+            app:met_maxCharacters="100"
+            app:met_baseColor="@color/colorAccent"
+            app:met_floatingLabelAnimating="true"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/colorPrimary"
+            app:met_singleLineEllipsis="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/submitReportBtn"
+            android:layout_gravity="end"
+            android:text="SUBMIT"
+            android:textSize="17sp"
+            android:textColor="@color/white"
+            android:layout_margin="5dp"
+            android:background="@drawable/buttons"/>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

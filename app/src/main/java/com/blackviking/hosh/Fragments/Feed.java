@@ -3,23 +3,32 @@ package com.blackviking.hosh.Fragments;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.FeedDetails;
 import com.blackviking.hosh.Model.HopdateModel;
 import com.blackviking.hosh.MyProfile;
@@ -34,12 +43,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.paperdb.Paper;
 
@@ -57,6 +72,7 @@ public class Feed extends Fragment {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference feedRef, userRef, likeRef, commentRef;
+    private String offenceString = "";
 
     public Feed() {
         // Required empty public constructor
@@ -140,74 +156,111 @@ public class Feed extends Fragment {
             protected void populateViewHolder(final FeedViewHolder viewHolder, final HopdateModel model, final int position) {
 
                 /*---   OPTIONS   ---*/
-                if (!model.getSender().equals(currentUid)){
+                if (model.getSender().equals(currentUid)){
 
-                    viewHolder.options.setVisibility(View.GONE);
+                    viewHolder.options.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        /*---   POPUP MENU FOR HOPDATE   ---*/
+                            PopupMenu popup = new PopupMenu(getContext(), viewHolder.options);
+                            popup.inflate(R.menu.feed_item_menu);
+                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem item) {
+                                    switch (item.getItemId()) {
+                                        case R.id.action_feed_delete:
+
+                                            AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                                                    .setTitle("Delete Hopdate !")
+                                                    .setIcon(R.drawable.ic_delete_feed)
+                                                    .setMessage("Are You Sure You Want To Delete This Hopdate From Your Timeline?")
+                                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+
+                                                            feedRef.child(adapter.getRef(position).getKey()).removeValue()
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Snackbar.make(getView(), "Hopdate Deleted !", Snackbar.LENGTH_LONG).show();
+                                                                        }
+                                                                    });
+
+                                                        }
+                                                    })
+                                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    })
+                                                    .create();
+
+                                            alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+                                            alertDialog.show();
+
+                                            return true;
+                                        case R.id.action_feed_share:
+
+                                            Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                                            i.setType("text/plain");
+                                            i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
+                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
+                                            startActivity(Intent.createChooser(i,"Share via"));
+
+                                            return true;
+                                        default:
+                                            return false;
+                                    }
+                                }
+                            });
+
+                            popup.show();
+                        }
+                    });
+
+                } else {
+
+                    viewHolder.options.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        /*---   POPUP MENU FOR HOPDATE   ---*/
+                            PopupMenu popup = new PopupMenu(getContext(), viewHolder.options);
+                            popup.inflate(R.menu.feed_item_menu_other);
+                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem item) {
+                                    switch (item.getItemId()) {
+                                        case R.id.action_feed_other_report:
+
+                                            openReportDialog(model.getSender());
+
+                                            return true;
+                                        case R.id.action_feed_other_share:
+
+                                            Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                                            i.setType("text/plain");
+                                            i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
+                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
+                                            startActivity(Intent.createChooser(i,"Share via"));
+
+                                            return true;
+                                        default:
+                                            return false;
+                                    }
+                                }
+                            });
+
+                            popup.show();
+                        }
+                    });
 
                 }
 
-                viewHolder.options.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
 
-                        /*---   POPUP MENU FOR HOPDATE   ---*/
-                        PopupMenu popup = new PopupMenu(getContext(), viewHolder.options);
-                        popup.inflate(R.menu.feed_item_menu);
-                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-                                switch (item.getItemId()) {
-                                    case R.id.action_feed_delete:
-
-                                        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
-                                                .setTitle("Delete Hopdate !")
-                                                .setIcon(R.drawable.ic_delete_feed)
-                                                .setMessage("Are You Sure You Want To Delete This Hopdate From Your Timeline?")
-                                                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-
-                                                        feedRef.child(adapter.getRef(position).getKey()).removeValue()
-                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
-                                                                        Snackbar.make(getView(), "Hopdate Deleted !", Snackbar.LENGTH_LONG).show();
-                                                                    }
-                                                                });
-
-                                                    }
-                                                })
-                                                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .create();
-
-                                        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-
-                                        alertDialog.show();
-
-                                        return true;
-                                    case R.id.action_feed_share:
-
-                                        Intent i = new Intent(android.content.Intent.ACTION_SEND);
-                                        i.setType("text/plain");
-                                        i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
-                                        i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
-                                        startActivity(Intent.createChooser(i,"Share via"));
-
-                                        return true;
-                                    default:
-                                        return false;
-                                }
-                            }
-                        });
-
-                        popup.show();
-                    }
-                });
 
 
                 /*---   POSTER DETAILS   ---*/
@@ -464,6 +517,107 @@ public class Feed extends Fragment {
         };
         feedRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+
+    }
+
+    private void openReportDialog(final String sender) {
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(getContext()).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.report_form,null);
+
+        final Spinner offenceClass = (Spinner) viewOptions.findViewById(R.id.reportTypeSpinner);
+        final EditText offenceDetails = (EditText) viewOptions.findViewById(R.id.reportDetails);
+        final Button submitReport = (Button) viewOptions.findViewById(R.id.submitReportBtn);
+        final DatabaseReference reportRef = db.getReference("Reports");
+
+
+        /*---   SETUP SPINNER   ---*/
+        /*---   FILL GENDER SPINNER   ---*/
+        List<String> offenceList = new ArrayList<>();
+        offenceList.add(0, "Report Type");
+        offenceList.add("Inappropriate Content");
+        offenceList.add("Offensive Acts");
+        offenceList.add("Bullying");
+
+        ArrayAdapter<String> dataAdapterOffence;
+        dataAdapterOffence = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, offenceList);
+
+        dataAdapterOffence.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        offenceClass.setAdapter(dataAdapterOffence);
+
+
+        /*---    GENDER SPINNER   ---*/
+        offenceClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (!parent.getItemAtPosition(position).equals("Report Type")){
+
+                    offenceString = parent.getItemAtPosition(position).toString();
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 200; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+        submitReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (Common.isConnectedToInternet(getContext())){
+
+                    if (offenceString.equals("") || TextUtils.isEmpty(offenceDetails.getText().toString())){
+
+                        Snackbar.make(getView(), "Invalid Report", Snackbar.LENGTH_SHORT).show();
+
+                    } else {
+
+                        final Map<String, Object> reportUserMap = new HashMap<>();
+                        reportUserMap.put("reporter", currentUid);
+                        reportUserMap.put("reported", sender);
+                        reportUserMap.put("reportClass", offenceString);
+                        reportUserMap.put("reportDetails", offenceDetails.getText().toString());
+
+                        reportRef.push().setValue(reportUserMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Snackbar.make(getView(), "Snitch", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
+
+                }else {
+
+                    Snackbar.make(getView(), "No Internet Access !", Snackbar.LENGTH_LONG).show();
+                }
+                alertDialog.dismiss();
+
+            }
+        });
+
+        alertDialog.show();
 
     }
 }

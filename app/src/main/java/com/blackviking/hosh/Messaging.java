@@ -151,6 +151,10 @@ public class Messaging extends AppCompatActivity {
 
         userRef = db.getReference("Users");
 
+        /*---   ONLINE STATE   ---*/
+        userRef.child(currentUid).child("onlineState").setValue("Online");
+
+
         /*---   MESSAGE REF   ---*/
         messageRef = db.getReference("Users").child(currentUid).child("Messages").child(friendId);
         messageRef.keepSynced(true);
@@ -240,6 +244,7 @@ public class Messaging extends AppCompatActivity {
         exitActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                messageListRef.child(friendId).child("read").setValue("true");
                 finish();
             }
         });
@@ -483,7 +488,6 @@ public class Messaging extends AppCompatActivity {
 
                         }
 
-                        messageListRef.child(friendId).child("read").setValue("true");
 
                     } else if (model.getType().equals("Image")){
 
@@ -1010,5 +1014,25 @@ public class Messaging extends AppCompatActivity {
         }
 
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        messageListRef.child(friendId).child("read").setValue("true");
+        finish();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        /*---   ONLINE STATE   ---*/
+        userRef.child(currentUid).child("onlineState").setValue("Offline");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*---   ONLINE STATE   ---*/
+        userRef.child(currentUid).child("onlineState").setValue("Online");
     }
 }

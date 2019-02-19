@@ -313,7 +313,7 @@ public class NewAnonymousUser extends AppCompatActivity {
                     if (!dataSnapshot.exists()){
 
                         userName.setTextColor(getResources().getColor(R.color.proceed));
-                        UserModel newUser = new UserModel(userNameTxt, emailTxt, "", selectGender, "", "", "", "true", "false", dateString, "",
+                        UserModel newUser = new UserModel(userNameTxt, emailTxt, "", selectGender, "", "", "", "Online", "false", dateString, "",
                                 "", "", "", "", "", "Customer", "", selectInterest, "Hello There! I am new to Hosh. Lets get chatting");
                         if (mAuth.getCurrentUser() != null)
                             currentUid = mAuth.getCurrentUser().getUid();

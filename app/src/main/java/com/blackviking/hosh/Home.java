@@ -63,6 +63,7 @@ public class Home extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null)
             currentUid = mAuth.getCurrentUser().getUid();
         userRef = db.getReference("Users");
+        userRef.child(currentUid).child("onlineState").setValue("Online");
 
 
         /*---   SECURITY MEASURE   ---*/
@@ -227,6 +228,20 @@ public class Home extends AppCompatActivity {
         } catch (IllegalAccessException e) {
             Log.e("BNVHelper", "Unable to change value of shift mode", e);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*---   ONLINE STATE   ---*/
+        userRef.child(currentUid).child("onlineState").setValue("Online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        /*---   ONLINE STATE   ---*/
+        userRef.child(currentUid).child("onlineState").setValue("Offline");
     }
 
 }

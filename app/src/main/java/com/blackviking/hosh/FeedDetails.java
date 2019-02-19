@@ -159,12 +159,11 @@ public class FeedDetails extends AppCompatActivity {
         commentRecycler.setLayoutManager(layoutManager);
         
 
-        if (mAuth.getCurrentUser() != null) {
+
 
             loadCurrentHopdate();
             loadComments();
 
-        }
     }
 
     private void sendTheComment() {

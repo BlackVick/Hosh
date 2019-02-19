@@ -66,11 +66,6 @@ public class UserListActivity extends AppCompatActivity {
         activityType = getIntent().getStringExtra("Type");
         currentUid = getIntent().getStringExtra("CurrentUserId");
 
-
-        /*---   IMAGE FACE DETECTION   ---*/
-        PicassoFaceDetector.initialize(this);
-
-
         /*---   FIREBASE   ---*/
         userListsRef = db.getReference("Users").child(currentUid).child(activityType);
         userRef = db.getReference("Users");

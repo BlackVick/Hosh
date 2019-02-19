@@ -178,102 +178,94 @@ public class OtherUserProfile extends AppCompatActivity {
 
 
         /*---   MESSAGING FAB   ---*/
-        if (mAuth.getCurrentUser() != null){
+        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                messageUserFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent messagingIntent = new Intent(OtherUserProfile.this, Messaging.class);
+                        messagingIntent.putExtra("UserId", userId);
+                        messagingIntent.putExtra("UserName", dataSnapshot.child("userName").getValue().toString());
+                        startActivity(messagingIntent);
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }
+                });
+            }
 
-            userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(final DataSnapshot dataSnapshot) {
-                    messageUserFab.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent messagingIntent = new Intent(OtherUserProfile.this, Messaging.class);
-                            messagingIntent.putExtra("UserId", userId);
-                            messagingIntent.putExtra("UserName", dataSnapshot.child("userName").getValue().toString());
-                            startActivity(messagingIntent);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                        }
-                    });
-                }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-        }
+            }
+        });
 
 
         /*---   FOLLOW CHECK   ---*/
-        if (mAuth.getCurrentUser() != null) {
+        userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-            userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child("Following").child(userId).exists()) {
 
-                    if (dataSnapshot.child("Following").child(userId).exists()) {
+                    followUserFab.setImageResource(R.drawable.ic_unfollow_user);
+                    timelineRecycler.setVisibility(View.VISIBLE);
+                    loadUserTimeline(userId);
 
-                        followUserFab.setImageResource(R.drawable.ic_unfollow_user);
-                        timelineRecycler.setVisibility(View.VISIBLE);
-                        loadUserTimeline(userId);
-
-                        followUserFab.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                userRef.child(currentUid).child("Following").child(userId).removeValue()
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                userRef.child(userId).child("Followers").child(currentUid).removeValue()
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                Snackbar.make(rootLayout, "You have un followed @" + currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
-                                                            }
-                                                        });
-                                            }
-                                        });
-                            }
-                        });
+                    followUserFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            userRef.child(currentUid).child("Following").child(userId).removeValue()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            userRef.child(userId).child("Followers").child(currentUid).removeValue()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Snackbar.make(rootLayout, "You have un followed @" + currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                        }
+                                    });
+                        }
+                    });
 
                     /*---   FABs   ---*/
-                        messageUserFab.setVisibility(View.VISIBLE);
+                    messageUserFab.setVisibility(View.VISIBLE);
 
-                    } else {
+                } else {
 
-                        timelineRecycler.setVisibility(View.GONE);
-                        followUserFab.setImageResource(R.drawable.ic_follow_user);
+                    timelineRecycler.setVisibility(View.GONE);
+                    followUserFab.setImageResource(R.drawable.ic_follow_user);
 
-                        followUserFab.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                userRef.child(currentUid).child("Following").child(userId).child("date").setValue(ServerValue.TIMESTAMP)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                userRef.child(userId).child("Followers").child(currentUid).child("date").setValue(ServerValue.TIMESTAMP)
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                Snackbar.make(rootLayout, "You are now following @" + currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
-                                                            }
-                                                        });
-                                            }
-                                        });
-                            }
-                        });
-
-                    }
+                    followUserFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            userRef.child(currentUid).child("Following").child(userId).child("date").setValue(ServerValue.TIMESTAMP)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            userRef.child(userId).child("Followers").child(currentUid).child("date").setValue(ServerValue.TIMESTAMP)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Snackbar.make(rootLayout, "You are now following @" + currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                        }
+                                    });
+                        }
+                    });
 
                 }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            }
 
-                }
-            });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-        }
+            }
+        });
 
 
         /*---   LOAD PROFILE   ---*/
