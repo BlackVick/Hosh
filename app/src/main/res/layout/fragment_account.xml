@@ -63,7 +63,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
+                            android:text=""
                             android:textSize="15sp"
                             android:textColor="@color/black"
                             android:layout_gravity="center"
@@ -91,7 +91,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
+                            android:text=""
                             android:textSize="15sp"
                             android:textColor="@color/black"
                             android:layout_gravity="center"
@@ -119,7 +119,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
+                            android:text=""
                             android:textSize="15sp"
                             android:textColor="@color/black"
                             android:layout_gravity="center"
@@ -187,8 +187,6 @@
         android:layout_height="match_parent"
         android:layout_below="@id/profileCard"
         android:id="@+id/timelineRecycler">
-
-
 
     </android.support.v7.widget.RecyclerView>
 

@@ -37,6 +37,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
@@ -128,114 +129,118 @@ public class HookUp extends Fragment {
         if (Common.isConnectedToInternet(getContext())) {
 
             /*---   INTERESTED IN   ---*/
-            userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+            if (mAuth.getCurrentUser() != null) {
 
-                    String myInterest = dataSnapshot.child("lookingFor").getValue().toString();
-                    String mySex = dataSnapshot.child("sex").getValue().toString();
+                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    if (myInterest.equalsIgnoreCase("Women")){
+                        String myInterest = dataSnapshot.child("lookingFor").getValue().toString();
+                        String mySex = dataSnapshot.child("sex").getValue().toString();
 
-                        sexToHaunt = "Men";
+                        if (myInterest.equalsIgnoreCase("Women")) {
+
+                            sexToHaunt = "Men";
 
                         /*---   LOAD   ---*/
-                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+                            userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                if (dataSnapshot.exists()){
+                                    if (dataSnapshot.exists()) {
 
-                                    mDialog.dismiss();
-                                    loadHookups(currentUid);
+                                        mDialog.dismiss();
+                                        loadHookups(currentUid);
 
-                                } else {
+                                    } else {
 
-                                    mDialog.dismiss();
-                                    openNoMatchFound();
+                                        mDialog.dismiss();
+                                        openNoMatchFound();
+
+                                    }
+
 
                                 }
 
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
-                            }
+                                }
+                            });
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                        } else if (myInterest.equalsIgnoreCase("Men")) {
 
-                            }
-                        });
-
-                    } else if (myInterest.equalsIgnoreCase("Men")){
-
-                        sexToHaunt = "Women";
+                            sexToHaunt = "Women";
 
                         /*---   LOAD   ---*/
-                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+                            userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                if (dataSnapshot.exists()){
+                                    if (dataSnapshot.exists()) {
 
-                                    mDialog.dismiss();
-                                    loadHookups(currentUid);
+                                        mDialog.dismiss();
+                                        loadHookups(currentUid);
 
-                                } else {
+                                    } else {
 
-                                    mDialog.dismiss();
-                                    openNoMatchFound();
+                                        mDialog.dismiss();
+                                        openNoMatchFound();
+
+                                    }
+
 
                                 }
 
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
-                            }
+                                }
+                            });
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                        } else if (myInterest.equalsIgnoreCase("Groupie")) {
 
-                            }
-                        });
-
-                    } else if (myInterest.equalsIgnoreCase("Groupie")){
-
-                        sexToHaunt = "Groupie";
+                            sexToHaunt = "Groupie";
 
                         /*---   LOAD   ---*/
-                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+                            userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                if (dataSnapshot.exists()){
+                                    if (dataSnapshot.exists()) {
 
-                                    mDialog.dismiss();
-                                    loadHookups(currentUid);
+                                        mDialog.dismiss();
+                                        loadHookups(currentUid);
 
-                                } else {
+                                    } else {
 
-                                    mDialog.dismiss();
-                                    openNoMatchFound();
+                                        mDialog.dismiss();
+                                        openNoMatchFound();
+
+                                    }
+
 
                                 }
 
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
-                            }
+                                }
+                            });
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                        }
 
-                            }
-                        });
+                        userRef.removeEventListener(this);
 
                     }
 
-                    userRef.removeEventListener(this);
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                }
+                    }
+                });
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            }
 
         } else {
 
@@ -275,11 +280,13 @@ public class HookUp extends Fragment {
 
     private void loadHookups(final String currentUid) {
 
+        Query specifics = userRef.orderByChild("lookingFor").equalTo(sexToHaunt);
+
         adapter = new FirebaseRecyclerAdapter<UserModel, HookupViewHolder>(
                 UserModel.class,
                 R.layout.hookup_item,
                 HookupViewHolder.class,
-                userRef.orderByChild("lookingFor").equalTo(sexToHaunt)
+                specifics
         ) {
             @Override
             protected void populateViewHolder(final HookupViewHolder viewHolder, final UserModel model, int position) {

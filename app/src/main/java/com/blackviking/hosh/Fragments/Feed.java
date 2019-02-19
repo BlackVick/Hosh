@@ -122,8 +122,8 @@ public class Feed extends Fragment {
         layoutManager.setReverseLayout(true);
         feedRecycler.setLayoutManager(layoutManager);
 
-
-        loadFeed();
+        if (mAuth.getCurrentUser() != null)
+            loadFeed();
 
         return v;
     }
@@ -321,7 +321,6 @@ public class Feed extends Fragment {
                                 @Override
                                 public void onClick(View v) {
                                     likeRef.child(feedId).child(currentUid).removeValue();
-                                    Snackbar.make(getView(), "Un Liked", Snackbar.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -333,7 +332,6 @@ public class Feed extends Fragment {
                                 @Override
                                 public void onClick(View v) {
                                     likeRef.child(feedId).child(currentUid).setValue("liked");
-                                    Snackbar.make(getView(), "Liked", Snackbar.LENGTH_SHORT).show();
                                 }
                             });
 

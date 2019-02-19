@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:id="@+id/posterName"
-                    android:text="name"
+                    android:text=""
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -63,7 +63,6 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/empty_profile"
             android:adjustViewBounds="true"
             android:id="@+id/postImage"/>
 
@@ -71,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/postText"
-            android:text="This is the post Text"
+            android:text=""
             android:textSize="14sp"
             android:textColor="@color/black"
             android:paddingStart="10dp"
@@ -96,7 +95,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
+                android:text=""
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:id="@+id/likeCount"
@@ -112,7 +111,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
+                android:text=""
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:id="@+id/commentCount"
@@ -124,7 +123,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/postTime"
-            android:text="Time"
+            android:text=""
             android:textColor="@color/offBlack"
             android:textSize="13sp"
             android:gravity="end"

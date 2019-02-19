@@ -170,7 +170,8 @@ public class MyProfile extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                openEditProfileDialog();
+                if (mAuth.getCurrentUser() != null)
+                    openEditProfileDialog();
 
             }
         });
@@ -191,7 +192,10 @@ public class MyProfile extends AppCompatActivity {
 
         /*---   LOAD PROFILE   ---*/
         if (Common.isConnectedToInternet(getBaseContext())) {
-            loadMyProfile(currentUid);
+
+            if (mAuth.getCurrentUser() != null)
+                loadMyProfile(currentUid);
+
         } else {
             Snackbar.make(rootLayout, "Could not Load Your Profile. . .   No Internet Access !", Snackbar.LENGTH_LONG).show();
         }

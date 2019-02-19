@@ -18,6 +18,21 @@
             android:animateLayoutChanges="true"
             android:orientation="vertical">
 
+            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_margin="30dp"
+                app:corner_radius="15dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/share_photo_icon"
+                    android:adjustViewBounds="true"
+                    android:id="@+id/hopdateImage"/>
+
+            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -32,23 +47,6 @@
                 android:drawablePadding="7dp"
                 android:maxLines="4"
                 android:minLines="2"/>
-            
-            
-            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_margin="20dp"
-                app:corner_radius="15dp"
-                android:background="@color/grey">
-                
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_action_add_image"
-                    android:adjustViewBounds="true"
-                    android:id="@+id/hopdateImage"/>
-
-            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
 
         </LinearLayout>
 

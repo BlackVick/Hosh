@@ -106,8 +106,9 @@ public class Messages extends Fragment {
         layoutManager.setStackFromEnd(true);
         chatRecycler.setLayoutManager(layoutManager);
 
-        
-        loadMessages();
+
+        if (mAuth.getCurrentUser() != null)
+            loadMessages();
 
         return v;
     }

@@ -80,10 +80,6 @@ public class FeedDetails extends AppCompatActivity {
         setContentView(R.layout.activity_feed_details);
 
 
-        /*---   IMAGE FACE DETECTION   ---*/
-        PicassoFaceDetector.initialize(this);
-
-
         /*---   LOCAL   ---*/
         Paper.init(this);
 
@@ -163,8 +159,12 @@ public class FeedDetails extends AppCompatActivity {
         commentRecycler.setLayoutManager(layoutManager);
         
 
-        loadCurrentHopdate();
-        loadComments();
+        if (mAuth.getCurrentUser() != null) {
+
+            loadCurrentHopdate();
+            loadComments();
+
+        }
     }
 
     private void sendTheComment() {
@@ -245,7 +245,6 @@ public class FeedDetails extends AppCompatActivity {
                                     .load(imageThumbLink)
                                     .networkPolicy(NetworkPolicy.OFFLINE)
                                     .placeholder(R.drawable.ic_loading_animation)
-                                    .transform(new FaceCenterCrop(400, 400))
                                     .into(posterImage, new Callback() {
                                         @Override
                                         public void onSuccess() {
@@ -257,7 +256,6 @@ public class FeedDetails extends AppCompatActivity {
                                             Picasso.with(getBaseContext())
                                                     .load(imageThumbLink)
                                                     .placeholder(R.drawable.ic_loading_animation)
-                                                    .transform(new FaceCenterCrop(400, 400))
                                                     .into(posterImage);
                                         }
                                     });
@@ -526,24 +524,6 @@ public class FeedDetails extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PicassoFaceDetector.releaseDetector();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        PicassoFaceDetector.releaseDetector();
     }
 
     @Override

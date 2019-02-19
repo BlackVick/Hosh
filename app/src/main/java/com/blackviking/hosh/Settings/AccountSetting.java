@@ -180,7 +180,8 @@ public class AccountSetting extends AppCompatActivity {
         });
 
 
-        loadAccount(currentUid, signUpChoice);
+        if (mAuth.getCurrentUser() != null)
+            loadAccount(currentUid, signUpChoice);
     }
 
     private void openDialogForDeleteAccount(String currentUid) {

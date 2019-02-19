@@ -112,7 +112,8 @@ public class UserImageGallery extends AppCompatActivity {
         galleryRecycler.setLayoutManager(layoutManager);
 
 
-        loadGallery();
+        if (mAuth.getCurrentUser() != null)
+            loadGallery();
     }
 
     private void loadGallery() {
