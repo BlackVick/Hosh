@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Common.GetTimeAgo;
@@ -54,6 +55,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -1173,13 +1175,37 @@ public class Messaging extends AppCompatActivity {
         String chatMessageId = adapter.getRef(item.getOrder()).getKey();
 
         if (item.getTitle().equals(Common.DELETE_SINGLE)){
-            //deleteCategory(chatMessageId);
+            deleteCategory(chatMessageId);
         } else if (item.getTitle().equals(Common.DELETE_BOTH)){
 
             //deleteBothCategory(chatMessageId);
         }
 
         return super.onContextItemSelected(item);
+    }
+
+    private void deleteCategory(final String chatMessageId) {
+
+        messageRef.child(chatMessageId).removeValue().addOnSuccessListener(
+                new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        final Map<String, Object> messageListMap = new HashMap<>();
+                        messageListMap.put("message", "DELETED");
+
+                        messageListRef.child(friendId).updateChildren(messageListMap)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Snackbar.make(rootLayout, "Deleted", Snackbar.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                    }
+                }
+        );
+
     }
 
     @Override
