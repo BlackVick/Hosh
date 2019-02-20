@@ -26,7 +26,6 @@
         android:tint="@color/white"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
-        app:fab_elevation="15dp"/>
+        android:layout_margin="16dp"/>
 
 </RelativeLayout>

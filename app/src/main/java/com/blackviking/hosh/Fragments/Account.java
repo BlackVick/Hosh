@@ -53,9 +53,9 @@ import io.paperdb.Paper;
 public class Account extends Fragment {
 
     private ImageView exitActivity, help;
-    private TextView activityName, following, followers, hookups, profileSetting, accountSetting;
+    private TextView activityName, following, followers, profileSetting, accountSetting;
     private CircleImageView profileImage;
-    private LinearLayout followingLayout, followersLayout, hookupsLayout;
+    private LinearLayout followingLayout, followersLayout;
     private RecyclerView timelineRecycler;
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<HopdateModel, FeedViewHolder> adapter;
@@ -97,13 +97,11 @@ public class Account extends Fragment {
         activityName = (TextView)v.findViewById(R.id.activityName);
         followers = (TextView)v.findViewById(R.id.followersCount);
         following = (TextView)v.findViewById(R.id.followingCount);
-        hookups = (TextView)v.findViewById(R.id.hookupCount);
         profileSetting = (TextView)v.findViewById(R.id.profileSetting);
         accountSetting = (TextView)v.findViewById(R.id.accountSetting);
         profileImage = (CircleImageView)v.findViewById(R.id.profileImage);
         followingLayout = (LinearLayout)v.findViewById(R.id.followingCountLayout);
         followersLayout = (LinearLayout)v.findViewById(R.id.followersCountLayout);
-        hookupsLayout = (LinearLayout)v.findViewById(R.id.hookupCountLayout);
         timelineRecycler = (RecyclerView)v.findViewById(R.id.timelineRecycler);
         
         
@@ -187,39 +185,6 @@ public class Account extends Fragment {
                         public void onClick(View v) {
                             Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
                             showUsersListIntent.putExtra("Type", "Following");
-                            showUsersListIntent.putExtra("CurrentUserId", currentUid);
-                            startActivity(showUsersListIntent);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                        }
-                    });
-
-
-                /*---   HOOKUPS   ---*/
-                    if (dataSnapshot.child("Hookups").exists()) {
-
-                        userRef.child(currentUid).child("Hookups").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                int count = (int) dataSnapshot.getChildrenCount();
-                                hookups.setText(String.valueOf(count));
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-
-                    }
-
-                    hookupsLayout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
-                            showUsersListIntent.putExtra("Type", "Hookups");
                             showUsersListIntent.putExtra("CurrentUserId", currentUid);
                             startActivity(showUsersListIntent);
                             getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);

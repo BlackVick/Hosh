@@ -280,49 +280,6 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/hookupsLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:weightSum="10"
-                        android:layout_margin="5dp"
-                        android:padding="5dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_weight="3"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:text="Hookups"
-                            android:textColor="@color/black"
-                            android:textSize="15sp"/>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_weight="2"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:text="0"
-                            android:textSize="17sp"
-                            android:textColor="@color/black"
-                            android:id="@+id/hookupsCount"/>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_weight="5"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:text="View Hookups"
-                            android:textColor="@color/colorPrimaryDark"
-                            android:textSize="17sp"
-                            android:textStyle="bold"
-                            android:id="@+id/viewHookups"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
                         android:id="@+id/locationLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

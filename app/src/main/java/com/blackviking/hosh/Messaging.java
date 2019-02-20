@@ -11,12 +11,12 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
@@ -34,15 +34,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Common.GetTimeAgo;
 import com.blackviking.hosh.Common.Permissions;
 import com.blackviking.hosh.ImageViewers.MessageImageView;
-import com.blackviking.hosh.Model.MessageListModel;
+import com.blackviking.hosh.Interface.ItemClickListener;
+import com.blackviking.hosh.Model.EmojiModel;
 import com.blackviking.hosh.Model.MessageModel;
 import com.blackviking.hosh.Model.MessageSessionModel;
+import com.blackviking.hosh.ViewHolder.EmojiViewHolder;
 import com.blackviking.hosh.ViewHolder.MessagingViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -101,7 +102,6 @@ public class Messaging extends AppCompatActivity {
     private android.app.AlertDialog mDialog;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference imageRef, imageThumbRef;
-    private String charSequence = "1234567890-=!@#$%^&*()_+QWERTYUIOPASDFGHJKLZXCVBNM<>?:{}|qwertyuiop[];lkjhgfdsazxcvbnm,./";
     private String messageSessionId = "";
     private String sessionId = "";
 
@@ -143,6 +143,7 @@ public class Messaging extends AppCompatActivity {
         attachement = (ImageView) findViewById(R.id.addAttachment);
         chatBox = (EditText)findViewById(R.id.messageEditText);
         messageRecycler = (RecyclerView)findViewById(R.id.messagingRecycler);
+
 
 
         /*---   FIREBASE   ---*/
@@ -348,14 +349,12 @@ public class Messaging extends AppCompatActivity {
                 if (stg.length() > 0){
 
                     sendMessageBtn.setVisibility(View.VISIBLE);
-
-                } else if (stg.length() > 0){
-
-                    sendMessageBtn.setVisibility(View.VISIBLE);
+                    addSmiley.setEnabled(false);
 
                 } else {
 
                     sendMessageBtn.setVisibility(View.GONE);
+                    addSmiley.setEnabled(true);
 
                 }
             }
@@ -363,6 +362,15 @@ public class Messaging extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
 
+            }
+        });
+
+
+        /*---    SEND EMOTICON   ---*/
+        addSmiley.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openEmoticonDialog();
             }
         });
 
@@ -391,6 +399,164 @@ public class Messaging extends AppCompatActivity {
         messageRecycler.setLayoutManager(layoutManager);
 
         loadMessages();
+
+    }
+
+    private void openEmoticonDialog() {
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.emoji_dialog,null);
+
+        final RecyclerView emojiRecycler;
+        final LinearLayoutManager emojiLayoutManager;
+        final FirebaseRecyclerAdapter<EmojiModel, EmojiViewHolder> emojiAdapter;
+
+
+        emojiRecycler = (RecyclerView)viewOptions.findViewById(R.id.emojiRecycler);
+
+        /*---   LOADING EMOJI   ---*/
+        emojiRecycler.setHasFixedSize(true);
+        emojiLayoutManager = new GridLayoutManager(this, 4);
+        emojiRecycler.setLayoutManager(emojiLayoutManager);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.EmojiShitAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        //layoutParams.y = 100; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+        DatabaseReference emojiRef = db.getReference("Emoticons");
+
+        emojiAdapter = new FirebaseRecyclerAdapter<EmojiModel, EmojiViewHolder>(
+                EmojiModel.class,
+                R.layout.emoji_item,
+                EmojiViewHolder.class,
+                emojiRef
+        ) {
+            @Override
+            protected void populateViewHolder(final EmojiViewHolder viewHolder, final EmojiModel model, int position) {
+
+                Picasso.with(getBaseContext())
+                        .load(model.getLink())
+                        .networkPolicy(NetworkPolicy.OFFLINE)
+                        .into(viewHolder.emojiView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+
+                            @Override
+                            public void onError() {
+                                Picasso.with(getBaseContext())
+                                        .load(model.getLink())
+                                        .networkPolicy(NetworkPolicy.OFFLINE)
+                                        .into(viewHolder.emojiView);
+                            }
+                        });
+
+                viewHolder.setItemClickListener(new ItemClickListener() {
+                    @Override
+                    public void onClick(View view, int position, boolean isLongClick) {
+
+                        /*---   PUSH   ---*/
+                        final DatabaseReference pushIdRef = messageRef.push();
+                        final String pushId = pushIdRef.getKey();
+
+
+                                            /*---   MODEL FOR CHAT LIST   ---*/
+                        final Map<String, Object> messageListMap = new HashMap<>();
+                        messageListMap.put("id", pushId);
+                        messageListMap.put("message", model.getLink());
+                        messageListMap.put("messageThumb", model.getLink());
+                        messageListMap.put("timeStamp", ServerValue.TIMESTAMP);
+                        messageListMap.put("read", "true");
+                        messageListMap.put("type", "Image");
+                        messageListMap.put("from", currentUid);
+                        messageListMap.put("sessionId", messageSessionId);
+
+
+                                            /*---   FRIEND MODEL FOR CHAT LIST   ---*/
+                        final Map<String, Object> messageListMapFriend = new HashMap<>();
+                        messageListMapFriend.put("id", pushId);
+                        messageListMapFriend.put("message", model.getLink());
+                        messageListMapFriend.put("messageThumb", model.getLink());
+                        messageListMapFriend.put("timeStamp", ServerValue.TIMESTAMP);
+                        messageListMapFriend.put("read", "false");
+                        messageListMapFriend.put("type", "Image");
+                        messageListMapFriend.put("from", currentUid);
+                        messageListMapFriend.put("sessionId", messageSessionId);
+
+
+                                            /*---   MODEL FOR MESSAGES   ---*/
+                                            /*---   MODEL FOR MESSAGE   ---*/
+                        final Map<String, Object> messageMap = new HashMap<>();
+                        messageMap.put("id", pushId);
+                        messageMap.put("message", model.getLink());
+                        messageMap.put("messageThumb", model.getLink());
+                        messageMap.put("timeStamp", ServerValue.TIMESTAMP);
+                        messageMap.put("read", "true");
+                        messageMap.put("type", "Image");
+                        messageMap.put("from", currentUid);
+                        messageMap.put("sessionId", messageSessionId);
+
+
+
+                                            /*---   FRIEND MODEL FOR MESSAGE   ---*/
+                        final Map<String, Object> messageMapFriend = new HashMap<>();
+                        messageMapFriend.put("id", pushId);
+                        messageMapFriend.put("message", model.getLink());
+                        messageMapFriend.put("messageThumb", model.getLink());
+                        messageMapFriend.put("timeStamp", ServerValue.TIMESTAMP);
+                        messageMapFriend.put("read", "false");
+                        messageMapFriend.put("type", "Image");
+                        messageMapFriend.put("from", currentUid);
+                        messageMapFriend.put("sessionId", messageSessionId);
+
+
+                        messageRef.child(pushId).setValue(messageMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                alertDialog.dismiss();
+                                chatBox.setText("");
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                friendMessageRef.child(pushId).setValue(messageMapFriend);
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                messageListRef.child(friendId).updateChildren(messageListMap).addOnSuccessListener(
+                                        new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                friendMessageListRef.child(currentUid).updateChildren(messageListMapFriend);
+                                            }
+                                        }
+                                );
+
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        };
+        emojiRecycler.setAdapter(emojiAdapter);
+        emojiAdapter.notifyDataSetChanged();
+
+        alertDialog.show();
 
     }
 

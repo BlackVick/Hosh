@@ -69,7 +69,7 @@ public class MyProfile extends AppCompatActivity {
     private FloatingActionButton editProfileFab;
     private String currentUid;
     private ImageView userProfileImage, coverPhoto, changeProfilePic;
-    private TextView username, status, gender, followersCount, viewFollowers, followingCount, viewFollowing, hookupCount, viewHookups, location, interest, bio;
+    private TextView username, status, gender, followersCount, viewFollowers, followingCount, viewFollowing, location, interest, bio;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef;
@@ -129,8 +129,6 @@ public class MyProfile extends AppCompatActivity {
         followersCount = (TextView)findViewById(R.id.followersCount);
         viewFollowing = (TextView)findViewById(R.id.viewFollowing);
         followingCount = (TextView)findViewById(R.id.followingCount);
-        viewHookups = (TextView)findViewById(R.id.viewHookups);
-        hookupCount = (TextView)findViewById(R.id.hookupsCount);
         location = (TextView)findViewById(R.id.myLocation);
         interest = (TextView)findViewById(R.id.myInterest);
         bio = (TextView)findViewById(R.id.myBio);
@@ -489,35 +487,6 @@ public class MyProfile extends AppCompatActivity {
                     public void onClick(View v) {
                         Intent showUsersListIntent = new Intent(MyProfile.this, UserListActivity.class);
                         showUsersListIntent.putExtra("Type", "Following");
-                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
-                        startActivity(showUsersListIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    }
-                });
-
-
-                /*---   HOOKUPS   ---*/
-                userRef.child(currentUid).child("Hookups").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        int count = (int) dataSnapshot.getChildrenCount();
-
-                        hookupCount.setText(String.valueOf(count));
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-                viewHookups.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent showUsersListIntent = new Intent(MyProfile.this, UserListActivity.class);
-                        showUsersListIntent.putExtra("Type", "Hookups");
                         showUsersListIntent.putExtra("CurrentUserId", currentUid);
                         startActivity(showUsersListIntent);
                         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);

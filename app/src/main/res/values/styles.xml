@@ -72,6 +72,11 @@
         <item name="android:windowExitAnimation">@anim/scale_out</item>
     </style>
 
+    <style name="EmojiShitAnimation">
+        <item name="android:windowEnterAnimation">@anim/goup</item>
+        <item name="android:windowExitAnimation">@anim/godown</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
