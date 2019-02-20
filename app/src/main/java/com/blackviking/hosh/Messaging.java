@@ -34,8 +34,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Common.GetTimeAgo;
 import com.blackviking.hosh.Common.Permissions;
