@@ -46,8 +46,6 @@
                         android:layout_height="45dp"
                         android:id="@+id/msgUserImageView"
                         android:src="@drawable/ic_empty_profile"
-                        app:civ_border_color="@color/white"
-                        app:civ_border_width="0.1dp"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="5dp"/>
 

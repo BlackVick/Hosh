@@ -77,7 +77,6 @@ public class AccountSettings extends AppCompatActivity {
             public void onClick(View v) {
                 Intent helpIntent = new Intent(AccountSettings.this, Help.class);
                 startActivity(helpIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -88,7 +87,6 @@ public class AccountSettings extends AppCompatActivity {
             public void onClick(View v) {
                 Intent infoIntent = new Intent(AccountSettings.this, AppInfo.class);
                 startActivity(infoIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -112,7 +110,6 @@ public class AccountSettings extends AppCompatActivity {
             public void onClick(View v) {
                 Intent notificationIntent = new Intent(AccountSettings.this, NotificationSetting.class);
                 startActivity(notificationIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -123,8 +120,12 @@ public class AccountSettings extends AppCompatActivity {
             public void onClick(View v) {
                 Intent accountIntent = new Intent(AccountSettings.this, AccountSetting.class);
                 startActivity(accountIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

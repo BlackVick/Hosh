@@ -98,10 +98,13 @@ public class UserListActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent helpIntent = new Intent(UserListActivity.this, Faq.class);
                 startActivity(helpIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
+        loadUserList();
+    }
+
+    private void loadUserList() {
 
         /*---   RECYCLER CONTROLLER   ---*/
         userListsRecycler.setHasFixedSize(true);
@@ -109,12 +112,6 @@ public class UserListActivity extends AppCompatActivity {
         layoutManager.setStackFromEnd(true);
         layoutManager.setReverseLayout(true);
         userListsRecycler.setLayoutManager(layoutManager);
-
-        if (mAuth.getCurrentUser() != null)
-            loadUserList();
-    }
-
-    private void loadUserList() {
 
         adapter = new FirebaseRecyclerAdapter<UserModel, UserListViewHolder>(
                 UserModel.class,
@@ -155,7 +152,6 @@ public class UserListActivity extends AppCompatActivity {
                                 Intent userIntent = new Intent(UserListActivity.this, OtherUserProfile.class);
                                 userIntent.putExtra("UserId", userId);
                                 startActivity(userIntent);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
                         });
 
@@ -177,6 +173,5 @@ public class UserListActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 }

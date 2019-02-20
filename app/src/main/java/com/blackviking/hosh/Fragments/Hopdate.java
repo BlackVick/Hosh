@@ -134,7 +134,6 @@ public class Hopdate extends Fragment {
             public void onClick(View v) {
                 Intent faqIntent = new Intent(getContext(), Faq.class);
                 startActivity(faqIntent);
-                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -196,7 +195,6 @@ public class Hopdate extends Fragment {
 
                     Intent i = new Intent(getContext(), Home.class);
                     startActivity(i);
-                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     getActivity().finish();
 
                 } else {
@@ -209,7 +207,6 @@ public class Hopdate extends Fragment {
 
                     Intent i = new Intent(getContext(), Home.class);
                     startActivity(i);
-                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     getActivity().finish();
 
                 }

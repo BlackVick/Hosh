@@ -137,36 +137,9 @@ public class OtherUserProfile extends AppCompatActivity {
         timelineRecycler = (RecyclerView)findViewById(R.id.otherUserTimelineRecycler);
 
 
-        /*---   BLUR COVER   ---*/
-        target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                coverPhoto.setImageBitmap(BlurImage.fastblur(bitmap, 1f,
-                        BLUR_PRECENTAGE));
-            }
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                coverPhoto.setImageResource(R.drawable.empty_profile);
-            }
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        };
-
-
         /*---   TOOLBAR   ---*/
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppbar);
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppbar);
-
-
-        /*---   TIMELINE RECYCLER   ---*/
-        timelineRecycler.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        layoutManager.setReverseLayout(true);
-        layoutManager.setStackFromEnd(true);
-        timelineRecycler.setLayoutManager(layoutManager);
-
 
         /*---   FAB VISIBILITY   ---*/
         if (Common.isConnectedToInternet(getBaseContext())){
@@ -174,30 +147,6 @@ public class OtherUserProfile extends AppCompatActivity {
         } else {
             followUserFab.setVisibility(View.GONE);
         }
-
-
-
-        /*---   MESSAGING FAB   ---*/
-        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot dataSnapshot) {
-                messageUserFab.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent messagingIntent = new Intent(OtherUserProfile.this, Messaging.class);
-                        messagingIntent.putExtra("UserId", userId);
-                        messagingIntent.putExtra("UserName", dataSnapshot.child("userName").getValue().toString());
-                        startActivity(messagingIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    }
-                });
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         /*---   FOLLOW CHECK   ---*/
@@ -259,6 +208,8 @@ public class OtherUserProfile extends AppCompatActivity {
 
                 }
 
+                userRef.child(currentUid).removeEventListener(this);
+
             }
 
             @Override
@@ -271,8 +222,7 @@ public class OtherUserProfile extends AppCompatActivity {
         /*---   LOAD PROFILE   ---*/
         if (Common.isConnectedToInternet(getBaseContext())){
 
-            if (mAuth.getCurrentUser() != null)
-                loadUserProfile(userId);
+            loadUserProfile(userId);
 
         } else {
             Snackbar.make(rootLayout, "Could not Load This Profile. . .   No Internet Access !", Snackbar.LENGTH_LONG).show();
@@ -281,6 +231,13 @@ public class OtherUserProfile extends AppCompatActivity {
     }
 
     private void loadUserTimeline(String userId) {
+
+        /*---   TIMELINE RECYCLER   ---*/
+        timelineRecycler.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+        timelineRecycler.setLayoutManager(layoutManager);
 
         Query myTimeline = timelineRef.orderByChild("sender").equalTo(userId);
 
@@ -491,7 +448,6 @@ public class OtherUserProfile extends AppCompatActivity {
                                 Intent feedDetail = new Intent(OtherUserProfile.this, FeedDetails.class);
                                 feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                                 startActivity(feedDetail);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
                         });
 
@@ -512,7 +468,6 @@ public class OtherUserProfile extends AppCompatActivity {
                         Intent feedDetail = new Intent(OtherUserProfile.this, FeedDetails.class);
                         feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                         startActivity(feedDetail);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                     }
                 });
@@ -526,7 +481,6 @@ public class OtherUserProfile extends AppCompatActivity {
                         Intent feedDetail = new Intent(OtherUserProfile.this, FeedDetails.class);
                         feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                         startActivity(feedDetail);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                     }
                 });
@@ -541,7 +495,24 @@ public class OtherUserProfile extends AppCompatActivity {
 
     private void loadUserProfile(final String userId) {
 
-        userRef.child(userId).addValueEventListener(new ValueEventListener() {
+        /*---   BLUR COVER   ---*/
+        target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                coverPhoto.setImageBitmap(BlurImage.fastblur(bitmap, 1f,
+                        BLUR_PRECENTAGE));
+            }
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                coverPhoto.setImageResource(R.drawable.empty_profile);
+            }
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+
+        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -578,11 +549,22 @@ public class OtherUserProfile extends AppCompatActivity {
                             profileImgIntent.putExtra("ImageUrl", currentUser.getProfilePicture());
                             profileImgIntent.putExtra("ImageThumbUrl", currentUser.getProfilePictureThumb());
                             startActivity(profileImgIntent);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
 
                 }
+
+
+                /*---   MESSAGING FAB   ---*/
+                messageUserFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent messagingIntent = new Intent(OtherUserProfile.this, Messaging.class);
+                        messagingIntent.putExtra("UserId", userId);
+                        messagingIntent.putExtra("UserName", currentUser.getUserName());
+                        startActivity(messagingIntent);
+                    }
+                });
 
                 /*---   GALLERY   ---*/
                 if (Common.isConnectedToInternet(getBaseContext())) {
@@ -592,7 +574,6 @@ public class OtherUserProfile extends AppCompatActivity {
                             Intent goToUserGallery = new Intent(OtherUserProfile.this, UserImageGallery.class);
                             goToUserGallery.putExtra("UserId", userId);
                             startActivity(goToUserGallery);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
                 } else {
@@ -612,7 +593,7 @@ public class OtherUserProfile extends AppCompatActivity {
                 status.setText(currentUser.getStatus());
 
                 /*---   FOLLOWERS   ---*/
-                userRef.child(userId).child("Followers").addValueEventListener(new ValueEventListener() {
+                userRef.child(userId).child("Followers").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -634,7 +615,6 @@ public class OtherUserProfile extends AppCompatActivity {
                         showUsersListIntent.putExtra("Type", "Followers");
                         showUsersListIntent.putExtra("CurrentUserId", userId);
                         startActivity(showUsersListIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
 

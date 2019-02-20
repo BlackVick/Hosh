@@ -110,8 +110,7 @@ public class ImageGallery extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = mAuth.getCurrentUser().getUid();
 
         galleryRef = db.getReference("Users").child(currentUid).child("Gallery");
         imageRef = storage.getReference("Users").child(currentUid).child("ImageGallery");
@@ -145,7 +144,6 @@ public class ImageGallery extends AppCompatActivity {
             public void onClick(View v) {
                 Intent helpIntent = new Intent(ImageGallery.this, Faq.class);
                 startActivity(helpIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -170,13 +168,7 @@ public class ImageGallery extends AppCompatActivity {
         }
 
 
-        /*---   RECYCLER CONTROLLER   ---*/
-        galleryRecycler.setHasFixedSize(true);
-        layoutManager = new GridLayoutManager(this, 5);
-        galleryRecycler.setLayoutManager(layoutManager);
-
-
-            loadGallery();
+        loadGallery();
 
     }
 
@@ -272,6 +264,11 @@ public class ImageGallery extends AppCompatActivity {
 
     private void loadGallery() {
 
+        /*---   RECYCLER CONTROLLER   ---*/
+        galleryRecycler.setHasFixedSize(true);
+        layoutManager = new GridLayoutManager(this, 5);
+        galleryRecycler.setLayoutManager(layoutManager);
+
         adapter = new FirebaseRecyclerAdapter<ImageModel, GalleryViewHolder>(
                 ImageModel.class,
                 R.layout.gallery_item,
@@ -308,7 +305,6 @@ public class ImageGallery extends AppCompatActivity {
                             Intent i = new Intent(ImageGallery.this, MyGalleryImageView.class);
                             i.putExtra("CurrentImage", adapter.getRef(position).getKey());
                             startActivity(i);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
 
@@ -486,5 +482,10 @@ public class ImageGallery extends AppCompatActivity {
         }
 
         return mediaFile;
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

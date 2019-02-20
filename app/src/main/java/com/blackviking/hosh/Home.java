@@ -80,7 +80,6 @@ public class Home extends AppCompatActivity {
                     Intent signoutIntent = new Intent(Home.this, Login.class);
                     signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(signoutIntent);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
 
                 }
@@ -228,6 +227,11 @@ public class Home extends AppCompatActivity {
         } catch (IllegalAccessException e) {
             Log.e("BNVHelper", "Unable to change value of shift mode", e);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     @Override

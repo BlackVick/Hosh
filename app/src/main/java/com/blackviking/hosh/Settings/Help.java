@@ -76,7 +76,6 @@ public class Help extends AppCompatActivity {
             public void onClick(View v) {
                 Intent faqIntent = new Intent(Help.this, Faq.class);
                 startActivity(faqIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -134,8 +133,12 @@ public class Help extends AppCompatActivity {
             public void onClick(View v) {
                 Intent appInfoIntent = new Intent(Help.this, AppInfo.class);
                 startActivity(appInfoIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

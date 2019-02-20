@@ -147,8 +147,8 @@ public class Messaging extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = mAuth.getCurrentUser().getUid();
+
 
         userRef = db.getReference("Users");
 
@@ -178,7 +178,7 @@ public class Messaging extends AppCompatActivity {
 
 
         /*---   FRIEND INFO   ---*/
-        userName.setText(friendUserName);
+        userName.setText("@"+friendUserName);
         userRef.child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -189,22 +189,8 @@ public class Messaging extends AppCompatActivity {
 
                     Picasso.with(getBaseContext())
                             .load(friendImageLink)
-                            .networkPolicy(NetworkPolicy.OFFLINE)
                             .placeholder(R.drawable.ic_loading_animation)
-                            .into(userImage, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError() {
-                                    Picasso.with(getBaseContext())
-                                            .load(friendImageLink)
-                                            .placeholder(R.drawable.ic_loading_animation)
-                                            .into(userImage);
-                                }
-                            });
+                            .into(userImage);
 
                 } else {
 
@@ -219,7 +205,6 @@ public class Messaging extends AppCompatActivity {
                         Intent userIntent = new Intent(Messaging.this, OtherUserProfile.class);
                         userIntent.putExtra("UserId", friendId);
                         startActivity(userIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
 
@@ -229,7 +214,6 @@ public class Messaging extends AppCompatActivity {
                         Intent userIntent = new Intent(Messaging.this, OtherUserProfile.class);
                         userIntent.putExtra("UserId", friendId);
                         startActivity(userIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
             }
@@ -333,7 +317,6 @@ public class Messaging extends AppCompatActivity {
 
         }
 
-
         /*---   TEXT WATCHER   ---*/
         chatBox.addTextChangedListener(new TextWatcher() {
             @Override
@@ -373,30 +356,6 @@ public class Messaging extends AppCompatActivity {
                 openEmoticonDialog();
             }
         });
-
-
-        /*---   LOADING MESSAGES   ---*/
-        messageRecycler.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this){
-
-            @Override
-            public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
-                LinearSmoothScroller smoothScroller = new LinearSmoothScroller(Messaging.this) {
-
-                    private static final float SPEED = 300f;
-
-                    @Override
-                    protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
-                        return SPEED / displayMetrics.densityDpi;
-                    }
-
-                };
-                smoothScroller.setTargetPosition(position);
-                startSmoothScroll(smoothScroller);
-            }
-
-        };
-        messageRecycler.setLayoutManager(layoutManager);
 
         loadMessages();
 
@@ -562,6 +521,29 @@ public class Messaging extends AppCompatActivity {
 
     private void loadMessages() {
 
+        /*---   LOADING MESSAGES   ---*/
+        messageRecycler.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this){
+
+            @Override
+            public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
+                LinearSmoothScroller smoothScroller = new LinearSmoothScroller(Messaging.this) {
+
+                    private static final float SPEED = 300f;
+
+                    @Override
+                    protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+                        return SPEED / displayMetrics.densityDpi;
+                    }
+
+                };
+                smoothScroller.setTargetPosition(position);
+                startSmoothScroll(smoothScroller);
+            }
+
+        };
+        messageRecycler.setLayoutManager(layoutManager);
+
         adapter = new FirebaseRecyclerAdapter<MessageModel, MessagingViewHolder>(
                 MessageModel.class,
                 R.layout.single_message_item,
@@ -625,7 +607,6 @@ public class Messaging extends AppCompatActivity {
                                     viewImage.putExtra("ThumbUrl", model.getMessageThumb());
                                     viewImage.putExtra("ImageUrl", model.getMessage());
                                     startActivity(viewImage);
-                                    overridePendingTransition(R.anim.scale_in, R.anim.scale_out);
                                 }
                             });
 
@@ -690,7 +671,6 @@ public class Messaging extends AppCompatActivity {
                                     viewImage.putExtra("ThumbUrl", model.getMessageThumb());
                                     viewImage.putExtra("ImageUrl", model.getMessage());
                                     startActivity(viewImage);
-                                    overridePendingTransition(R.anim.scale_in, R.anim.scale_out);
                                 }
                             });
 
@@ -1176,10 +1156,48 @@ public class Messaging extends AppCompatActivity {
             deleteCategory(chatMessageId);
         } else if (item.getTitle().equals(Common.DELETE_BOTH)){
 
-            //deleteBothCategory(chatMessageId);
+            deleteBothCategory(chatMessageId);
         }
 
         return super.onContextItemSelected(item);
+    }
+
+    private void deleteBothCategory(final String chatMessageId) {
+
+        messageRef.child(chatMessageId).removeValue().addOnSuccessListener(
+                new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        friendMessageRef.child(chatMessageId).removeValue()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        final Map<String, Object> messageListMap = new HashMap<>();
+                                        messageListMap.put("message", "Retracted a message");
+
+                                        final Map<String, Object> messageFriendListMap = new HashMap<>();
+                                        messageFriendListMap.put("message", "A message was retracted");
+
+                                        friendMessageListRef.child(currentUid).updateChildren(messageFriendListMap);
+                                        messageListRef.child(friendId).updateChildren(messageListMap)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Snackbar.make(rootLayout, "Deleted", Snackbar.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    }
+                                });
+
+                    }
+                }
+        );
+
+
+
+
     }
 
     private void deleteCategory(final String chatMessageId) {
@@ -1190,7 +1208,7 @@ public class Messaging extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
 
                         final Map<String, Object> messageListMap = new HashMap<>();
-                        messageListMap.put("message", "DELETED");
+                        messageListMap.put("message", "Deleted a message");
 
                         messageListRef.child(friendId).updateChildren(messageListMap)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {

@@ -60,4 +60,9 @@ public class NotificationSetting extends AppCompatActivity {
         /*---   HELP   ---*/
         help.setVisibility(View.GONE);
     }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
 }

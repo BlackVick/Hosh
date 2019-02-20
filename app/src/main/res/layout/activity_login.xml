@@ -81,4 +81,16 @@
         android:gravity="center"
         android:layout_alignParentBottom="true"/>
 
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/helpButtonLogin"
+        android:src="@drawable/ic_help_icon"
+        android:tint="@color/white"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="3dp"
+        android:adjustViewBounds="true"
+        android:padding="2dp"/>
+
 </RelativeLayout>

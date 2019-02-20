@@ -81,7 +81,6 @@
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/empty_profile"
                     android:adjustViewBounds="true"
                     android:id="@+id/feedDetailPostImage"/>
 

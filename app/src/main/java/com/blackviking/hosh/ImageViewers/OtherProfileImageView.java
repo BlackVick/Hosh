@@ -59,7 +59,6 @@ public class OtherProfileImageView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                overridePendingTransition(R.anim.scale_out, R.anim.scale_out);
             }
         });
 
@@ -69,21 +68,7 @@ public class OtherProfileImageView extends AppCompatActivity {
 
             Picasso.with(getBaseContext())
                     .load(imageThumbLink) // thumbnail url goes here
-                    .into(image, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Picasso.with(getBaseContext())
-                                    .load(imageThumbLink) // image url goes here
-                                    .placeholder(image.getDrawable())
-                                    .into(image);
-
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
+                    .into(image);
 
         }
     }
@@ -91,6 +76,5 @@ public class OtherProfileImageView extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-        overridePendingTransition(R.anim.scale_out, R.anim.scale_out);
     }
 }

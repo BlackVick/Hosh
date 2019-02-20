@@ -89,11 +89,9 @@ public class Feed extends Fragment {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = mAuth.getCurrentUser().getUid();
 
         feedRef = db.getReference("Hopdate");
-        feedRef.keepSynced(true);
         userRef = db.getReference("Users");
         likeRef = db.getReference("Likes");
         commentRef = db.getReference("HopdateComments");
@@ -126,10 +124,16 @@ public class Feed extends Fragment {
             public void onClick(View v) {
                 Intent faqIntent = new Intent(getContext(), Faq.class);
                 startActivity(faqIntent);
-                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
+
+        loadFeed();
+
+        return v;
+    }
+
+    private void loadFeed() {
 
         /*---   RECYCLER CONTROLLER   ---*/
         feedRecycler.setHasFixedSize(true);
@@ -137,14 +141,6 @@ public class Feed extends Fragment {
         layoutManager.setStackFromEnd(true);
         layoutManager.setReverseLayout(true);
         feedRecycler.setLayoutManager(layoutManager);
-
-        if (mAuth.getCurrentUser() != null)
-            loadFeed();
-
-        return v;
-    }
-
-    private void loadFeed() {
 
         adapter = new FirebaseRecyclerAdapter<HopdateModel, FeedViewHolder>(
                 HopdateModel.class,
@@ -414,7 +410,6 @@ public class Feed extends Fragment {
                                 Intent feedDetail = new Intent(getContext(), FeedDetails.class);
                                 feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                                 startActivity(feedDetail);
-                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
                         });
 
@@ -435,7 +430,6 @@ public class Feed extends Fragment {
                         Intent feedDetail = new Intent(getContext(), FeedDetails.class);
                         feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                         startActivity(feedDetail);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                     }
                 });
@@ -449,7 +443,6 @@ public class Feed extends Fragment {
                         Intent feedDetail = new Intent(getContext(), FeedDetails.class);
                         feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                         startActivity(feedDetail);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                     }
                 });
@@ -464,7 +457,6 @@ public class Feed extends Fragment {
 
                             Intent posterProfile = new Intent(getContext(), MyProfile.class);
                             startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
@@ -477,7 +469,6 @@ public class Feed extends Fragment {
 
                             Intent posterProfile = new Intent(getContext(), MyProfile.class);
                             startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
@@ -492,7 +483,6 @@ public class Feed extends Fragment {
                             Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
                             posterProfile.putExtra("UserId", model.getSender());
                             startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
@@ -506,7 +496,6 @@ public class Feed extends Fragment {
                             Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
                             posterProfile.putExtra("UserId", model.getSender());
                             startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });

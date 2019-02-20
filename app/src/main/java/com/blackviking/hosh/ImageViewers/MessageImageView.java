@@ -77,7 +77,6 @@ public class MessageImageView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                overridePendingTransition(R.anim.scale_out, R.anim.scale_out);
             }
         });
 
@@ -105,7 +104,6 @@ public class MessageImageView extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-        overridePendingTransition(R.anim.scale_out, R.anim.scale_out);
     }
 
     private class DownloadFileFromURL extends AsyncTask<String, String, String> {

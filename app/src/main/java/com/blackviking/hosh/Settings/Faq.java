@@ -150,4 +150,9 @@ public class Faq extends AppCompatActivity {
         listHash.put(listFaqTitle.get(7), account);
 
     }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
 }

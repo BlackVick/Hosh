@@ -57,8 +57,7 @@ public class Messages extends Fragment {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = mAuth.getCurrentUser().getUid();
 
         chatRef = db.getReference("Users").child(currentUid).child("Messages");
         chatListRef = db.getReference("Users").child(currentUid).child("MessageList");
@@ -94,10 +93,15 @@ public class Messages extends Fragment {
             public void onClick(View v) {
                 Intent faqIntent = new Intent(getContext(), Faq.class);
                 startActivity(faqIntent);
-                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
+        loadMessages();
+
+        return v;
+    }
+
+    private void loadMessages() {
 
         /*---   RECYCLER HANDLER   ---*/
         chatRecycler.setHasFixedSize(true);
@@ -105,15 +109,6 @@ public class Messages extends Fragment {
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
         chatRecycler.setLayoutManager(layoutManager);
-
-
-        if (mAuth.getCurrentUser() != null)
-            loadMessages();
-
-        return v;
-    }
-
-    private void loadMessages() {
 
         Query newestShit = chatListRef.orderByChild("timeStamp");
 
@@ -162,7 +157,7 @@ public class Messages extends Fragment {
 
                 if (!model.getFrom().equals(currentUid)) {
 
-                    userRef.child(model.getFrom()).addValueEventListener(new ValueEventListener() {
+                    userRef.child(model.getFrom()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -201,7 +196,6 @@ public class Messages extends Fragment {
                                     messagingIntent.putExtra("UserId", model.getFrom());
                                     messagingIntent.putExtra("UserName", userName);
                                     startActivity(messagingIntent);
-                                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 }
                             });
 
@@ -262,7 +256,6 @@ public class Messages extends Fragment {
                                             messagingIntent.putExtra("UserId", friendId);
                                             messagingIntent.putExtra("UserName", userName);
                                             startActivity(messagingIntent);
-                                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                         }
                                     });
 

@@ -58,9 +58,7 @@ public class ProfileImageView extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
-
+        currentUid = mAuth.getCurrentUser().getUid();
         userRef = db.getReference("Users").child(currentUid);
 
 
@@ -76,7 +74,6 @@ public class ProfileImageView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                overridePendingTransition(R.anim.scale_out, R.anim.scale_out);
             }
         });
 
@@ -87,7 +84,6 @@ public class ProfileImageView extends AppCompatActivity {
             public void onClick(View v) {
                 Intent newProfilePic = new Intent(ProfileImageView.this, ImageGallery.class);
                 startActivity(newProfilePic);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -96,7 +92,7 @@ public class ProfileImageView extends AppCompatActivity {
         final android.app.AlertDialog waitingDialog = new SpotsDialog(ProfileImageView.this, "Please Wait . . .");
         waitingDialog.show();
 
-        userRef.addValueEventListener(new ValueEventListener() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -108,19 +104,7 @@ public class ProfileImageView extends AppCompatActivity {
                     waitingDialog.dismiss();
                     Picasso.with(getBaseContext())
                             .load(profilePictureThumb) // thumbnail url goes here
-                            .into(image, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    Picasso.with(getBaseContext())
-                                            .load(profilePictureThumb) // image url goes here
-                                            .placeholder(image.getDrawable())
-                                            .into(image);
-                                }
-                                @Override
-                                public void onError() {
-
-                                }
-                            });
+                            .into(image);
 
                 } else {
 
@@ -142,6 +126,5 @@ public class ProfileImageView extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-        overridePendingTransition(R.anim.scale_out, R.anim.scale_out);
     }
 }

@@ -101,21 +101,18 @@ public class UserImageGallery extends AppCompatActivity {
             public void onClick(View v) {
                 Intent helpIntent = new Intent(UserImageGallery.this, Faq.class);
                 startActivity(helpIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
+        loadGallery();
+    }
+
+    private void loadGallery() {
 
         /*---   RECYCLER CONTROLLER   ---*/
         galleryRecycler.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(this, 5);
         galleryRecycler.setLayoutManager(layoutManager);
-
-
-            loadGallery();
-    }
-
-    private void loadGallery() {
 
         adapter = new FirebaseRecyclerAdapter<ImageModel, GalleryViewHolder>(
                 ImageModel.class,
@@ -130,22 +127,8 @@ public class UserImageGallery extends AppCompatActivity {
 
                     Picasso.with(getBaseContext())
                             .load(model.getImageThumbUrl())
-                            .networkPolicy(NetworkPolicy.OFFLINE)
                             .placeholder(R.drawable.ic_loading_animation)
-                            .into(viewHolder.galleryImage, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError() {
-                                    Picasso.with(getBaseContext())
-                                            .load(model.getImageThumbUrl())
-                                            .placeholder(R.drawable.ic_loading_animation)
-                                            .into(viewHolder.galleryImage);
-                                }
-                            });
+                            .into(viewHolder.galleryImage);
 
                     viewHolder.setItemClickListener(new ItemClickListener() {
                         @Override
@@ -155,7 +138,6 @@ public class UserImageGallery extends AppCompatActivity {
                             i.putExtra("ImageUrl", model.getImageUrl());
                             i.putExtra("ImageThumbUrl", model.getImageThumbUrl());
                             startActivity(i);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
 
@@ -168,5 +150,10 @@ public class UserImageGallery extends AppCompatActivity {
         galleryRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

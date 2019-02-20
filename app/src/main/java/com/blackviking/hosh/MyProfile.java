@@ -110,8 +110,7 @@ public class MyProfile extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = mAuth.getCurrentUser().getUid();
         userRef = db.getReference("Users");
 
 
@@ -135,24 +134,6 @@ public class MyProfile extends AppCompatActivity {
         openGallery = (Button)findViewById(R.id.openGalleryButton);
 
 
-        /*---   BLUR COVER   ---*/
-        target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                coverPhoto.setImageBitmap(BlurImage.fastblur(bitmap, 1f,
-                        BLUR_PRECENTAGE));
-            }
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                coverPhoto.setImageResource(R.drawable.empty_profile);
-            }
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        };
-
-
         /*---   TOOLBAR   ---*/
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppbar);
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppbar);
@@ -164,13 +145,12 @@ public class MyProfile extends AppCompatActivity {
         } else {
             editProfileFab.setVisibility(View.GONE);
         }
+
+
         editProfileFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (mAuth.getCurrentUser() != null)
-                    openEditProfileDialog();
-
+                openEditProfileDialog();
             }
         });
 
@@ -182,20 +162,13 @@ public class MyProfile extends AppCompatActivity {
 
                 Intent newProfilePic = new Intent(MyProfile.this, ImageGallery.class);
                 startActivity(newProfilePic);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
             }
         });
 
 
         /*---   LOAD PROFILE   ---*/
-        if (Common.isConnectedToInternet(getBaseContext())) {
-
-                loadMyProfile(currentUid);
-
-        } else {
-            Snackbar.make(rootLayout, "Could not Load Your Profile. . .   No Internet Access !", Snackbar.LENGTH_LONG).show();
-        }
+        loadMyProfile(currentUid);
     }
 
     private void openEditProfileDialog() {
@@ -358,7 +331,24 @@ public class MyProfile extends AppCompatActivity {
 
     private void loadMyProfile(final String currentUid) {
 
-        userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
+        /*---   BLUR COVER   ---*/
+        target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                coverPhoto.setImageBitmap(BlurImage.fastblur(bitmap, 1f,
+                        BLUR_PRECENTAGE));
+            }
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                coverPhoto.setImageResource(R.drawable.empty_profile);
+            }
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+
+        userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -406,7 +396,6 @@ public class MyProfile extends AppCompatActivity {
                         public void onClick(View v) {
                             Intent profileImgIntent = new Intent(MyProfile.this, ProfileImageView.class);
                             startActivity(profileImgIntent);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
                 }
@@ -419,7 +408,6 @@ public class MyProfile extends AppCompatActivity {
                         public void onClick(View v) {
                             Intent newProfilePic = new Intent(MyProfile.this, ImageGallery.class);
                             startActivity(newProfilePic);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
                 } else {
@@ -437,7 +425,7 @@ public class MyProfile extends AppCompatActivity {
                 status.setText(currentUser.getStatus());
 
                 /*---   FOLLOWERS   ---*/
-                userRef.child(currentUid).child("Followers").addValueEventListener(new ValueEventListener() {
+                userRef.child(currentUid).child("Followers").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -460,13 +448,12 @@ public class MyProfile extends AppCompatActivity {
                         showUsersListIntent.putExtra("Type", "Followers");
                         showUsersListIntent.putExtra("CurrentUserId", currentUid);
                         startActivity(showUsersListIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
 
 
                 /*---   FOLLOWING   ---*/
-                userRef.child(currentUid).child("Following").addValueEventListener(new ValueEventListener() {
+                userRef.child(currentUid).child("Following").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -489,7 +476,6 @@ public class MyProfile extends AppCompatActivity {
                         showUsersListIntent.putExtra("Type", "Following");
                         showUsersListIntent.putExtra("CurrentUserId", currentUid);
                         startActivity(showUsersListIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     }
                 });
 

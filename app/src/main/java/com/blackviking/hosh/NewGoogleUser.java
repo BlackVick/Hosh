@@ -115,7 +115,6 @@ public class NewGoogleUser extends AppCompatActivity {
             public void onClick(View v) {
                 Paper.book().destroy();
                 FirebaseAuth.getInstance().signOut();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();
             }
         });
@@ -128,7 +127,6 @@ public class NewGoogleUser extends AppCompatActivity {
 
                 Intent helpIntent = new Intent(NewGoogleUser.this, Faq.class);
                 startActivity(helpIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
@@ -326,7 +324,6 @@ public class NewGoogleUser extends AppCompatActivity {
 
                                 Intent goToHome = new Intent(NewGoogleUser.this, Home.class);
                                 startActivity(goToHome);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 finish();
                             }
                         });
@@ -355,7 +352,6 @@ public class NewGoogleUser extends AppCompatActivity {
 
         Paper.book().destroy();
         FirebaseAuth.getInstance().signOut();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
 
     }

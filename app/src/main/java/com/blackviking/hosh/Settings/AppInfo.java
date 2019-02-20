@@ -28,4 +28,9 @@ public class AppInfo extends AppCompatActivity {
 
         setContentView(R.layout.activity_app_info);
     }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
 }

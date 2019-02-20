@@ -10,9 +10,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.blackviking.hosh.Common.Common;
+import com.blackviking.hosh.Settings.Faq;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -55,6 +57,7 @@ public class Login extends AppCompatActivity {
     private Button google, email, anonymous;
     private RoundKornerRelativeLayout buttonSLayout;
     private android.app.AlertDialog mDialog;
+    private ImageView help;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -89,6 +92,7 @@ public class Login extends AppCompatActivity {
         anonymous = (Button)findViewById(R.id.signInAnonymously);
         rootLayout = (RelativeLayout)findViewById(R.id.loginRootLayout);
         buttonSLayout = (RoundKornerRelativeLayout)findViewById(R.id.loginButtonLayout);
+        help = (ImageView)findViewById(R.id.helpButtonLogin);
 
 
         /*---   BUTTON REVEAL TIME   ---*/
@@ -99,6 +103,14 @@ public class Login extends AppCompatActivity {
             }
         }, REVEAL_BUTTONS_TIME);
 
+        /*---   HELP   ---*/
+        help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent helpIntent = new Intent(Login.this, Faq.class);
+                startActivity(helpIntent);
+            }
+        });
 
         /*---   GOOGLE API INITIALIZATION   ---*/
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -459,7 +471,6 @@ public class Login extends AppCompatActivity {
                             mDialog.dismiss();
                             Intent newGoogleUser = new Intent(Login.this, NewGoogleUser.class);
                             startActivity(newGoogleUser);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
                         } else {
@@ -468,7 +479,6 @@ public class Login extends AppCompatActivity {
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
                         }
@@ -492,7 +502,6 @@ public class Login extends AppCompatActivity {
                             mDialog.dismiss();
                             Intent newGoogleUser = new Intent(Login.this, NewEmailUser.class);
                             startActivity(newGoogleUser);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
                         } else {
@@ -501,7 +510,6 @@ public class Login extends AppCompatActivity {
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
                         }
@@ -525,7 +533,6 @@ public class Login extends AppCompatActivity {
                             mDialog.dismiss();
                             Intent newFacebookUser = new Intent(Login.this, NewAnonymousUser.class);
                             startActivity(newFacebookUser);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
                         } else {
@@ -534,7 +541,6 @@ public class Login extends AppCompatActivity {
                             Paper.book().write(Common.USER_ID, currentUid);
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             finish();
 
                         }
@@ -565,7 +571,6 @@ public class Login extends AppCompatActivity {
 
                 Intent goToHome = new Intent(Login.this, Home.class);
                 startActivity(goToHome);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();
 
             }

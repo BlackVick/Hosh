@@ -77,11 +77,9 @@ public class HookUp extends Fragment {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = mAuth.getCurrentUser().getUid();
 
         userRef = db.getReference("Users");
-
 
         /*---   WIDGETS   ---*/
         exitActivity = (ImageView)v.findViewById(R.id.exitActivity);
@@ -115,132 +113,121 @@ public class HookUp extends Fragment {
             public void onClick(View v) {
                 Intent faqIntent = new Intent(getContext(), Faq.class);
                 startActivity(faqIntent);
-                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
-
-
-        /*---   RECYCLER CONTROLLER   ---*/
-        hookupRecycler.setHasFixedSize(true);
-        layoutManager = new GridLayoutManager(getContext(), 5);
-        hookupRecycler.setLayoutManager(layoutManager);
 
 
         if (Common.isConnectedToInternet(getContext())) {
 
             /*---   INTERESTED IN   ---*/
-            if (mAuth.getCurrentUser() != null) {
+            userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    String myInterest = dataSnapshot.child("lookingFor").getValue().toString();
+                    String mySex = dataSnapshot.child("sex").getValue().toString();
 
-                        String myInterest = dataSnapshot.child("lookingFor").getValue().toString();
-                        String mySex = dataSnapshot.child("sex").getValue().toString();
+                    if (myInterest.equalsIgnoreCase("Women")) {
 
-                        if (myInterest.equalsIgnoreCase("Women")) {
-
-                            sexToHaunt = "Men";
+                        sexToHaunt = "Men";
 
                         /*---   LOAD   ---*/
-                            userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    if (dataSnapshot.exists()) {
+                                if (dataSnapshot.exists()) {
 
-                                        mDialog.dismiss();
-                                        loadHookups(currentUid);
+                                    mDialog.dismiss();
+                                    loadHookups(currentUid);
 
-                                    } else {
+                                } else {
 
-                                        mDialog.dismiss();
-                                        openNoMatchFound();
-
-                                    }
-
+                                    mDialog.dismiss();
+                                    openNoMatchFound();
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
+                            }
 
-                        } else if (myInterest.equalsIgnoreCase("Men")) {
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                            sexToHaunt = "Women";
+                            }
+                        });
+
+                    } else if (myInterest.equalsIgnoreCase("Men")) {
+
+                        sexToHaunt = "Women";
 
                         /*---   LOAD   ---*/
-                            userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    if (dataSnapshot.exists()) {
+                                if (dataSnapshot.exists()) {
 
-                                        mDialog.dismiss();
-                                        loadHookups(currentUid);
+                                    mDialog.dismiss();
+                                    loadHookups(currentUid);
 
-                                    } else {
+                                } else {
 
-                                        mDialog.dismiss();
-                                        openNoMatchFound();
-
-                                    }
-
+                                    mDialog.dismiss();
+                                    openNoMatchFound();
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
+                            }
 
-                        } else if (myInterest.equalsIgnoreCase("Groupie")) {
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                            sexToHaunt = "Groupie";
+                            }
+                        });
+
+                    } else if (myInterest.equalsIgnoreCase("Groupie")) {
+
+                        sexToHaunt = "Groupie";
 
                         /*---   LOAD   ---*/
-                            userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                        userRef.orderByChild("lookingFor").equalTo(sexToHaunt).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    if (dataSnapshot.exists()) {
+                                if (dataSnapshot.exists()) {
 
-                                        mDialog.dismiss();
-                                        loadHookups(currentUid);
+                                    mDialog.dismiss();
+                                    loadHookups(currentUid);
 
-                                    } else {
+                                } else {
 
-                                        mDialog.dismiss();
-                                        openNoMatchFound();
-
-                                    }
-
+                                    mDialog.dismiss();
+                                    openNoMatchFound();
 
                                 }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
+                            }
 
-                        }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                        userRef.removeEventListener(this);
+                            }
+                        });
 
                     }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    userRef.removeEventListener(this);
 
-                    }
-                });
+                }
 
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
 
         } else {
 
@@ -279,6 +266,11 @@ public class HookUp extends Fragment {
     }
 
     private void loadHookups(final String currentUid) {
+
+        /*---   RECYCLER CONTROLLER   ---*/
+        hookupRecycler.setHasFixedSize(true);
+        layoutManager = new GridLayoutManager(getContext(), 5);
+        hookupRecycler.setLayoutManager(layoutManager);
 
         Query specifics = userRef.orderByChild("lookingFor").equalTo(sexToHaunt);
 
@@ -328,7 +320,6 @@ public class HookUp extends Fragment {
                             Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
                             posterProfile.putExtra("UserId", ids);
                             startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         }
                     });
 

@@ -3,6 +3,8 @@ package com.blackviking.hosh;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +12,19 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.blackviking.hosh.Common.Common;
@@ -39,6 +48,10 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.paperdb.Paper;
@@ -61,6 +74,7 @@ public class FeedDetails extends AppCompatActivity {
     private String currentFeedId, currentUid;
     private HopdateModel currentHopdate;
     private CommentModel newComment;
+    private String offenceString = "";
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -136,11 +150,9 @@ public class FeedDetails extends AppCompatActivity {
             public void onClick(View v) {
                 Intent helpIntent = new Intent(FeedDetails.this, Faq.class);
                 startActivity(helpIntent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
-        
         /*---   SEND COMMENT   ---*/
         sendComment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,21 +161,8 @@ public class FeedDetails extends AppCompatActivity {
             }
         });
 
-
-
-        /*---   RECYCLER CONTROLLER   ---*/
-        commentRecycler.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        layoutManager.setReverseLayout(true);
-        layoutManager.setStackFromEnd(true);
-        commentRecycler.setLayoutManager(layoutManager);
-        
-
-
-
-            loadCurrentHopdate();
-            loadComments();
-
+        loadCurrentHopdate();
+        loadComments();
     }
 
     private void sendTheComment() {
@@ -192,6 +191,13 @@ public class FeedDetails extends AppCompatActivity {
 
     private void loadComments() {
 
+        /*---   RECYCLER CONTROLLER   ---*/
+        commentRecycler.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+        commentRecycler.setLayoutManager(layoutManager);
+
         adapter = new FirebaseRecyclerAdapter<CommentModel, CommentViewHolder>(
                 CommentModel.class,
                 R.layout.comment_item,
@@ -203,7 +209,7 @@ public class FeedDetails extends AppCompatActivity {
                 viewHolder.time.setText(model.getCommentTime());
                 viewHolder.comment.setText(model.getComment());
 
-                userRef.child(model.getCommenter()).addValueEventListener(new ValueEventListener() {
+                userRef.child(model.getCommenter()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         viewHolder.username.setText(dataSnapshot.child("userName").getValue().toString());
@@ -242,22 +248,8 @@ public class FeedDetails extends AppCompatActivity {
 
                             Picasso.with(getBaseContext())
                                     .load(imageThumbLink)
-                                    .networkPolicy(NetworkPolicy.OFFLINE)
                                     .placeholder(R.drawable.ic_loading_animation)
-                                    .into(posterImage, new Callback() {
-                                        @Override
-                                        public void onSuccess() {
-
-                                        }
-
-                                        @Override
-                                        public void onError() {
-                                            Picasso.with(getBaseContext())
-                                                    .load(imageThumbLink)
-                                                    .placeholder(R.drawable.ic_loading_animation)
-                                                    .into(posterImage);
-                                        }
-                                    });
+                                    .into(posterImage);
 
                         }
 
@@ -340,7 +332,40 @@ public class FeedDetails extends AppCompatActivity {
 
                 } else {
 
-                    options.setVisibility(View.GONE);
+                    options.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        /*---   POPUP MENU FOR HOPDATE   ---*/
+                            PopupMenu popup = new PopupMenu(FeedDetails.this, options);
+                            popup.inflate(R.menu.feed_item_menu_other);
+                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem item) {
+                                    switch (item.getItemId()) {
+                                        case R.id.action_feed_other_report:
+
+                                            openReportDialog(currentHopdate.getSender());
+
+                                            return true;
+                                        case R.id.action_feed_other_share:
+
+                                            Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                                            i.setType("text/plain");
+                                            i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
+                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
+                                            startActivity(Intent.createChooser(i,"Share via"));
+
+                                            return true;
+                                        default:
+                                            return false;
+                                    }
+                                }
+                            });
+
+                            popup.show();
+                        }
+                    });
 
                 }
 
@@ -351,22 +376,8 @@ public class FeedDetails extends AppCompatActivity {
 
                     Picasso.with(getBaseContext())
                             .load(currentHopdate.getImageUrl())
-                            .networkPolicy(NetworkPolicy.OFFLINE)
                             .placeholder(R.drawable.post_loading_icon)
-                            .into(postImage, new Callback() {
-                                @Override
-                                public void onSuccess() {
-
-                                }
-
-                                @Override
-                                public void onError() {
-                                    Picasso.with(getBaseContext())
-                                            .load(currentHopdate.getImageUrl())
-                                            .placeholder(R.drawable.post_loading_icon)
-                                            .into(postImage);
-                                }
-                            });
+                            .into(postImage);
 
                 } else {
 
@@ -465,7 +476,6 @@ public class FeedDetails extends AppCompatActivity {
 
                             Intent posterProfile = new Intent(FeedDetails.this, MyProfile.class);
                             startActivity(posterProfile);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
@@ -478,7 +488,6 @@ public class FeedDetails extends AppCompatActivity {
 
                             Intent posterProfile = new Intent(FeedDetails.this, MyProfile.class);
                             startActivity(posterProfile);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
@@ -493,7 +502,6 @@ public class FeedDetails extends AppCompatActivity {
                             Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
                             posterProfile.putExtra("UserId", currentHopdate.getSender());
                             startActivity(posterProfile);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         }
                     });
@@ -507,7 +515,6 @@ public class FeedDetails extends AppCompatActivity {
                             Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
                             posterProfile.putExtra("UserId", currentHopdate.getSender());
                             startActivity(posterProfile);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
 
                         }
@@ -522,6 +529,107 @@ public class FeedDetails extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    private void openReportDialog(final String sender) {
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.report_form,null);
+
+        final Spinner offenceClass = (Spinner) viewOptions.findViewById(R.id.reportTypeSpinner);
+        final EditText offenceDetails = (EditText) viewOptions.findViewById(R.id.reportDetails);
+        final Button submitReport = (Button) viewOptions.findViewById(R.id.submitReportBtn);
+        final DatabaseReference reportRef = db.getReference("Reports");
+
+
+        /*---   SETUP SPINNER   ---*/
+        /*---   FILL GENDER SPINNER   ---*/
+        List<String> offenceList = new ArrayList<>();
+        offenceList.add(0, "Report Type");
+        offenceList.add("Inappropriate Content");
+        offenceList.add("Offensive Acts");
+        offenceList.add("Bullying");
+
+        ArrayAdapter<String> dataAdapterOffence;
+        dataAdapterOffence = new ArrayAdapter(FeedDetails.this, android.R.layout.simple_spinner_item, offenceList);
+
+        dataAdapterOffence.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        offenceClass.setAdapter(dataAdapterOffence);
+
+
+        /*---    GENDER SPINNER   ---*/
+        offenceClass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (!parent.getItemAtPosition(position).equals("Report Type")){
+
+                    offenceString = parent.getItemAtPosition(position).toString();
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 200; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+        submitReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (Common.isConnectedToInternet(getBaseContext())){
+
+                    if (offenceString.equals("") || TextUtils.isEmpty(offenceDetails.getText().toString())){
+
+                        Snackbar.make(rootLayout, "Invalid Report", Snackbar.LENGTH_SHORT).show();
+
+                    } else {
+
+                        final Map<String, Object> reportUserMap = new HashMap<>();
+                        reportUserMap.put("reporter", currentUid);
+                        reportUserMap.put("reported", sender);
+                        reportUserMap.put("reportClass", offenceString);
+                        reportUserMap.put("reportDetails", offenceDetails.getText().toString());
+
+                        reportRef.push().setValue(reportUserMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Snackbar.make(rootLayout, "Report Logged, Don't Be A Snitch", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
+
+                }else {
+
+                    Snackbar.make(rootLayout, "No Internet Access !", Snackbar.LENGTH_LONG).show();
+                }
+                alertDialog.dismiss();
+
+            }
+        });
+
+        alertDialog.show();
 
     }
 

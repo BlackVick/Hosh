@@ -106,8 +106,7 @@ public class AccountSetting extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = mAuth.getCurrentUser().getUid();
         userRef = db.getReference("Users");
 
 
@@ -180,8 +179,7 @@ public class AccountSetting extends AppCompatActivity {
         });
 
 
-        if (mAuth.getCurrentUser() != null)
-            loadAccount(currentUid, signUpChoice);
+        loadAccount(currentUid, signUpChoice);
     }
 
     private void openDialogForDeleteAccount(String currentUid) {
@@ -199,7 +197,6 @@ public class AccountSetting extends AppCompatActivity {
                         Intent signoutIntent = new Intent(AccountSetting.this, Login.class);
                         signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(signoutIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         finish();
 
                     }
@@ -233,7 +230,6 @@ public class AccountSetting extends AppCompatActivity {
                         Intent signoutIntent = new Intent(AccountSetting.this, Login.class);
                         signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(signoutIntent);
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         finish();
 
                     }
@@ -564,7 +560,6 @@ public class AccountSetting extends AppCompatActivity {
                             Intent reload = new Intent(AccountSetting.this, AccountSetting.class);
                             startActivity(reload);
                             finish();
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                         } else {
 
@@ -578,5 +573,8 @@ public class AccountSetting extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
 }

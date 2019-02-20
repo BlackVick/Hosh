@@ -74,15 +74,12 @@ public class Account extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_account, container, false);
 
-
         /*---   PAPER DB   ---*/
         Paper.init(getContext());
 
 
         /*---   CURRENT USER TOKEN   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
-
+        currentUid = mAuth.getCurrentUser().getUid();
 
         /*---   FIREBASE   ---*/
         userRef = db.getReference("Users");
@@ -104,160 +101,142 @@ public class Account extends Fragment {
         followersLayout = (LinearLayout)v.findViewById(R.id.followersCountLayout);
         timelineRecycler = (RecyclerView)v.findViewById(R.id.timelineRecycler);
         
-        
-        /*---   TIMELINE   ---*/
-        timelineRecycler.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setStackFromEnd(true);
-        layoutManager.setReverseLayout(true);
-        timelineRecycler.setLayoutManager(layoutManager);
-        
-        
         /*---   CURRENT USER   ---*/
-        if (mAuth.getCurrentUser() != null) {
+        userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-            userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    currentUser = dataSnapshot.getValue(UserModel.class);
+                currentUser = dataSnapshot.getValue(UserModel.class);
 
                 /*---   ACTIVITY NAME   ---*/
-                    activityName.setText("@" + currentUser.getUserName());
+                activityName.setText("@" + currentUser.getUserName());
 
 
                 /*---   FOLLOWERS   ---*/
-                    if (dataSnapshot.child("Followers").exists()) {
+                if (dataSnapshot.child("Followers").exists()) {
 
-                        userRef.child(currentUid).child("Followers").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                int count = (int) dataSnapshot.getChildrenCount();
-                                followers.setText(String.valueOf(count));
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-
-                    }
-
-                    followersLayout.setOnClickListener(new View.OnClickListener() {
+                    userRef.child(currentUid).child("Followers").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onClick(View v) {
-                            Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
-                            showUsersListIntent.putExtra("Type", "Followers");
-                            showUsersListIntent.putExtra("CurrentUserId", currentUid);
-                            startActivity(showUsersListIntent);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            int count = (int) dataSnapshot.getChildrenCount();
+                            followers.setText(String.valueOf(count));
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
                         }
                     });
+
+
+                }
+
+                followersLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
+                        showUsersListIntent.putExtra("Type", "Followers");
+                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
+                        startActivity(showUsersListIntent);
+                    }
+                });
 
 
                 /*---   FOLLOWING   ---*/
-                    if (dataSnapshot.child("Following").exists()) {
+                if (dataSnapshot.child("Following").exists()) {
 
-                        userRef.child(currentUid).child("Following").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                int count = (int) dataSnapshot.getChildrenCount();
-                                following.setText(String.valueOf(count));
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-
-                    }
-
-                    followingLayout.setOnClickListener(new View.OnClickListener() {
+                    userRef.child(currentUid).child("Following").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onClick(View v) {
-                            Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
-                            showUsersListIntent.putExtra("Type", "Following");
-                            showUsersListIntent.putExtra("CurrentUserId", currentUid);
-                            startActivity(showUsersListIntent);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            int count = (int) dataSnapshot.getChildrenCount();
+                            following.setText(String.valueOf(count));
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
                         }
                     });
+
+
+                }
+
+                followingLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent showUsersListIntent = new Intent(getContext(), UserListActivity.class);
+                        showUsersListIntent.putExtra("Type", "Following");
+                        showUsersListIntent.putExtra("CurrentUserId", currentUid);
+                        startActivity(showUsersListIntent);
+                    }
+                });
 
 
                 /*---   PROFILE PICTURE   ---*/
-                    if (!currentUser.getProfilePictureThumb().equals("")) {
+                if (!currentUser.getProfilePictureThumb().equals("")) {
 
-                        Picasso.with(getContext())
-                                .load(currentUser.getProfilePictureThumb())
-                                .networkPolicy(NetworkPolicy.OFFLINE)
-                                .placeholder(R.drawable.ic_loading_animation)
-                                .into(profileImage, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
+                    Picasso.with(getContext())
+                            .load(currentUser.getProfilePictureThumb())
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.drawable.ic_loading_animation)
+                            .into(profileImage, new Callback() {
+                                @Override
+                                public void onSuccess() {
 
-                                    }
+                                }
 
-                                    @Override
-                                    public void onError() {
-                                        Picasso.with(getContext())
-                                                .load(currentUser.getProfilePictureThumb())
-                                                .placeholder(R.drawable.ic_loading_animation)
-                                                .into(profileImage);
-                                    }
-                                });
+                                @Override
+                                public void onError() {
+                                    Picasso.with(getContext())
+                                            .load(currentUser.getProfilePictureThumb())
+                                            .placeholder(R.drawable.ic_loading_animation)
+                                            .into(profileImage);
+                                }
+                            });
 
-                    }
+                }
 
-                    profileImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent profileImgIntent = new Intent(getContext(), ProfileImageView.class);
+                profileImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent profileImgIntent = new Intent(getContext(), ProfileImageView.class);
                         /*profileImgIntent.putExtra("ImageUrl", currentUser.getProfilePicture());
                         profileImgIntent.putExtra("ImageThumbUrl", currentUser.getProfilePictureThumb());*/
-                            startActivity(profileImgIntent);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                        }
-                    });
+                        startActivity(profileImgIntent);
+                    }
+                });
 
 
                 /*---   PROFILE SETTING   ---*/
-                    profileSetting.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent posterProfile = new Intent(getContext(), MyProfile.class);
-                            startActivity(posterProfile);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                        }
-                    });
+                profileSetting.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent posterProfile = new Intent(getContext(), MyProfile.class);
+                        startActivity(posterProfile);
+                    }
+                });
 
 
                 /*---   ACCOUNT SETTING   ---*/
-                    accountSetting.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent accountIntent = new Intent(getContext(), AccountSettings.class);
-                            startActivity(accountIntent);
-                            getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                        }
-                    });
+                accountSetting.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent accountIntent = new Intent(getContext(), AccountSettings.class);
+                        startActivity(accountIntent);
+                    }
+                });
 
-                }
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
-
-        }
+            }
+        });
 
 
         /*---   EXIT   ---*/
@@ -276,19 +255,23 @@ public class Account extends Fragment {
             public void onClick(View v) {
                 Intent faqIntent = new Intent(getContext(), Faq.class);
                 startActivity(faqIntent);
-                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
 
 
-
-            loadMyTimeline();
-
+        loadMyTimeline();
 
         return v;
     }
 
     private void loadMyTimeline() {
+
+        /*---   TIMELINE   ---*/
+        timelineRecycler.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        timelineRecycler.setLayoutManager(layoutManager);
 
         Query myTimeline = timelineRef.orderByChild("sender").equalTo(currentUid);
 
@@ -499,7 +482,6 @@ public class Account extends Fragment {
                                 Intent feedDetail = new Intent(getContext(), FeedDetails.class);
                                 feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                                 startActivity(feedDetail);
-                                getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
                         });
 
@@ -520,7 +502,6 @@ public class Account extends Fragment {
                         Intent feedDetail = new Intent(getContext(), FeedDetails.class);
                         feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                         startActivity(feedDetail);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                     }
                 });
@@ -534,7 +515,6 @@ public class Account extends Fragment {
                         Intent feedDetail = new Intent(getContext(), FeedDetails.class);
                         feedDetail.putExtra("CurrentFeedId", adapter.getRef(position).getKey());
                         startActivity(feedDetail);
-                        getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
                     }
                 });

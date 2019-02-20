@@ -63,12 +63,10 @@ public class MyGalleryImageView extends AppCompatActivity {
 
 
         /*---   FIREBASE   ---*/
-        if (mAuth.getCurrentUser() != null)
-            currentUid = mAuth.getCurrentUser().getUid();
+        currentUid = mAuth.getCurrentUser().getUid();
 
         userRef = db.getReference("Users").child(currentUid);
         imageRef = db.getReference("Users").child(currentUid).child("Gallery");
-
 
 
         /*---   WIDGETS   ---*/
@@ -84,7 +82,6 @@ public class MyGalleryImageView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                overridePendingTransition(R.anim.scale_out, R.anim.scale_out);
             }
         });
 
@@ -229,6 +226,5 @@ public class MyGalleryImageView extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-        overridePendingTransition(R.anim.scale_out, R.anim.scale_out);
     }
 }
