@@ -58,6 +58,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:11.4.2'
     implementation 'com.google.firebase:firebase-storage:11.4.2'
     implementation 'com.google.firebase:firebase-database:11.4.2'
+    implementation 'com.google.firebase:firebase-messaging:11.4.2'
     implementation 'com.firebaseui:firebase-ui-database:2.1.1'
     implementation 'com.firebaseui:firebase-ui-auth:2.1.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.8'

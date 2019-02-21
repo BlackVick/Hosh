@@ -63,6 +63,15 @@
             android:value="97c5e0bb9711d1cf829d94e2147e8567b6542b37"
             tools:replace="value" />
 
+        <service
+            android:name=".Notification.MyFirebaseMessaging"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".Login"
             android:configChanges="orientation"

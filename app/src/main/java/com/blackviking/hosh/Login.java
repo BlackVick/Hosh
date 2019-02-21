@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout;
 
 import dmax.dialog.SpotsDialog;
@@ -477,6 +478,10 @@ public class Login extends AppCompatActivity {
 
                             mDialog.dismiss();
                             Paper.book().write(Common.USER_ID, currentUid);
+
+                            FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
+                            Paper.book().write(Common.NOTIFICATION_STATE, "true");
+
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);
                             finish();
@@ -508,6 +513,10 @@ public class Login extends AppCompatActivity {
 
                             mDialog.dismiss();
                             Paper.book().write(Common.USER_ID, currentUid);
+
+                            FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
+                            Paper.book().write(Common.NOTIFICATION_STATE, "true");
+
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);
                             finish();
@@ -539,6 +548,10 @@ public class Login extends AppCompatActivity {
 
                             mDialog.dismiss();
                             Paper.book().write(Common.USER_ID, currentUid);
+
+                            FirebaseMessaging.getInstance().subscribeToTopic(currentUid);
+                            Paper.book().write(Common.NOTIFICATION_STATE, "true");
+
                             Intent goToHome = new Intent(Login.this, Home.class);
                             startActivity(goToHome);
                             finish();

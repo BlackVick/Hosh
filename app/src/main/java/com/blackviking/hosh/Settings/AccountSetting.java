@@ -57,6 +57,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -226,6 +227,9 @@ public class AccountSetting extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         FirebaseAuth.getInstance().signOut();
+
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(currentUid);
+
                         Paper.book().destroy();
                         Intent signoutIntent = new Intent(AccountSetting.this, Login.class);
                         signoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -28,9 +28,12 @@ import com.blackviking.hosh.ImageViewers.BlurImage;
 import com.blackviking.hosh.ImageViewers.OtherProfileImageView;
 import com.blackviking.hosh.ImageViewers.ProfileImageView;
 import com.blackviking.hosh.Interface.ItemClickListener;
+import com.blackviking.hosh.Model.DataMessage;
 import com.blackviking.hosh.Model.HopdateModel;
 import com.blackviking.hosh.Model.ImageModel;
+import com.blackviking.hosh.Model.MyResponse;
 import com.blackviking.hosh.Model.UserModel;
+import com.blackviking.hosh.Notification.APIService;
 import com.blackviking.hosh.ViewHolder.FeedViewHolder;
 import com.blackviking.hosh.ViewHolder.UserProfileGalleryViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -53,7 +56,12 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -75,6 +83,8 @@ public class OtherUserProfile extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<HopdateModel, FeedViewHolder> adapter;
     private Target target;
+    private APIService mService;
+
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -101,6 +111,10 @@ public class OtherUserProfile extends AppCompatActivity {
 
         /*---   LOCAL   ---*/
         Paper.init(this);
+
+
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
 
 
         /*---   FIREBASE   ---*/
@@ -199,6 +213,8 @@ public class OtherUserProfile extends AppCompatActivity {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             Snackbar.make(rootLayout, "You are now following @" + currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
+                                                            sendFollowNotification(currentUser.getUserName(), currentUid);
+
                                                         }
                                                     });
                                         }
@@ -207,8 +223,6 @@ public class OtherUserProfile extends AppCompatActivity {
                     });
 
                 }
-
-                userRef.child(currentUid).removeEventListener(this);
 
             }
 
@@ -227,6 +241,29 @@ public class OtherUserProfile extends AppCompatActivity {
         } else {
             Snackbar.make(rootLayout, "Could not Load This Profile. . .   No Internet Access !", Snackbar.LENGTH_LONG).show();
         }
+
+    }
+
+    private void sendFollowNotification(String userName, String currentUid) {
+
+        Map<String, String> dataSend = new HashMap<>();
+        dataSend.put("title", "Account");
+        dataSend.put("message", "@"+userName+" Just Followed You");
+        dataSend.put("user_id", currentUid);
+        DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
+
+        mService.sendNotification(dataMessage)
+                .enqueue(new retrofit2.Callback<MyResponse>() {
+                    @Override
+                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<MyResponse> call, Throwable t) {
+                        Snackbar.make(rootLayout, "Error Sending Notification !", Snackbar.LENGTH_LONG).show();
+                    }
+                });
 
     }
 

@@ -29,7 +29,10 @@ import android.widget.TextView;
 
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Model.CommentModel;
+import com.blackviking.hosh.Model.DataMessage;
 import com.blackviking.hosh.Model.HopdateModel;
+import com.blackviking.hosh.Model.MyResponse;
+import com.blackviking.hosh.Notification.APIService;
 import com.blackviking.hosh.Settings.Faq;
 import com.blackviking.hosh.Settings.Help;
 import com.blackviking.hosh.ViewHolder.CommentViewHolder;
@@ -41,6 +44,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
 import com.squareup.picasso.Callback;
@@ -55,6 +59,8 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -75,6 +81,7 @@ public class FeedDetails extends AppCompatActivity {
     private HopdateModel currentHopdate;
     private CommentModel newComment;
     private String offenceString = "";
+    private APIService mService;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -96,6 +103,10 @@ public class FeedDetails extends AppCompatActivity {
 
         /*---   LOCAL   ---*/
         Paper.init(this);
+
+
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
 
 
         /*---   INTENT DATA   ---*/
@@ -182,6 +193,9 @@ public class FeedDetails extends AppCompatActivity {
                 newComment = new CommentModel(theComment, currentUid, dateString);
                 commentRef.child(currentFeedId).push().setValue(newComment);
                 commentBox.setText("");
+                if (!currentHopdate.getSender().equalsIgnoreCase(currentUid)){
+                    sendCommentNotification();
+                }
 
             }
 
@@ -320,6 +334,13 @@ public class FeedDetails extends AppCompatActivity {
                                             startActivity(Intent.createChooser(i,"Share via"));
 
                                             return true;
+
+                                        case R.id.action_feed_stop_notification:
+
+                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.FEED_NOTIFICATION_TOPIC+currentFeedId);
+
+                                            return true;
+
                                         default:
                                             return false;
                                     }
@@ -433,6 +454,10 @@ public class FeedDetails extends AppCompatActivity {
                                 public void onClick(View v) {
                                     likeRef.child(currentFeedId).child(currentUid).setValue("liked");
                                     Snackbar.make(rootLayout, "Liked", Snackbar.LENGTH_SHORT).show();
+                                    if (!currentHopdate.getSender().equalsIgnoreCase(currentUid)){
+                                        sendLikeNotification();
+                                    }
+
                                 }
                             });
 
@@ -521,6 +546,80 @@ public class FeedDetails extends AppCompatActivity {
                     });
 
                 }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void sendLikeNotification() {
+
+        userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String userName = dataSnapshot.child("userName").getValue().toString();
+
+                Map<String, String> dataSend = new HashMap<>();
+                dataSend.put("title", "Hosh Feed");
+                dataSend.put("message", "@"+userName+" Just Liked Your Post");
+                dataSend.put("feed_id", currentFeedId);
+                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(Common.FEED_NOTIFICATION_TOPIC+currentFeedId).toString(), dataSend);
+
+                mService.sendNotification(dataMessage)
+                        .enqueue(new retrofit2.Callback<MyResponse>() {
+                            @Override
+                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<MyResponse> call, Throwable t) {
+                                Snackbar.make(rootLayout, "Error Sending Notification !", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void sendCommentNotification() {
+
+        userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String userName = dataSnapshot.child("userName").getValue().toString();
+
+                Map<String, String> dataSend = new HashMap<>();
+                dataSend.put("title", "Hosh Feed");
+                dataSend.put("message", "@"+userName+" Just Commented On Your Post");
+                dataSend.put("feed_id", currentFeedId);
+                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(Common.FEED_NOTIFICATION_TOPIC+currentFeedId).toString(), dataSend);
+
+                mService.sendNotification(dataMessage)
+                        .enqueue(new retrofit2.Callback<MyResponse>() {
+                            @Override
+                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<MyResponse> call, Throwable t) {
+                                Snackbar.make(rootLayout, "Error Sending Notification !", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
 
             }
 

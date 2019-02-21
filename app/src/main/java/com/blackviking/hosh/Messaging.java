@@ -39,9 +39,12 @@ import com.blackviking.hosh.Common.GetTimeAgo;
 import com.blackviking.hosh.Common.Permissions;
 import com.blackviking.hosh.ImageViewers.MessageImageView;
 import com.blackviking.hosh.Interface.ItemClickListener;
+import com.blackviking.hosh.Model.DataMessage;
 import com.blackviking.hosh.Model.EmojiModel;
 import com.blackviking.hosh.Model.MessageModel;
 import com.blackviking.hosh.Model.MessageSessionModel;
+import com.blackviking.hosh.Model.MyResponse;
+import com.blackviking.hosh.Notification.APIService;
 import com.blackviking.hosh.ViewHolder.EmojiViewHolder;
 import com.blackviking.hosh.ViewHolder.MessagingViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -77,6 +80,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import dmax.dialog.SpotsDialog;
 import id.zelory.compressor.Compressor;
 import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -104,6 +109,7 @@ public class Messaging extends AppCompatActivity {
     private StorageReference imageRef, imageThumbRef;
     private String messageSessionId = "";
     private String sessionId = "";
+    private APIService mService;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -125,6 +131,10 @@ public class Messaging extends AppCompatActivity {
 
         /*---   LOCAL   ---*/
         Paper.init(this);
+
+
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
 
 
         /*---   INTENT   ---*/
@@ -229,8 +239,26 @@ public class Messaging extends AppCompatActivity {
         exitActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                messageListRef.child(friendId).child("read").setValue("true");
-                finish();
+                messageListRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child(friendId).exists()){
+
+                            messageListRef.child(friendId).child("read").setValue("true");
+                            finish();
+
+                        } else {
+
+                            finish();
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
@@ -500,6 +528,7 @@ public class Messaging extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 friendMessageListRef.child(currentUid).updateChildren(messageListMapFriend);
+                                                sendEmojiNotification();
                                             }
                                         }
                                 );
@@ -886,6 +915,7 @@ public class Messaging extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         friendMessageListRef.child(currentUid).updateChildren(messageListMapFriend);
+                                        sendNotification(message);
                                     }
                                 }
                         );
@@ -900,6 +930,135 @@ public class Messaging extends AppCompatActivity {
             }
 
         }
+
+    }
+
+    private void sendNotification(final String message) {
+
+        userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String userName = dataSnapshot.child("userName").getValue().toString();
+                String userImage = dataSnapshot.child("profilePictureThumb").getValue().toString();
+
+                Map<String, String> dataSend = new HashMap<>();
+                dataSend.put("title", "New Message");
+                dataSend.put("message", "@"+userName+" : "+message);
+                dataSend.put("user_id", currentUid);
+                dataSend.put("user_name", userName);
+                dataSend.put("user_image", userImage);
+                dataSend.put("my_name", friendUserName);
+                dataSend.put("my_id", currentUid);
+                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(friendId).toString(), dataSend);
+
+                mService.sendNotification(dataMessage)
+                        .enqueue(new retrofit2.Callback<MyResponse>() {
+                            @Override
+                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<MyResponse> call, Throwable t) {
+                                Snackbar.make(rootLayout, "Error Sending Notification !", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+
+                userRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void sendPictureNotification() {
+
+        userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String userName = dataSnapshot.child("userName").getValue().toString();
+                String userImage = dataSnapshot.child("profilePictureThumb").getValue().toString();
+
+                Map<String, String> dataSend = new HashMap<>();
+                dataSend.put("title", "New Message");
+                dataSend.put("message", "@"+userName+" Just Sent You An Image");
+                dataSend.put("user_id", currentUid);
+                dataSend.put("user_name", userName);
+                dataSend.put("user_image", userImage);
+                dataSend.put("my_name", friendUserName);
+                dataSend.put("my_id", currentUid);
+                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(friendId).toString(), dataSend);
+
+                mService.sendNotification(dataMessage)
+                        .enqueue(new retrofit2.Callback<MyResponse>() {
+                            @Override
+                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<MyResponse> call, Throwable t) {
+                                Snackbar.make(rootLayout, "Error Sending Notification !", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+
+                userRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void sendEmojiNotification() {
+
+        userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String userName = dataSnapshot.child("userName").getValue().toString();
+                String userImage = dataSnapshot.child("profilePictureThumb").getValue().toString();
+
+                Map<String, String> dataSend = new HashMap<>();
+                dataSend.put("title", "New Message");
+                dataSend.put("message", "@"+userName+" Just Sent You An Emoji");
+                dataSend.put("user_id", currentUid);
+                dataSend.put("user_name", userName);
+                dataSend.put("user_image", userImage);
+                dataSend.put("my_name", friendUserName);
+                dataSend.put("my_id", currentUid);
+                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(friendId).toString(), dataSend);
+
+                mService.sendNotification(dataMessage)
+                        .enqueue(new retrofit2.Callback<MyResponse>() {
+                            @Override
+                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<MyResponse> call, Throwable t) {
+                                Snackbar.make(rootLayout, "Error Sending Notification !", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+
+                userRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -1109,6 +1268,7 @@ public class Messaging extends AppCompatActivity {
                                                                 @Override
                                                                 public void onSuccess(Void aVoid) {
                                                                     friendMessageListRef.child(currentUid).updateChildren(messageListMapFriend);
+                                                                    sendPictureNotification();
                                                                 }
                                                             }
                                                     );
@@ -1226,8 +1386,27 @@ public class Messaging extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        messageListRef.child(friendId).child("read").setValue("true");
-        finish();
+        messageListRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(friendId).exists()){
+
+                    messageListRef.child(friendId).child("read").setValue("true");
+                    finish();
+
+                } else {
+
+                    finish();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     @Override

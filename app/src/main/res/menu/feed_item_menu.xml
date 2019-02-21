@@ -13,4 +13,10 @@
         android:orderInCategory="102"
         android:title="Share"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_feed_stop_notification"
+        android:orderInCategory="103"
+        android:title="Stop Notification"
+        app:showAsAction="never" />
 </menu>

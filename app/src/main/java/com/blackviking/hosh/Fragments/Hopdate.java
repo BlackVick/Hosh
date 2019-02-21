@@ -38,6 +38,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -193,6 +194,8 @@ public class Hopdate extends Fragment {
                     final String pushId = pushRef.getKey();
                     hopdateRef.child(pushId).setValue(newHopdate);
 
+                    FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
+
                     Intent i = new Intent(getContext(), Home.class);
                     startActivity(i);
                     getActivity().finish();
@@ -204,6 +207,8 @@ public class Hopdate extends Fragment {
                     pushRef = hopdateRef.push();
                     final String pushId = pushRef.getKey();
                     hopdateRef.child(pushId).setValue(newHopdate);
+
+                    FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
 
                     Intent i = new Intent(getContext(), Home.class);
                     startActivity(i);
@@ -289,10 +294,6 @@ public class Hopdate extends Fragment {
         final String dateShitFmt = String.valueOf(date);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        /*File photo = new File(Environment.getExternalStorageDirectory(), "Hosh/Images/"+dateShitFmt+".jpg");
-
-        imageUri = FileProvider.getUriForFile(getActivity(), BuildConfig.APPLICATION_ID + ".provider", photo);*/
 
         File file=getOutputMediaFile(1);
         imageUri = FileProvider.getUriForFile(

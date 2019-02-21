@@ -30,8 +30,11 @@ import android.widget.TextView;
 
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.FeedDetails;
+import com.blackviking.hosh.Model.DataMessage;
 import com.blackviking.hosh.Model.HopdateModel;
+import com.blackviking.hosh.Model.MyResponse;
 import com.blackviking.hosh.MyProfile;
+import com.blackviking.hosh.Notification.APIService;
 import com.blackviking.hosh.OtherUserProfile;
 import com.blackviking.hosh.R;
 import com.blackviking.hosh.Settings.Faq;
@@ -45,6 +48,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
 import com.squareup.picasso.Callback;
@@ -57,6 +61,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -73,6 +79,7 @@ public class Feed extends Fragment {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference feedRef, userRef, likeRef, commentRef;
     private String offenceString = "";
+    private APIService mService;
 
     public Feed() {
         // Required empty public constructor
@@ -86,6 +93,10 @@ public class Feed extends Fragment {
 
         /*---   PAPER DB   ---*/
         Paper.init(getContext());
+
+
+        /*---   FCM   ---*/
+        mService = Common.getFCMService();
 
 
         /*---   FIREBASE   ---*/
@@ -205,6 +216,12 @@ public class Feed extends Fragment {
                                             i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
                                             i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
                                             startActivity(Intent.createChooser(i,"Share via"));
+
+                                            return true;
+
+                                        case R.id.action_feed_stop_notification:
+
+                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.FEED_NOTIFICATION_TOPIC+adapter.getRef(position).getKey());
 
                                             return true;
                                         default:
@@ -381,6 +398,10 @@ public class Feed extends Fragment {
                                 @Override
                                 public void onClick(View v) {
                                     likeRef.child(feedId).child(currentUid).setValue("liked");
+
+                                    if (!model.getSender().equalsIgnoreCase(currentUid)){
+                                        sendLikeNotification(feedId);
+                                    }
                                 }
                             });
 
@@ -607,6 +628,43 @@ public class Feed extends Fragment {
         });
 
         alertDialog.show();
+
+    }
+
+    private void sendLikeNotification(final String feedId) {
+
+        userRef.child(currentUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String userName = dataSnapshot.child("userName").getValue().toString();
+
+                Map<String, String> dataSend = new HashMap<>();
+                dataSend.put("title", "Hosh Feed");
+                dataSend.put("message", "@"+userName+" Just Liked Your Post");
+                dataSend.put("feed_id", feedId);
+                DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(Common.FEED_NOTIFICATION_TOPIC+feedId).toString(), dataSend);
+
+                mService.sendNotification(dataMessage)
+                        .enqueue(new retrofit2.Callback<MyResponse>() {
+                            @Override
+                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<MyResponse> call, Throwable t) {
+                                Snackbar.make(getView(), "Error Sending Notification !", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 }
