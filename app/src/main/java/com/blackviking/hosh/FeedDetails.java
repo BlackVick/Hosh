@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -337,7 +339,7 @@ public class FeedDetails extends AppCompatActivity {
 
                                         case R.id.action_feed_stop_notification:
 
-                                            FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.FEED_NOTIFICATION_TOPIC+currentFeedId);
+                                            openNotificationDialog(currentFeedId);
 
                                             return true;
 
@@ -554,6 +556,60 @@ public class FeedDetails extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    private void openNotificationDialog(final String key) {
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.feed_notification_layout,null);
+
+        final RadioGroup notificationGroup = (RadioGroup) viewOptions.findViewById(R.id.notificationGroup);
+        final RadioButton notificationOn = (RadioButton) viewOptions.findViewById(R.id.notificationOn);
+        final RadioButton notificationOff = (RadioButton) viewOptions.findViewById(R.id.notificationOff);
+        String notiState = Paper.book().read(Common.FEED_NOTIFICATION_TOPIC+key);
+
+        /*---   NOTIFICATION SWITCH SETTINGS HANDLER   ---*/
+        if (notiState == null || TextUtils.isEmpty(notiState) || notiState.equals("false")) {
+            notificationOff.setChecked(true);
+            notificationOn.setChecked(false);
+        } else {
+            notificationOff.setChecked(false);
+            notificationOn.setChecked(true);
+        }
+
+        notificationGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+
+                    case R.id.notificationOn:
+                        FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+key);
+                        Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+key, "true");
+
+                    case R.id.notificationOff:
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.FEED_NOTIFICATION_TOPIC+key);
+                        Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+key, "false");
+                }
+            }
+        });
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 200; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+
+        alertDialog.show();
 
     }
 

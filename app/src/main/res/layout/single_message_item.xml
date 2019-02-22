@@ -44,7 +44,7 @@
                     android:id="@+id/yourMessageText"
                     android:textSize="17sp"
                     android:textColor="@color/black"
-                    android:text="This is the message"
+                    android:text=""
                     android:padding="2dp"
                     android:layout_gravity="start"/>
 
@@ -53,8 +53,7 @@
                     android:layout_height="120dp"
                     android:adjustViewBounds="true"
                     android:id="@+id/yourMessageImage"
-                    android:scaleType="centerCrop"
-                    android:layout_marginTop="4dp"/>
+                    android:scaleType="centerInside"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -100,7 +99,7 @@
                     android:id="@+id/otherMessageText"
                     android:textSize="17sp"
                     android:textColor="@color/black"
-                    android:text="This is the message"
+                    android:text=""
                     android:padding="2dp"
                     android:layout_gravity="start"/>
 
@@ -109,8 +108,7 @@
                     android:layout_height="120dp"
                     android:adjustViewBounds="true"
                     android:id="@+id/otherMessageImage"
-                    android:scaleType="centerCrop"
-                    android:layout_marginTop="4dp" />
+                    android:scaleType="centerInside" />
 
                 <TextView
                     android:layout_width="wrap_content"

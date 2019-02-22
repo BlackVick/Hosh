@@ -17,6 +17,6 @@
     <item
         android:id="@+id/action_feed_stop_notification"
         android:orderInCategory="103"
-        android:title="Stop Notification"
+        android:title="Notification"
         app:showAsAction="never" />
 </menu>

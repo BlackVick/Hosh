@@ -195,6 +195,7 @@ public class Hopdate extends Fragment {
                     hopdateRef.child(pushId).setValue(newHopdate);
 
                     FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
+                    Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
 
                     Intent i = new Intent(getContext(), Home.class);
                     startActivity(i);
@@ -209,6 +210,7 @@ public class Hopdate extends Fragment {
                     hopdateRef.child(pushId).setValue(newHopdate);
 
                     FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
+                    Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
 
                     Intent i = new Intent(getContext(), Home.class);
                     startActivity(i);

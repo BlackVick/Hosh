@@ -1,8 +1,10 @@
 package com.blackviking.hosh;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -13,7 +15,9 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -110,6 +114,7 @@ public class Messaging extends AppCompatActivity {
     private String messageSessionId = "";
     private String sessionId = "";
     private APIService mService;
+    private BroadcastReceiver mMessageReceiver = null;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -131,6 +136,7 @@ public class Messaging extends AppCompatActivity {
 
         /*---   LOCAL   ---*/
         Paper.init(this);
+        Paper.book().write(Common.APP_STATE, "Foreground");
 
 
         /*---   FCM   ---*/
@@ -153,6 +159,24 @@ public class Messaging extends AppCompatActivity {
         attachement = (ImageView) findViewById(R.id.addAttachment);
         chatBox = (EditText)findViewById(R.id.messageEditText);
         messageRecycler = (RecyclerView)findViewById(R.id.messagingRecycler);
+
+
+        /*---   IN APP NOTIFICATION   ---*/
+        mMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra("Message");
+
+                Snackbar snackbar = Snackbar
+                        .make(rootLayout, message, Snackbar.LENGTH_LONG);
+                View sbView = snackbar.getView();
+                TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                textView.setTextColor(Color.WHITE);
+                sbView.setBackgroundColor(ContextCompat.getColor(Messaging.this, R.color.colorPrimaryDark));
+                snackbar.setDuration(2500);
+                snackbar.show();
+            }
+        };
 
 
 
@@ -433,21 +457,8 @@ public class Messaging extends AppCompatActivity {
 
                 Picasso.with(getBaseContext())
                         .load(model.getLink())
-                        .networkPolicy(NetworkPolicy.OFFLINE)
-                        .into(viewHolder.emojiView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-
-                            }
-
-                            @Override
-                            public void onError() {
-                                Picasso.with(getBaseContext())
-                                        .load(model.getLink())
-                                        .networkPolicy(NetworkPolicy.OFFLINE)
-                                        .into(viewHolder.emojiView);
-                            }
-                        });
+                        .placeholder(R.drawable.ic_loading_animation)
+                        .into(viewHolder.emojiView);
 
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
@@ -552,25 +563,7 @@ public class Messaging extends AppCompatActivity {
 
         /*---   LOADING MESSAGES   ---*/
         messageRecycler.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this){
-
-            @Override
-            public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
-                LinearSmoothScroller smoothScroller = new LinearSmoothScroller(Messaging.this) {
-
-                    private static final float SPEED = 300f;
-
-                    @Override
-                    protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
-                        return SPEED / displayMetrics.densityDpi;
-                    }
-
-                };
-                smoothScroller.setTargetPosition(position);
-                startSmoothScroll(smoothScroller);
-            }
-
-        };
+        layoutManager = new LinearLayoutManager(this);
         messageRecycler.setLayoutManager(layoutManager);
 
         adapter = new FirebaseRecyclerAdapter<MessageModel, MessagingViewHolder>(
@@ -606,7 +599,6 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.yourMsgLayout.setVisibility(View.VISIBLE);
                         viewHolder.otherMsgLayout.setVisibility(View.GONE);
                         viewHolder.yourMsgImage.setVisibility(View.VISIBLE);
-                        viewHolder.myText.setVisibility(View.GONE);
 
                         if (!model.getMessageThumb().equals("")){
 
@@ -670,7 +662,6 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.yourMsgLayout.setVisibility(View.GONE);
                         viewHolder.otherMsgLayout.setVisibility(View.VISIBLE);
                         viewHolder.otherMsgImage.setVisibility(View.VISIBLE);
-                        viewHolder.otherText.setVisibility(View.GONE);
 
                         if (!model.getMessageThumb().equals("")){
 
@@ -1413,13 +1404,17 @@ public class Messaging extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         /*---   ONLINE STATE   ---*/
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         userRef.child(currentUid).child("onlineState").setValue("Offline");
+        Paper.book().write(Common.APP_STATE, "Background");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         /*---   ONLINE STATE   ---*/
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("NOTIFICATION_BROADCAST"));
         userRef.child(currentUid).child("onlineState").setValue("Online");
+        Paper.book().write(Common.APP_STATE, "Foreground");
     }
 }

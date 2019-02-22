@@ -1,19 +1,28 @@
 package com.blackviking.hosh;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Fragments.Account;
 import com.blackviking.hosh.Fragments.Feed;
 import com.blackviking.hosh.Fragments.HookUp;
@@ -40,6 +49,8 @@ public class Home extends AppCompatActivity {
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef;
     private String currentUid;
+    private RelativeLayout rootLayout;
+    private BroadcastReceiver mMessageReceiver = null;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -57,6 +68,11 @@ public class Home extends AppCompatActivity {
                 .build());
 
         setContentView(R.layout.activity_home);
+
+
+        /*---   LOCAL   ---*/
+        Paper.init(this);
+        Paper.book().write(Common.APP_STATE, "Foreground");
 
 
         /*---   FIREBASE   ---*/
@@ -107,6 +123,25 @@ public class Home extends AppCompatActivity {
         hopdate = (ImageView)findViewById(R.id.hopdate);
         messaging = (ImageView)findViewById(R.id.messaging);
         account = (ImageView)findViewById(R.id.account);
+        rootLayout = (RelativeLayout)findViewById(R.id.homeRootLayout);
+
+
+        /*---   IN APP NOTIFICATION   ---*/
+        mMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra("Message");
+
+                Snackbar snackbar = Snackbar
+                        .make(rootLayout, message, Snackbar.LENGTH_LONG);
+                View sbView = snackbar.getView();
+                TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                textView.setTextColor(Color.WHITE);
+                sbView.setBackgroundColor(ContextCompat.getColor(Home.this, R.color.colorPrimaryDark));
+                snackbar.setDuration(2500);
+                snackbar.show();
+            }
+        };
 
 
 
@@ -214,14 +249,18 @@ public class Home extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         /*---   ONLINE STATE   ---*/
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("NOTIFICATION_BROADCAST"));
         userRef.child(currentUid).child("onlineState").setValue("Online");
+        Paper.book().write(Common.APP_STATE, "Foreground");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         /*---   ONLINE STATE   ---*/
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         userRef.child(currentUid).child("onlineState").setValue("Offline");
+        Paper.book().write(Common.APP_STATE, "Background");
     }
 
 }

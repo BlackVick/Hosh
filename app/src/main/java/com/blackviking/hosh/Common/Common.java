@@ -20,6 +20,10 @@ public class Common {
     public static final String DELETE_SINGLE = "Delete Message";
 
 
+    /*---   DEVICE ONLINE OFFLINE   ---*/
+    public static final String APP_STATE = "State";
+
+
     /*---   NOTIFICATION   ---*/
     public static final String NOTIFICATION_STATE = "Notification";
     public static final String ACCOUNT_NOTIFICATION = "Account";

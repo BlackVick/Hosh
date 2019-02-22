@@ -7,10 +7,40 @@
 
     <include layout="@layout/snippet_for_general"/>
 
+    <RelativeLayout
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:id="@+id/filterLayout"
+        android:layout_height="40dp"
+        android:background="@drawable/white_backround_ripple_news"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="17dp"
+            android:text="Filter Options"
+            android:textSize="20sp"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_filter_hookup"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:adjustViewBounds="true"
+            android:padding="4dp"/>
+
+    </RelativeLayout>
+
     <android.support.v7.widget.RecyclerView
+        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:id="@+id/hookupRecycler"></android.support.v7.widget.RecyclerView>
+        android:id="@+id/hookupRecycler"/>
 
 </RelativeLayout>

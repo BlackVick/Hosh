@@ -17,8 +17,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.blackviking.hosh.Common.Common;
@@ -43,6 +47,9 @@ import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;
 
@@ -54,9 +61,10 @@ public class HookUp extends Fragment {
     private ImageView exitActivity, help;
     private TextView activityName;
     private RecyclerView hookupRecycler;
+    private RelativeLayout filterSearch;
     private LinearLayoutManager layoutManager;
     private FirebaseRecyclerAdapter<UserModel, HookupViewHolder> adapter;
-    private String currentUid, sexToHaunt = "";
+    private String currentUid, sexToHaunt = "", locationToHunt = "";
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private DatabaseReference userRef;
@@ -86,6 +94,7 @@ public class HookUp extends Fragment {
         help = (ImageView)v.findViewById(R.id.helpIcon);
         activityName = (TextView)v.findViewById(R.id.activityName);
         hookupRecycler = (RecyclerView)v.findViewById(R.id.hookupRecycler);
+        filterSearch = (RelativeLayout)v.findViewById(R.id.filterLayout);
 
 
         /*---   EXIT   ---*/
@@ -117,6 +126,7 @@ public class HookUp extends Fragment {
         });
 
 
+
         if (Common.isConnectedToInternet(getContext())) {
 
             /*---   INTERESTED IN   ---*/
@@ -126,6 +136,18 @@ public class HookUp extends Fragment {
 
                     String myInterest = dataSnapshot.child("lookingFor").getValue().toString();
                     String mySex = dataSnapshot.child("sex").getValue().toString();
+                    String myLocation = dataSnapshot.child("location").getValue().toString();
+
+                    locationToHunt = myLocation;
+
+                    /*---   FILTER   ---*/
+                    filterSearch.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            openFilterDialog();
+                        }
+                    });
+
 
                     if (myInterest.equalsIgnoreCase("Women")) {
 
@@ -239,6 +261,97 @@ public class HookUp extends Fragment {
         return v;
     }
 
+    private void openFilterDialog() {
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.location_edit,null);
+
+        final Spinner locationSpinner = (Spinner)viewOptions.findViewById(R.id.locationSpinner);
+        final Button saveLocation = (Button)viewOptions.findViewById(R.id.saveLocation);
+
+
+        /*---   FILL LOCATION LIST   ---*/
+        List<String> locationList = new ArrayList<>();
+        locationList.add(0, "Location");
+        locationList.add("Abuja");
+        locationList.add("Abia");
+        locationList.add("Adamawa");
+        locationList.add("Akwa Ibom");
+        locationList.add("Anambra");
+        locationList.add("Bauchi");
+        locationList.add("Benue");
+        locationList.add("Borno");
+        locationList.add("Cross River");
+        locationList.add("Ebonyi");
+        locationList.add("Ekiti");
+        locationList.add("Jigawa");
+        locationList.add("Kogi");
+        locationList.add("Kwara");
+        locationList.add("Lagos");
+        locationList.add("Niger");
+        locationList.add("Ogun");
+        locationList.add("Ondo");
+        locationList.add("Osun");
+        locationList.add("Oyo");
+
+        ArrayAdapter<String> dataAdapterLocation;
+        dataAdapterLocation = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, locationList);
+
+        dataAdapterLocation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        locationSpinner.setAdapter(dataAdapterLocation);
+
+
+        /*---   LISTENER   ---*/
+        locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (!parent.getItemAtPosition(position).equals("Location")){
+
+                    locationToHunt = parent.getItemAtPosition(position).toString();
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 180; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+
+        /*---   SAVE LOCATION   ---*/
+        saveLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                loadHookupsFiltered(locationToHunt);
+
+            }
+        });
+
+
+        alertDialog.show();
+
+    }
+
     private void showNoInternetDialog() {
 
         final AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
@@ -269,7 +382,7 @@ public class HookUp extends Fragment {
 
         /*---   RECYCLER CONTROLLER   ---*/
         hookupRecycler.setHasFixedSize(true);
-        layoutManager = new GridLayoutManager(getContext(), 5);
+        layoutManager = new GridLayoutManager(getContext(), 4);
         hookupRecycler.setLayoutManager(layoutManager);
 
         Query specifics = userRef.orderByChild("lookingFor").equalTo(sexToHaunt);
@@ -278,7 +391,78 @@ public class HookUp extends Fragment {
                 UserModel.class,
                 R.layout.hookup_item,
                 HookupViewHolder.class,
-                specifics
+                userRef.orderByChild("lookingFor").equalTo(sexToHaunt)
+        ) {
+            @Override
+            protected void populateViewHolder(final HookupViewHolder viewHolder, final UserModel model, int position) {
+
+                final String ids = adapter.getRef(position).getKey();
+
+                if (!ids.equals(currentUid)) {
+
+                    viewHolder.theLayout.setVisibility(View.VISIBLE);
+
+                    if (!model.getProfilePictureThumb().equals("")) {
+
+                        Picasso.with(getContext())
+                                .load(model.getProfilePictureThumb())
+                                .placeholder(R.drawable.ic_loading_animation)
+                                .into(viewHolder.hookUpImage);
+
+                    } else {
+
+                        viewHolder.hookUpImage.setImageResource(R.drawable.empty_profile);
+
+                    }
+
+
+                    /*---    ONLINE STATUS   ---*/
+                    if (model.getOnlineState().equalsIgnoreCase("Online")) {
+
+                        viewHolder.onlineIndicator.setVisibility(View.VISIBLE);
+
+                    } else {
+
+                        viewHolder.onlineIndicator.setVisibility(View.GONE);
+
+                    }
+
+                    viewHolder.setItemClickListener(new ItemClickListener() {
+                        @Override
+                        public void onClick(View view, int position, boolean isLongClick) {
+                            Intent posterProfile = new Intent(getContext(), OtherUserProfile.class);
+                            posterProfile.putExtra("UserId", ids);
+                            startActivity(posterProfile);
+                        }
+                    });
+
+                } else {
+
+                    viewHolder.theLayout.setVisibility(View.GONE);
+
+                }
+
+            }
+        };
+        hookupRecycler.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+    }
+
+    private void loadHookupsFiltered(String locationToHunt) {
+
+        /*---   RECYCLER CONTROLLER   ---*/
+        hookupRecycler.setHasFixedSize(true);
+        layoutManager = new GridLayoutManager(getContext(), 4);
+        hookupRecycler.setLayoutManager(layoutManager);
+
+        Query specifics = userRef.orderByChild("location").equalTo(locationToHunt);
+
+        adapter = new FirebaseRecyclerAdapter<UserModel, HookupViewHolder>(
+                UserModel.class,
+                R.layout.hookup_item,
+                HookupViewHolder.class,
+                specifics.orderByChild("lookingFor").equalTo(sexToHaunt).limitToLast(100)
         ) {
             @Override
             protected void populateViewHolder(final HookupViewHolder viewHolder, final UserModel model, int position) {
