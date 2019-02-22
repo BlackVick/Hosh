@@ -14,8 +14,8 @@
         android:visibility="gone">
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/hookupImage"
             android:adjustViewBounds="true"
             android:src="@drawable/empty_profile"

@@ -3,22 +3,30 @@ package com.blackviking.hosh.Fragments;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.blackviking.hosh.AccountSettings;
+import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.FeedDetails;
 import com.blackviking.hosh.ImageViewers.ProfileImageView;
 import com.blackviking.hosh.Model.HopdateModel;
@@ -38,6 +46,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.rohitarya.picasso.facedetection.transformation.FaceCenterCrop;
 import com.rohitarya.picasso.facedetection.transformation.core.PicassoFaceDetector;
 import com.squareup.picasso.Callback;
@@ -338,6 +347,12 @@ public class Account extends Fragment {
                                         startActivity(Intent.createChooser(i,"Share via"));
 
                                         return true;
+
+                                    case R.id.action_feed_stop_notification:
+
+                                        openNotificationDialog(adapter.getRef(position).getKey());
+
+                                        return true;
                                     default:
                                         return false;
                                 }
@@ -524,6 +539,60 @@ public class Account extends Fragment {
         };
         timelineRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+
+    }
+
+    private void openNotificationDialog(final String key) {
+
+        final android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(getContext()).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.feed_notification_layout,null);
+
+        final RadioGroup notificationGroup = (RadioGroup) viewOptions.findViewById(R.id.notificationGroup);
+        final RadioButton notificationOn = (RadioButton) viewOptions.findViewById(R.id.notificationOn);
+        final RadioButton notificationOff = (RadioButton) viewOptions.findViewById(R.id.notificationOff);
+        String notiState = Paper.book().read(Common.FEED_NOTIFICATION_TOPIC+key);
+
+        /*---   NOTIFICATION SWITCH SETTINGS HANDLER   ---*/
+        if (notiState == null || TextUtils.isEmpty(notiState) || notiState.equals("false")) {
+            notificationOff.setChecked(true);
+            notificationOn.setChecked(false);
+        } else {
+            notificationOff.setChecked(false);
+            notificationOn.setChecked(true);
+        }
+
+        notificationGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+
+                    case R.id.notificationOn:
+                        FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+key);
+                        Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+key, "true");
+
+                    case R.id.notificationOff:
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.FEED_NOTIFICATION_TOPIC+key);
+                        Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+key, "false");
+                }
+            }
+        });
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 200; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+
+        alertDialog.show();
 
     }
 }

@@ -48,7 +48,7 @@ public class NotificationSetting extends AppCompatActivity {
         Paper.init(this);
         String isSubscribeToNoti = Paper.book().read(Common.ACCOUNT_NOTIFICATION);
 
-        if (isSubscribeToNoti.equalsIgnoreCase("")){
+        if (isSubscribeToNoti == null){
 
             Paper.book().write(Common.ACCOUNT_NOTIFICATION, "true");
 

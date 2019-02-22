@@ -160,7 +160,7 @@ public class Feed extends Fragment {
                 HopdateModel.class,
                 R.layout.feed_item,
                 FeedViewHolder.class,
-                feedRef
+                feedRef.limitToLast(50)
         ) {
             @Override
             protected void populateViewHolder(final FeedViewHolder viewHolder, final HopdateModel model, final int position) {

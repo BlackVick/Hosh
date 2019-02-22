@@ -599,6 +599,7 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.yourMsgLayout.setVisibility(View.VISIBLE);
                         viewHolder.otherMsgLayout.setVisibility(View.GONE);
                         viewHolder.yourMsgImage.setVisibility(View.VISIBLE);
+                        viewHolder.myText.setVisibility(View.GONE);
 
                         if (!model.getMessageThumb().equals("")){
 
@@ -662,6 +663,8 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.yourMsgLayout.setVisibility(View.GONE);
                         viewHolder.otherMsgLayout.setVisibility(View.VISIBLE);
                         viewHolder.otherMsgImage.setVisibility(View.VISIBLE);
+
+                        viewHolder.otherText.setVisibility(View.GONE);
 
                         if (!model.getMessageThumb().equals("")){
 
@@ -887,6 +890,8 @@ public class Messaging extends AppCompatActivity {
                 messageMapFriend.put("sessionId", messageSessionId);
 
 
+
+                loadMessages();
                 messageRef.child(pushId).setValue(messageMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
