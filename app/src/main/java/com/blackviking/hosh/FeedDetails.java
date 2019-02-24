@@ -96,7 +96,7 @@ public class FeedDetails extends AppCompatActivity {
 
         /*---   FONT MANAGEMENT   ---*/
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Wigrum-Regular.otf")
+                .setDefaultFontPath("fonts/Roboto-Thin.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
@@ -120,9 +120,13 @@ public class FeedDetails extends AppCompatActivity {
             currentUid = mAuth.getCurrentUser().getUid();
 
         userRef = db.getReference("Users");
+        userRef.keepSynced(true);
         hopdateRef = db.getReference("Hopdate").child(currentFeedId);
+        hopdateRef.keepSynced(true);
         likeRef = db.getReference("Likes");
+        likeRef.keepSynced(true);
         commentRef = db.getReference("HopdateComments");
+        commentRef.keepSynced(true);
 
 
         /*---   WIDGETS   ---*/
@@ -246,306 +250,313 @@ public class FeedDetails extends AppCompatActivity {
 
     private void loadCurrentHopdate() {
 
-        hopdateRef.addValueEventListener(new ValueEventListener() {
+        hopdateRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 currentHopdate = dataSnapshot.getValue(HopdateModel.class);
 
                 /*---   POSTER DETAILS   ---*/
-                userRef.child(currentHopdate.getSender()).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        final String imageThumbLink = dataSnapshot.child("profilePictureThumb").getValue().toString();
-                        final String username = dataSnapshot.child("userName").getValue().toString();
+                if (currentHopdate != null) {
 
-                        if (!imageThumbLink.equals("")){
+                    userRef.child(currentHopdate.getSender()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            Picasso.with(getBaseContext())
-                                    .load(imageThumbLink)
-                                    .placeholder(R.drawable.ic_loading_animation)
-                                    .into(posterImage);
+                            final String imageThumbLink = dataSnapshot.child("profilePictureThumb").getValue().toString();
+                            final String username = dataSnapshot.child("userName").getValue().toString();
+
+                            if (!imageThumbLink.equals("")) {
+
+                                Picasso.with(getBaseContext())
+                                        .load(imageThumbLink)
+                                        .placeholder(R.drawable.ic_loading_animation)
+                                        .into(posterImage);
+
+                            }
+
+                            posterName.setText(username);
 
                         }
 
-                        posterName.setText(username);
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
+                        }
+                    });
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
 
 
                 /*---   OPTIONS   ---*/
-                if (currentHopdate.getSender().equals(currentUid)){
+                    if (currentHopdate.getSender().equals(currentUid)) {
 
-                    options.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                        options.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
                             /*---   POPUP MENU FOR HOPDATE   ---*/
-                            PopupMenu popup = new PopupMenu(FeedDetails.this, options);
-                            popup.inflate(R.menu.feed_item_menu);
-                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem item) {
-                                    switch (item.getItemId()) {
-                                        case R.id.action_feed_delete:
+                                PopupMenu popup = new PopupMenu(FeedDetails.this, options);
+                                popup.inflate(R.menu.feed_item_menu);
+                                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                    @Override
+                                    public boolean onMenuItemClick(MenuItem item) {
+                                        switch (item.getItemId()) {
+                                            case R.id.action_feed_delete:
 
-                                            AlertDialog alertDialog = new AlertDialog.Builder(FeedDetails.this)
-                                                    .setTitle("Delete Hopdate !")
-                                                    .setIcon(R.drawable.ic_delete_feed)
-                                                    .setMessage("Are You Sure You Want To Delete This Hopdate From Your Timeline?")
-                                                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
+                                                AlertDialog alertDialog = new AlertDialog.Builder(FeedDetails.this)
+                                                        .setTitle("Delete Hopdate !")
+                                                        .setIcon(R.drawable.ic_delete_feed)
+                                                        .setMessage("Are You Sure You Want To Delete This Hopdate From Your Timeline?")
+                                                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
 
-                                                            hopdateRef.removeValue()
-                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                            finish();
-                                                                        }
-                                                                    });
+                                                                hopdateRef.removeValue()
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                finish();
+                                                                            }
+                                                                        });
 
-                                                        }
-                                                    })
-                                                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            dialog.dismiss();
-                                                        }
-                                                    })
-                                                    .create();
+                                                            }
+                                                        })
+                                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                dialog.dismiss();
+                                                            }
+                                                        })
+                                                        .create();
 
-                                            alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+                                                alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
 
-                                            alertDialog.show();
+                                                alertDialog.show();
 
-                                            return true;
-                                        case R.id.action_feed_share:
+                                                return true;
+                                            case R.id.action_feed_share:
 
-                                            Intent i = new Intent(android.content.Intent.ACTION_SEND);
-                                            i.setType("text/plain");
-                                            i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Share");
-                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Check Out My New Story On HOSH Mobile App On PlayStore. ");
-                                            startActivity(Intent.createChooser(i,"Share via"));
+                                                Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                                                i.setType("text/plain");
+                                                i.putExtra(android.content.Intent.EXTRA_SUBJECT, "Hosh Share");
+                                                i.putExtra(android.content.Intent.EXTRA_TEXT, "Check Out My New Story On HOSH Mobile App On PlayStore. ");
+                                                startActivity(Intent.createChooser(i, "Share via"));
 
-                                            return true;
+                                                return true;
 
-                                        case R.id.action_feed_stop_notification:
+                                            case R.id.action_feed_stop_notification:
 
-                                            openNotificationDialog(currentFeedId);
+                                                openNotificationDialog(currentFeedId);
 
-                                            return true;
+                                                return true;
 
-                                        default:
-                                            return false;
+                                            default:
+                                                return false;
+                                        }
                                     }
-                                }
-                            });
+                                });
 
-                            popup.show();
-                        }
-                    });
+                                popup.show();
+                            }
+                        });
 
-                } else {
+                    } else {
 
-                    options.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                        options.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
                         /*---   POPUP MENU FOR HOPDATE   ---*/
-                            PopupMenu popup = new PopupMenu(FeedDetails.this, options);
-                            popup.inflate(R.menu.feed_item_menu_other);
-                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem item) {
-                                    switch (item.getItemId()) {
-                                        case R.id.action_feed_other_report:
+                                PopupMenu popup = new PopupMenu(FeedDetails.this, options);
+                                popup.inflate(R.menu.feed_item_menu_other);
+                                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                    @Override
+                                    public boolean onMenuItemClick(MenuItem item) {
+                                        switch (item.getItemId()) {
+                                            case R.id.action_feed_other_report:
 
-                                            openReportDialog(currentHopdate.getSender());
+                                                openReportDialog(currentHopdate.getSender());
 
-                                            return true;
-                                        case R.id.action_feed_other_share:
+                                                return true;
+                                            case R.id.action_feed_other_share:
 
-                                            Intent i = new Intent(android.content.Intent.ACTION_SEND);
-                                            i.setType("text/plain");
-                                            i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
-                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
-                                            startActivity(Intent.createChooser(i,"Share via"));
+                                                Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                                                i.setType("text/plain");
+                                                i.putExtra(android.content.Intent.EXTRA_SUBJECT, "Hosh Invite");
+                                                i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
+                                                startActivity(Intent.createChooser(i, "Share via"));
 
-                                            return true;
-                                        default:
-                                            return false;
+                                                return true;
+                                            default:
+                                                return false;
+                                        }
                                     }
-                                }
-                            });
+                                });
 
-                            popup.show();
-                        }
-                    });
+                                popup.show();
+                            }
+                        });
 
-                }
+                    }
 
 
                 /*---   FEED DETAILS   ---*/
                 /*---   POST IMAGE   ---*/
-                if (!currentHopdate.getImageThumbUrl().equals("")){
+                    if (!currentHopdate.getImageThumbUrl().equals("")) {
 
-                    Picasso.with(getBaseContext())
-                            .load(currentHopdate.getImageUrl())
-                            .placeholder(R.drawable.post_loading_icon)
-                            .into(postImage);
+                        Picasso.with(getBaseContext())
+                                .load(currentHopdate.getImageThumbUrl())
+                                .placeholder(R.drawable.post_loading_icon)
+                                .into(postImage);
 
-                } else {
+                    } else {
 
-                    postImage.setVisibility(View.GONE);
+                        postImage.setVisibility(View.GONE);
 
-                }
+                    }
 
 
                 /*---   HOPDATE   ---*/
-                if (!currentHopdate.getHopdate().equals("")){
+                    if (!currentHopdate.getHopdate().equals("")) {
 
-                    postText.setText(currentHopdate.getHopdate());
+                        postText.setText(currentHopdate.getHopdate());
 
-                } else {
+                    } else {
 
-                    postText.setVisibility(View.GONE);
+                        postText.setVisibility(View.GONE);
 
-                }
+                    }
 
 
                 /*---  TIME   ---*/
-                postTime.setText(currentHopdate.getTimestamp());
+                    postTime.setText(currentHopdate.getTimestamp());
 
 
                 /*---   LIKES   ---*/
-                likeRef.child(currentFeedId).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    likeRef.child(currentFeedId).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
                             /*---   LIKES   ---*/
-                        int countLike = (int) dataSnapshot.getChildrenCount();
+                            int countLike = (int) dataSnapshot.getChildrenCount();
 
-                        likeCount.setText(String.valueOf(countLike));
+                            likeCount.setText(String.valueOf(countLike));
 
-                        if (dataSnapshot.child(currentUid).exists()){
+                            if (dataSnapshot.child(currentUid).exists()) {
 
-                            likeBtn.setImageResource(R.drawable.liked_icon);
+                                likeBtn.setImageResource(R.drawable.liked_icon);
 
-                            likeBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    likeRef.child(currentFeedId).child(currentUid).removeValue();
-                                    Snackbar.make(rootLayout, "Un Liked", Snackbar.LENGTH_SHORT).show();
-                                }
-                            });
-
-                        } else {
-
-                            likeBtn.setImageResource(R.drawable.unliked_icon);
-
-                            likeBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    likeRef.child(currentFeedId).child(currentUid).setValue("liked");
-                                    Snackbar.make(rootLayout, "Liked", Snackbar.LENGTH_SHORT).show();
-                                    if (!currentHopdate.getSender().equalsIgnoreCase(currentUid)){
-                                        sendLikeNotification();
+                                likeBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        likeRef.child(currentFeedId).child(currentUid).removeValue();
+                                        Snackbar.make(rootLayout, "Un Liked", Snackbar.LENGTH_SHORT).show();
                                     }
+                                });
 
-                                }
-                            });
+                            } else {
+
+                                likeBtn.setImageResource(R.drawable.unliked_icon);
+
+                                likeBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        likeRef.child(currentFeedId).child(currentUid).setValue("liked");
+                                        Snackbar.make(rootLayout, "Liked", Snackbar.LENGTH_SHORT).show();
+                                        if (!currentHopdate.getSender().equalsIgnoreCase(currentUid)) {
+                                            sendLikeNotification();
+                                        }
+
+                                    }
+                                });
+
+                            }
 
                         }
 
-                    }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                        }
+                    });
 
 
                 /*---   COMMENTS   ---*/
-                commentRef.child(currentFeedId).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    commentRef.child(currentFeedId).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        int countComment = (int) dataSnapshot.getChildrenCount();
+                            int countComment = (int) dataSnapshot.getChildrenCount();
 
-                        commentCount.setText(String.valueOf(countComment));
+                            commentCount.setText(String.valueOf(countComment));
 
-                    }
+                        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
 
 
 
                 /*---   POSTER DETS CLICK   ---*/
-                if (currentHopdate.getSender().equals(currentUid)) {
+                    if (currentHopdate.getSender().equals(currentUid)) {
 
                     /*---   POSTER NAME CLICK   ---*/
-                    posterName.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                        posterName.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                            Intent posterProfile = new Intent(FeedDetails.this, MyProfile.class);
-                            startActivity(posterProfile);
+                                Intent posterProfile = new Intent(FeedDetails.this, MyProfile.class);
+                                startActivity(posterProfile);
 
-                        }
-                    });
+                            }
+                        });
 
 
                     /*---   POSTER IMAGE CLICK   ---*/
-                    posterImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                        posterImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                            Intent posterProfile = new Intent(FeedDetails.this, MyProfile.class);
-                            startActivity(posterProfile);
+                                Intent posterProfile = new Intent(FeedDetails.this, MyProfile.class);
+                                startActivity(posterProfile);
 
-                        }
-                    });
+                            }
+                        });
 
-                } else {
+                    } else {
 
                     /*---   POSTER NAME CLICK   ---*/
-                    posterName.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                        posterName.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                            Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
-                            posterProfile.putExtra("UserId", currentHopdate.getSender());
-                            startActivity(posterProfile);
+                                Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
+                                posterProfile.putExtra("UserId", currentHopdate.getSender());
+                                startActivity(posterProfile);
 
-                        }
-                    });
+                            }
+                        });
 
 
                     /*---   POSTER IMAGE CLICK   ---*/
-                    posterImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                        posterImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                            Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
-                            posterProfile.putExtra("UserId", currentHopdate.getSender());
-                            startActivity(posterProfile);
+                                Intent posterProfile = new Intent(FeedDetails.this, OtherUserProfile.class);
+                                posterProfile.putExtra("UserId", currentHopdate.getSender());
+                                startActivity(posterProfile);
 
 
-                        }
-                    });
+                            }
+                        });
+
+                    }
 
                 }
 

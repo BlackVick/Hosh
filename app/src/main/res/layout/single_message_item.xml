@@ -17,7 +17,7 @@
         android:orientation="horizontal"
         android:weightSum="10"
         android:id="@+id/yourMessageTextLayout"
-        android:layout_margin="2dp"
+        android:layout_margin="1dp"
         android:visibility="gone">
 
         <ImageView
@@ -35,25 +35,29 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:orientation="vertical"
-                android:background="@drawable/chat_back_you"
-                android:padding="5dp">
+                android:padding="2dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/yourMessageText"
+                    android:background="@drawable/chat_back_you"
                     android:textSize="17sp"
                     android:textColor="@color/black"
                     android:text=""
-                    android:padding="2dp"
-                    android:layout_gravity="start"/>
+                    android:padding="8dp"
+                    android:visibility="gone"
+                    android:layout_gravity="end"/>
 
                 <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="200dp"
+                    android:maxWidth="200dp"
                     android:adjustViewBounds="true"
                     android:id="@+id/yourMessageImage"
-                    android:scaleType="centerInside"/>
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -61,7 +65,7 @@
                     android:id="@+id/yourMessageTimeStamp"
                     android:textSize="12sp"
                     android:textColor="@color/grey"
-                    android:text="2:45pm"
+                    android:text=""
                     android:padding="2dp"
                     android:layout_gravity="end"/>
 
@@ -77,7 +81,7 @@
         android:orientation="horizontal"
         android:weightSum="10"
         android:id="@+id/otherMessageTextLayout"
-        android:layout_margin="2dp"
+        android:layout_margin="1dp"
         android:visibility="gone">
 
         <RelativeLayout
@@ -90,8 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:orientation="vertical"
-                android:background="@drawable/chat_back"
-                android:padding="5dp">
+                android:padding="2dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -100,15 +103,20 @@
                     android:textSize="17sp"
                     android:textColor="@color/black"
                     android:text=""
-                    android:padding="2dp"
-                    android:layout_gravity="start"/>
+                    android:padding="8dp"
+                    android:layout_gravity="start"
+                    android:background="@drawable/chat_back"
+                    android:visibility="gone"/>
 
                 <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
+                    android:maxHeight="200dp"
+                    android:maxWidth="200dp"
                     android:id="@+id/otherMessageImage"
-                    android:scaleType="centerInside" />
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -116,7 +124,7 @@
                     android:id="@+id/otherMessageTimeStamp"
                     android:textSize="12sp"
                     android:textColor="@color/grey"
-                    android:text="2:45pm"
+                    android:text=""
                     android:padding="2dp"
                     android:layout_gravity="start"/>
 

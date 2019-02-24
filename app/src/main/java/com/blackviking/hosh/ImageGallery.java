@@ -2,6 +2,7 @@ package com.blackviking.hosh;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -98,7 +99,7 @@ public class ImageGallery extends AppCompatActivity {
 
         /*---   FONT MANAGEMENT   ---*/
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Wigrum-Regular.otf")
+                .setDefaultFontPath("fonts/Roboto-Thin.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
@@ -408,19 +409,37 @@ public class ImageGallery extends AppCompatActivity {
 
                     final StorageReference imageThumbRef1 = imageThumbRef.child("Thumbnails").child(currentUid +dateShitFmt+ ".jpg");
 
-                    imageRef1.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    final UploadTask originalUpload = imageRef1.putFile(resultUri);
+
+                    mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            imageUri = null;
+                            originalUpload.cancel();
+                        }
+                    });
+
+                    originalUpload.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                             if (task.isSuccessful()) {
 
-                                originalImageUrl = Objects.requireNonNull(task.getResult().getDownloadUrl()).toString();
-                                UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
+                                originalImageUrl = task.getResult().getDownloadUrl().toString();
+                                final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
+
+                                mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        imageUri = null;
+                                        uploadTask.cancel();
+                                    }
+                                });
 
                                 uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
 
-                                        thumbDownloadUrl = Objects.requireNonNull(thumb_task.getResult().getDownloadUrl()).toString();
+                                        thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
 
                                         if (thumb_task.isSuccessful()){
 
@@ -431,7 +450,7 @@ public class ImageGallery extends AppCompatActivity {
 
                                         } else {
                                             mDialog.dismiss();
-                                            Snackbar.make(rootLayout, "Error Occurred While Uploading", Snackbar.LENGTH_LONG).show();
+                                            Toast.makeText(ImageGallery.this, "Error Occurred", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
@@ -441,7 +460,7 @@ public class ImageGallery extends AppCompatActivity {
                             } else {
 
                                 mDialog.dismiss();
-                                Snackbar.make(rootLayout, "Error Uploading", Snackbar.LENGTH_LONG).show();
+                                Toast.makeText(ImageGallery.this, "Error Occurred", Toast.LENGTH_SHORT).show();
 
                             }
                         }

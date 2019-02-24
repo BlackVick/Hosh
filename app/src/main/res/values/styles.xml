@@ -23,7 +23,7 @@
     </style>
 
     <style name="ChatBackground" parent="AppTheme">
-        <item name="android:windowBackground">@drawable/hosh_chat_background</item>
+        <item name="android:windowBackground">@color/offWhite</item>
     </style>
 
     <style name="AppBackground" parent="AppTheme">
@@ -114,6 +114,7 @@
     <style name="ExpandedAppbar" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:textSize">2sp</item>
     </style>
 
     <!-- Style for use as Dialog-->

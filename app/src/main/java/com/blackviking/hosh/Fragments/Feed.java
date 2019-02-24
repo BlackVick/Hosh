@@ -106,9 +106,13 @@ public class Feed extends Fragment {
         currentUid = mAuth.getCurrentUser().getUid();
 
         feedRef = db.getReference("Hopdate");
+        feedRef.keepSynced(true);
         userRef = db.getReference("Users");
+        userRef.keepSynced(true);
         likeRef = db.getReference("Likes");
+        likeRef.keepSynced(true);
         commentRef = db.getReference("HopdateComments");
+        commentRef.keepSynced(true);
 
 
         /*---   WIDGETS   ---*/
@@ -329,6 +333,8 @@ public class Feed extends Fragment {
                     /*---   POST IMAGE   ---*/
                 if (!model.getImageThumbUrl().equals("")){
 
+                    viewHolder.postImage.setVisibility(View.VISIBLE);
+
                     Picasso.with(getContext())
                             .load(model.getImageThumbUrl())
                             .networkPolicy(NetworkPolicy.OFFLINE)
@@ -358,6 +364,7 @@ public class Feed extends Fragment {
                     /*---   HOPDATE   ---*/
                 if (!model.getHopdate().equals("")){
 
+                    viewHolder.postText.setVisibility(View.VISIBLE);
                     viewHolder.postText.setText(model.getHopdate());
 
                 } else {

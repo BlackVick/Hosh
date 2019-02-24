@@ -18,7 +18,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing"
             android:layout_width="match_parent"
-            android:layout_height="280dp"
+            android:layout_height="320dp"
             android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="@color/colorPrimary">
@@ -36,7 +36,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 app:corner_radius="10dp"
-                android:layout_marginBottom="50dp"
+                android:layout_marginBottom="80dp"
                 android:layout_gravity="bottom|center_horizontal">
 
                 <ImageView
@@ -74,7 +74,9 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
@@ -97,6 +99,22 @@
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.3dp"
+                        android:background="@color/offBlack"/>
+
+                    <Button
+                        android:id="@+id/followUser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:layout_margin="7dp"
+                        android:padding="6dp"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="18sp"
+                        android:background="@drawable/white_backround_ripple"
+                        android:visibility="visible"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -374,18 +392,6 @@
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/followUser"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_follow_user"
-        android:visibility="visible"
-        app:backgroundTint="@color/white"
-        app:layout_anchor="@id/app_bar_layout"
-        app:layout_anchorGravity="bottom|start"
-        app:pressedTranslationZ="12dp"
-        app:useCompatPadding="true" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/messageUser"

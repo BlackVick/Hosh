@@ -63,7 +63,7 @@ public class Home extends AppCompatActivity {
 
         /*---   FONT MANAGEMENT   ---*/
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Wigrum-Regular.otf")
+                .setDefaultFontPath("fonts/Roboto-Thin.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
@@ -232,7 +232,7 @@ public class Home extends AppCompatActivity {
     private void setFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment);
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.blackviking.hosh.Fragments;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.hosh.BuildConfig;
 import com.blackviking.hosh.Common.Common;
@@ -182,11 +184,11 @@ public class Hopdate extends Fragment {
         final SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yy HH:mm");
         final String dateString = sdf.format(date);
 
-        if (imageUri != null || !theHopdate.isEmpty()){
+        if (imageUri != null || originalImageUrl != null || thumbDownloadUrl != null || !theHopdate.isEmpty()){
 
             if (Common.isConnectedToInternet(getContext())){
 
-                if (imageUri != null){
+                if (imageUri != null || originalImageUrl != null || thumbDownloadUrl != null){
 
                     newHopdate = new HopdateModel("User", "", theHopdate, currentUid, originalImageUrl, thumbDownloadUrl, dateString, "Image");
 
@@ -375,6 +377,8 @@ public class Hopdate extends Fragment {
             if (resultCode == RESULT_OK) {
 
                 mDialog = new SpotsDialog(getContext(), "Upload In Progress . . .");
+                //mDialog.setCancelable(false);
+                //mDialog.setCanceledOnTouchOutside(false);
                 mDialog.show();
 
                 Uri resultUri = result.getUri();
@@ -389,51 +393,77 @@ public class Hopdate extends Fragment {
 
                 try {
                     Bitmap thumb_bitmap = new Compressor(getContext())
-                            .setMaxWidth(300)
-                            .setMaxHeight(300)
-                            .setQuality(70)
+                            .setMaxWidth(400)
+                            .setMaxHeight(400)
+                            .setQuality(75)
                             .compressToBitmap(thumb_filepath);
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                    thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos);
                     final byte[] thumb_byte = baos.toByteArray();
 
                     final StorageReference imageRef1 = imageRef.child("FullImages").child(dateShitFmt + ".jpg");
 
                     final StorageReference imageThumbRef1 = imageThumbRef.child("Thumbnails").child(dateShitFmt + ".jpg");
 
+                    final UploadTask originalUpload = imageRef1.putFile(resultUri);
+
+                    mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            imageUri = null;
+                            originalUpload.cancel();
+                        }
+                    });
+
+                            originalUpload.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                    if (task.isSuccessful()) {
+
+                                        originalImageUrl = task.getResult().getDownloadUrl().toString();
+                                        final UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
+
+                                        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                imageUri = null;
+                                                uploadTask.cancel();
+                                            }
+                                        });
+
+                                        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+
+                                                thumbDownloadUrl = thumb_task.getResult().getDownloadUrl().toString();
+
+                                                if (thumb_task.isSuccessful()){
+
+                                                    mDialog.dismiss();
+                                                    Snackbar.make(getView(), "Upload Completed", Snackbar.LENGTH_SHORT).show();
+
+                                                } else {
+                                                    mDialog.dismiss();
+                                                    Toast.makeText(getContext(), "Error Occurred While Uploading", Toast.LENGTH_SHORT).show();
+                                                    imageUri = null;
+                                                }
+                                            }
+                                        });
+
+                                    } else {
+
+                                        mDialog.dismiss();
+                                        Toast.makeText(getContext(), "Error Occurred Or Upload Cancelled", Toast.LENGTH_SHORT).show();
+                                        imageUri = null;
+
+                                    }
+                                }
+                            });
                     imageRef1.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                            if (task.isSuccessful()) {
 
-                                originalImageUrl = Objects.requireNonNull(task.getResult().getDownloadUrl()).toString();
-                                UploadTask uploadTask = imageThumbRef1.putBytes(thumb_byte);
-
-                                uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
-
-                                        thumbDownloadUrl = Objects.requireNonNull(thumb_task.getResult().getDownloadUrl()).toString();
-
-                                        if (thumb_task.isSuccessful()){
-
-                                            mDialog.dismiss();
-                                            Snackbar.make(getView(), "Upload Completed", Snackbar.LENGTH_LONG).show();
-
-                                        } else {
-                                            mDialog.dismiss();
-                                            Snackbar.make(getView(), "Error Occurred While Uploading", Snackbar.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-
-                            } else {
-
-                                mDialog.dismiss();
-                                Snackbar.make(getView(), "Error Uploading", Snackbar.LENGTH_LONG).show();
-
-                            }
                         }
                     });
 

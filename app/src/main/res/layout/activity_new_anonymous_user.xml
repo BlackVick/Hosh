@@ -38,6 +38,7 @@
                 android:id="@+id/userNameRegEdt"
                 android:inputType="textPersonName"
                 android:hint="User Name"
+                android:digits="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 android:text=""
                 android:textColor="@color/black"
                 android:textColorHint="@color/colorPrimaryDark"

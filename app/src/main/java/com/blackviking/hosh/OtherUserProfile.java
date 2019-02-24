@@ -68,11 +68,11 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class OtherUserProfile extends AppCompatActivity {
 
     private CollapsingToolbarLayout collapsingToolbarLayout;
-    private FloatingActionButton messageUserFab, followUserFab;
+    private FloatingActionButton messageUserFab;
     private String userId, currentUid;
     private ImageView userProfileImage, coverPhoto;
     private TextView username, status, online, gender, followersCount, location, interest, dateJoined, bio;
-    private Button viewFollowers, openGallery;
+    private Button viewFollowers, openGallery, followUserFab;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase db = FirebaseDatabase.getInstance();
     private DatabaseReference userRef, timelineRef, likeRef, commentRef;
@@ -97,7 +97,7 @@ public class OtherUserProfile extends AppCompatActivity {
 
         /*---   FONT MANAGEMENT   ---*/
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Wigrum-Regular.otf")
+                .setDefaultFontPath("fonts/Roboto-Thin.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
@@ -133,7 +133,7 @@ public class OtherUserProfile extends AppCompatActivity {
         /*---   WIDGETS   ---*/
         collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing);
         messageUserFab = (FloatingActionButton)findViewById(R.id.messageUser);
-        followUserFab = (FloatingActionButton)findViewById(R.id.followUser);
+        followUserFab = (Button)findViewById(R.id.followUser);
         coverPhoto = (ImageView)findViewById(R.id.userProfilePictureBlur);
         userProfileImage = (ImageView)findViewById(R.id.userProfilePicture);
         rootLayout = (CoordinatorLayout)findViewById(R.id.otherUserProfileRootLayout);
@@ -170,7 +170,7 @@ public class OtherUserProfile extends AppCompatActivity {
 
                 if (dataSnapshot.child("Following").child(userId).exists()) {
 
-                    followUserFab.setImageResource(R.drawable.ic_unfollow_user);
+                    followUserFab.setText("Unfollow");
                     timelineRecycler.setVisibility(View.VISIBLE);
                     loadUserTimeline(userId);
 
@@ -199,7 +199,7 @@ public class OtherUserProfile extends AppCompatActivity {
                 } else {
 
                     timelineRecycler.setVisibility(View.GONE);
-                    followUserFab.setImageResource(R.drawable.ic_follow_user);
+                    followUserFab.setText("Follow");
 
                     followUserFab.setOnClickListener(new View.OnClickListener() {
                         @Override

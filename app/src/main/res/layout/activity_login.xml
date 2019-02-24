@@ -44,20 +44,61 @@
                 android:padding="7dp"
                 android:layout_margin="10dp"/>
 
-            <Button
+            <LinearLayout
                 android:layout_below="@id/signInWithGoogle"
-                android:id="@+id/signInWithEmail"
+                android:id="@+id/emailLayout"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@drawable/white_backround_ripple"
-                android:text="Sign In With Email"
-                android:drawableStart="@drawable/email_sign_in_icon"
-                android:drawablePadding="7dp"
-                android:padding="7dp"
-                android:layout_margin="10dp"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:animateLayoutChanges="true"
+                android:layout_margin="10dp">
+
+                <Button
+                    android:id="@+id/signInWithEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/white_backround_ripple"
+                    android:text="Sign In With Email"
+                    android:drawableStart="@drawable/email_sign_in_icon"
+                    android:drawablePadding="7dp"
+                    android:padding="7dp"/>
+
+                <LinearLayout
+                    android:id="@+id/emailChoiceLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:weightSum="2"
+                    android:visibility="gone">
+
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="40dp"
+                        android:background="@drawable/white_backround_ripple"
+                        android:layout_margin="5dp"
+                        android:id="@+id/emailSignUpButton"
+                        android:text="SIGN UP"
+                        android:textColor="@color/ButtonSign"/>
+
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="40dp"
+                        android:background="@drawable/white_backround_ripple"
+                        android:layout_margin="5dp"
+                        android:id="@+id/emailSignInButton"
+                        android:text="SIGN IN"
+                        android:textColor="@color/proceed"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
 
             <Button
-                android:layout_below="@id/signInWithEmail"
+                android:layout_below="@id/emailLayout"
                 android:id="@+id/signInAnonymously"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"

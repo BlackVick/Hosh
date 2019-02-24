@@ -88,8 +88,6 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         String myName = data.get("my_name");
         String feedId = data.get("feed_id");
 
-        String accountNoti = Paper.book().read(Common.ACCOUNT_NOTIFICATION);
-
 
         /*---   MAIN NOTIFICATION LOGIC   ---*/
         if (title.equalsIgnoreCase("Hosh Feed")) {
@@ -203,14 +201,42 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, messageIntent, 0);
 
-            try {
-                Bitmap bmp = Picasso.with(getApplicationContext()).load(otherUserImage).get();
+            if (!otherUserImage.equalsIgnoreCase("")) {
+
+                try {
+                    Bitmap bmp = Picasso.with(getApplicationContext()).load(otherUserImage).get();
+
+                    Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
+                            .setSmallIcon(R.drawable.ic_stat_hosh_notification)
+                            .setContentTitle(title)
+                            .setContentText(message)
+                            .setLargeIcon(bmp)
+                            .setSubText(myName)
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText(message)
+                                    .setBigContentTitle("Message Details")
+                                    .setSummaryText("Messaging"))
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                            .setColor(getResources().getColor(R.color.colorPrimaryDark))
+                            .setContentIntent(contentIntent)
+                            .setAutoCancel(true)
+                            .addAction(R.drawable.hosh_logo_faded_white, "Open Message", contentIntent)
+                            .build();
+
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(NotificationID.getID(), notification);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
 
                 Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
                         .setSmallIcon(R.drawable.ic_stat_hosh_notification)
                         .setContentTitle(title)
                         .setContentText(message)
-                        .setLargeIcon(bmp)
                         .setSubText(myName)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message)
@@ -227,37 +253,31 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(NotificationID.getID(), notification);
 
-            } catch (IOException e) {
-                e.printStackTrace();
             }
 
 
         } else if (title.equalsIgnoreCase("Account")) {
 
-            if (accountNoti.equalsIgnoreCase("true")) {
+            Intent accountIntent = new Intent(this, OtherUserProfile.class);
+            accountIntent.putExtra("UserId", otherUserId);
+            PendingIntent contentIntent = PendingIntent.getActivity(this,
+                    0, accountIntent, 0);
 
-                Intent accountIntent = new Intent(this, OtherUserProfile.class);
-                accountIntent.putExtra("UserId", otherUserId);
-                PendingIntent contentIntent = PendingIntent.getActivity(this,
-                        0, accountIntent, 0);
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_3_ID)
+                    .setSmallIcon(R.drawable.ic_stat_hosh_notification)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setCategory(NotificationCompat.CATEGORY_EMAIL)
+                    .setColor(getResources().getColor(R.color.colorPrimaryDark))
+                    .setContentIntent(contentIntent)
+                    .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
+                    .addAction(R.drawable.hosh_logo_faded_white, "View Profile", contentIntent)
+                    .build();
 
-                Notification notification = new NotificationCompat.Builder(this, CHANNEL_3_ID)
-                        .setSmallIcon(R.drawable.ic_stat_hosh_notification)
-                        .setContentTitle(title)
-                        .setContentText(message)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setCategory(NotificationCompat.CATEGORY_EMAIL)
-                        .setColor(getResources().getColor(R.color.colorPrimaryDark))
-                        .setContentIntent(contentIntent)
-                        .setAutoCancel(true)
-                        .setOnlyAlertOnce(true)
-                        .addAction(R.drawable.hosh_logo_faded_white, "View Profile", contentIntent)
-                        .build();
-
-                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(2, notification);
-
-            }
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(2, notification);
 
         }
 
@@ -310,14 +330,39 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             PendingIntent contentIntent = PendingIntent.getActivity(this,
                     0, messageIntent, 0);
 
-            try {
-                Bitmap bmp = Picasso.with(getApplicationContext()).load(otherUserImage).get();
+            if (!otherUserImage.equalsIgnoreCase("")) {
+
+                try {
+                    Bitmap bmp = Picasso.with(getApplicationContext()).load(otherUserImage).get();
+
+                    Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
+                            .setSmallIcon(R.drawable.ic_stat_hosh_notification)
+                            .setContentTitle(title)
+                            .setContentText(message)
+                            .setLargeIcon(bmp)
+                            .setSubText(myName)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                            .setColor(getResources().getColor(R.color.colorPrimaryDark))
+                            .setContentIntent(contentIntent)
+                            .setAutoCancel(true)
+                            .addAction(R.drawable.hosh_logo_faded_white, "Open Message", contentIntent)
+                            .setSound(Uri.parse("android.resource://" + this.getPackageName() + "/" + R.raw.hosh_notification))
+                            .build();
+
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(NotificationID.getID(), notification);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
 
                 Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
                         .setSmallIcon(R.drawable.ic_stat_hosh_notification)
                         .setContentTitle(title)
                         .setContentText(message)
-                        .setLargeIcon(bmp)
                         .setSubText(myName)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
@@ -331,38 +376,32 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(NotificationID.getID(), notification);
 
-            } catch (IOException e) {
-                e.printStackTrace();
             }
 
 
         } else if (title.equalsIgnoreCase("Account")) {
 
-            if (accountNoti.equalsIgnoreCase("true")) {
+            Intent accountIntent = new Intent(this, OtherUserProfile.class);
+            accountIntent.putExtra("UserId", otherUserId);
+            PendingIntent contentIntent = PendingIntent.getActivity(this,
+                    0, accountIntent, 0);
 
-                Intent accountIntent = new Intent(this, OtherUserProfile.class);
-                accountIntent.putExtra("UserId", otherUserId);
-                PendingIntent contentIntent = PendingIntent.getActivity(this,
-                        0, accountIntent, 0);
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_3_ID)
+                    .setSmallIcon(R.drawable.ic_stat_hosh_notification)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setCategory(NotificationCompat.CATEGORY_EMAIL)
+                    .setColor(getResources().getColor(R.color.colorPrimaryDark))
+                    .setContentIntent(contentIntent)
+                    .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
+                    .addAction(R.drawable.hosh_logo_faded_white, "View Profile", contentIntent)
+                    .setSound(Uri.parse("android.resource://" + this.getPackageName() + "/" + R.raw.hosh_notification))
+                    .build();
 
-                Notification notification = new NotificationCompat.Builder(this, CHANNEL_3_ID)
-                        .setSmallIcon(R.drawable.ic_stat_hosh_notification)
-                        .setContentTitle(title)
-                        .setContentText(message)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setCategory(NotificationCompat.CATEGORY_EMAIL)
-                        .setColor(getResources().getColor(R.color.colorPrimaryDark))
-                        .setContentIntent(contentIntent)
-                        .setAutoCancel(true)
-                        .setOnlyAlertOnce(true)
-                        .addAction(R.drawable.hosh_logo_faded_white, "View Profile", contentIntent)
-                        .setSound(Uri.parse("android.resource://" + this.getPackageName() + "/" + R.raw.hosh_notification))
-                        .build();
-
-                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(2, notification);
-
-            }
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(2, notification);
         }
 
     }

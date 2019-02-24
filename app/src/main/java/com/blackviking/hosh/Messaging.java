@@ -127,7 +127,7 @@ public class Messaging extends AppCompatActivity {
 
         /*---   FONT MANAGEMENT   ---*/
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Wigrum-Regular.otf")
+                .setDefaultFontPath("fonts/Roboto-Thin.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
@@ -192,7 +192,6 @@ public class Messaging extends AppCompatActivity {
 
         /*---   MESSAGE REF   ---*/
         messageRef = db.getReference("Users").child(currentUid).child("Messages").child(friendId);
-        messageRef.keepSynced(true);
         friendMessageRef = db.getReference("Users").child(friendId).child("Messages").child(currentUid);
 
 
@@ -370,9 +369,12 @@ public class Messaging extends AppCompatActivity {
         }
 
         /*---   TEXT WATCHER   ---*/
+        addSmiley.setVisibility(View.VISIBLE);
         chatBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
 
             }
 
@@ -384,12 +386,12 @@ public class Messaging extends AppCompatActivity {
                 if (stg.length() > 0){
 
                     sendMessageBtn.setVisibility(View.VISIBLE);
-                    addSmiley.setEnabled(false);
+                    addSmiley.setVisibility(View.GONE);
 
                 } else {
 
                     sendMessageBtn.setVisibility(View.GONE);
-                    addSmiley.setEnabled(true);
+                    addSmiley.setVisibility(View.VISIBLE);
 
                 }
             }
@@ -589,9 +591,8 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.yourMsgLayout.setVisibility(View.VISIBLE);
                         viewHolder.otherMsgLayout.setVisibility(View.GONE);
                         viewHolder.yourMsgImage.setVisibility(View.GONE);
-
+                        viewHolder.myText.setVisibility(View.VISIBLE);
                         viewHolder.myText.setText(model.getMessage());
-                        viewHolder.myTextTimeStamp.setText(lastSeenTime);
 
 
                     } else if (model.getType().equals("Image")){
@@ -606,7 +607,7 @@ public class Messaging extends AppCompatActivity {
                             Picasso.with(getBaseContext())
                                     .load(model.getMessageThumb())
                                     .networkPolicy(NetworkPolicy.OFFLINE)
-                                    .noPlaceholder()
+                                    .placeholder(R.drawable.ic_loading_animation)
                                     .into(viewHolder.yourMsgImage, new Callback() {
                                         @Override
                                         public void onSuccess() {
@@ -634,9 +635,9 @@ public class Messaging extends AppCompatActivity {
 
                         }
 
-                        viewHolder.myTextTimeStamp.setText(lastSeenTime);
-
                     }
+
+                    viewHolder.myTextTimeStamp.setText(lastSeenTime);
 
 
                 } else if (model.getFrom().equals(friendId)){
@@ -646,9 +647,8 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.yourMsgLayout.setVisibility(View.GONE);
                         viewHolder.otherMsgLayout.setVisibility(View.VISIBLE);
                         viewHolder.otherMsgImage.setVisibility(View.GONE);
-
+                        viewHolder.otherText.setVisibility(View.VISIBLE);
                         viewHolder.otherText.setText(model.getMessage());
-                        viewHolder.otherTextTimeStamp.setText(lastSeenTime);
 
                         if (model.getRead().equals("false")){
 
@@ -663,7 +663,6 @@ public class Messaging extends AppCompatActivity {
                         viewHolder.yourMsgLayout.setVisibility(View.GONE);
                         viewHolder.otherMsgLayout.setVisibility(View.VISIBLE);
                         viewHolder.otherMsgImage.setVisibility(View.VISIBLE);
-
                         viewHolder.otherText.setVisibility(View.GONE);
 
                         if (!model.getMessageThumb().equals("")){
@@ -699,10 +698,9 @@ public class Messaging extends AppCompatActivity {
 
                         }
 
-                        viewHolder.otherTextTimeStamp.setText(lastSeenTime);
-
                     }
 
+                    viewHolder.otherTextTimeStamp.setText(lastSeenTime);
                     viewHolder.itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
                         @Override
                         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -891,7 +889,6 @@ public class Messaging extends AppCompatActivity {
 
 
 
-                loadMessages();
                 messageRef.child(pushId).setValue(messageMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -1337,13 +1334,7 @@ public class Messaging extends AppCompatActivity {
                                         messageFriendListMap.put("message", "A message was retracted");
 
                                         friendMessageListRef.child(currentUid).updateChildren(messageFriendListMap);
-                                        messageListRef.child(friendId).updateChildren(messageListMap)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Snackbar.make(rootLayout, "Deleted", Snackbar.LENGTH_SHORT).show();
-                                                    }
-                                                });
+                                        messageListRef.child(friendId).updateChildren(messageListMap);
                                     }
                                 });
 
@@ -1366,13 +1357,7 @@ public class Messaging extends AppCompatActivity {
                         final Map<String, Object> messageListMap = new HashMap<>();
                         messageListMap.put("message", "Deleted a message");
 
-                        messageListRef.child(friendId).updateChildren(messageListMap)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Snackbar.make(rootLayout, "Deleted", Snackbar.LENGTH_SHORT).show();
-                                    }
-                                });
+                        messageListRef.child(friendId).updateChildren(messageListMap);
 
                     }
                 }

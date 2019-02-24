@@ -60,9 +60,13 @@ public class Messages extends Fragment {
         currentUid = mAuth.getCurrentUser().getUid();
 
         chatRef = db.getReference("Users").child(currentUid).child("Messages");
+        chatRef.keepSynced(true);
         chatListRef = db.getReference("Users").child(currentUid).child("MessageList");
+        chatListRef.keepSynced(true);
         sessionIdRef = db.getReference("Users").child(currentUid).child("MessageSessions");
+        sessionIdRef.keepSynced(true);
         userRef = db.getReference("Users");
+        userRef.keepSynced(true);
 
 
 

@@ -1,17 +1,28 @@
 package com.blackviking.hosh;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackviking.hosh.Common.Common;
 import com.blackviking.hosh.Settings.Faq;
@@ -37,6 +48,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;
@@ -55,10 +67,11 @@ public class Login extends AppCompatActivity {
     private DatabaseReference userRef, authed;
     private String TAG = "Hosh:Login";
     private static final int REVEAL_BUTTONS_TIME = 2500;
-    private Button google, email, anonymous;
+    private Button google, email, anonymous, emailSignUp, emailSignIn;
     private RoundKornerRelativeLayout buttonSLayout;
     private android.app.AlertDialog mDialog;
     private ImageView help;
+    private LinearLayout emailChoiceLayout;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -71,7 +84,7 @@ public class Login extends AppCompatActivity {
 
         /*---   FONT MANAGEMENT   ---*/
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Wigrum-Regular.otf")
+                .setDefaultFontPath("fonts/Roboto-Thin.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
@@ -94,6 +107,9 @@ public class Login extends AppCompatActivity {
         rootLayout = (RelativeLayout)findViewById(R.id.loginRootLayout);
         buttonSLayout = (RoundKornerRelativeLayout)findViewById(R.id.loginButtonLayout);
         help = (ImageView)findViewById(R.id.helpButtonLogin);
+        emailSignIn = (Button)findViewById(R.id.emailSignInButton);
+        emailSignUp = (Button)findViewById(R.id.emailSignUpButton);
+        emailChoiceLayout = (LinearLayout) findViewById(R.id.emailChoiceLayout);
 
 
         /*---   BUTTON REVEAL TIME   ---*/
@@ -179,6 +195,17 @@ public class Login extends AppCompatActivity {
         email.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                emailChoiceLayout.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+
+        /*---   SIGN UP   ---*/
+        emailSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 if (choiceShit != null){
 
                     if (!choiceShit.isEmpty()){
@@ -188,7 +215,8 @@ public class Login extends AppCompatActivity {
                             google.setEnabled(false);
                             email.setEnabled(false);
                             anonymous.setEnabled(false);
-                            signInWithEmail();
+
+                            openEmailSignUpDialog();
 
                         } else if (choiceShit.equals("Google")){
 
@@ -207,10 +235,49 @@ public class Login extends AppCompatActivity {
                     google.setEnabled(false);
                     email.setEnabled(false);
                     anonymous.setEnabled(false);
-                    signInWithEmail();
+                    openEmailSignUpDialog();
 
                 }
+            }
+        });
 
+
+        /*---   SIGN IN   ---*/
+        emailSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (choiceShit != null){
+
+                    if (!choiceShit.isEmpty()){
+
+                        if (choiceShit.equals("EMail")){
+
+                            google.setEnabled(false);
+                            email.setEnabled(false);
+                            anonymous.setEnabled(false);
+
+                            openEmailSignInDialog();
+
+                        } else if (choiceShit.equals("Google")){
+
+                            Snackbar.make(rootLayout, "Sorry Mate You Already Signed In With Gmail, Please Continue Registration", Snackbar.LENGTH_LONG).show();
+
+                        } else if (choiceShit.equals("Facebook")){
+
+                            Snackbar.make(rootLayout, "Sorry Mate You Already Signed In With Anonymous, Please Continue Registration", Snackbar.LENGTH_LONG).show();
+
+                        }
+
+                    }
+
+                } else {
+
+                    google.setEnabled(false);
+                    email.setEnabled(false);
+                    anonymous.setEnabled(false);
+                    openEmailSignInDialog();
+
+                }
             }
         });
 
@@ -257,6 +324,195 @@ public class Login extends AppCompatActivity {
 
     }
 
+    private void openEmailSignInDialog() {
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.email_sign_in_layout,null);
+
+        final MaterialEditText theEmail = (MaterialEditText) viewOptions.findViewById(R.id.signInEmail);
+        final MaterialEditText thePassword = (MaterialEditText) viewOptions.findViewById(R.id.signInPassword);
+        final Button signInBtn = (Button) viewOptions.findViewById(R.id.signInEmailButton);
+        final TextView resetPass = (TextView) viewOptions.findViewById(R.id.resetPassword);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 100; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+
+        resetPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (TextUtils.isEmpty(theEmail.getText().toString()) || !isValidEmail(theEmail.getText().toString())){
+
+                    Snackbar.make(rootLayout, "Please Enter A Valid E-Mail Address", Snackbar.LENGTH_SHORT).show();
+
+                } else {
+
+                    mAuth.sendPasswordResetEmail(theEmail.getText().toString())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+
+                                        Snackbar.make(rootLayout, "Password Reset Instructions Have Been Sent To Your Mail !", Snackbar.LENGTH_SHORT).show();
+                                        alertDialog.dismiss();
+
+                                    } else {
+
+                                        Snackbar.make(rootLayout, "Password Reset Failed !", Snackbar.LENGTH_SHORT).show();
+                                        alertDialog.dismiss();
+
+                                    }
+                                }
+                            });
+
+                }
+
+            }
+        });
+
+
+        signInBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Common.isConnectedToInternet(getBaseContext())){
+
+                    if (TextUtils.isEmpty(theEmail.getText().toString()) || !isValidEmail(theEmail.getText().toString())){
+
+                        Snackbar.make(rootLayout, "Please Enter A Valid E-Mail Address", Snackbar.LENGTH_SHORT).show();
+
+                    } else if (TextUtils.isEmpty(thePassword.getText().toString()) || thePassword.getText().toString().length() < 6){
+
+                        Snackbar.make(rootLayout, "Password Too weak Or Invalid", Snackbar.LENGTH_SHORT).show();
+
+                    } else {
+
+                        signInWithEmail(theEmail.getText().toString(), thePassword.getText().toString());
+                        alertDialog.dismiss();
+
+                    }
+
+                }
+            }
+        });
+
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                google.setEnabled(true);
+                email.setEnabled(true);
+                anonymous.setEnabled(true);
+                emailChoiceLayout.setVisibility(View.GONE);
+            }
+        });
+
+
+        alertDialog.show();
+
+    }
+
+    private void openEmailSignUpDialog() {
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View viewOptions = inflater.inflate(R.layout.email_sign_up_layout,null);
+
+        final MaterialEditText theEmail = (MaterialEditText) viewOptions.findViewById(R.id.signUpEmail);
+        final MaterialEditText thePassword = (MaterialEditText) viewOptions.findViewById(R.id.signUpPassword);
+        final Button signInBtn = (Button) viewOptions.findViewById(R.id.signUpEmailButton);
+
+        alertDialog.setView(viewOptions);
+
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+
+        alertDialog.getWindow().setGravity(Gravity.BOTTOM);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        WindowManager.LayoutParams layoutParams = alertDialog.getWindow().getAttributes();
+        //layoutParams.x = 100; // left margin
+        layoutParams.y = 100; // bottom margin
+        alertDialog.getWindow().setAttributes(layoutParams);
+
+
+        signInBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Common.isConnectedToInternet(getBaseContext())){
+
+                    if (TextUtils.isEmpty(theEmail.getText().toString()) || !isValidEmail(theEmail.getText().toString())){
+
+                        Snackbar.make(rootLayout, "Please Enter A Valid E-Mail Address", Snackbar.LENGTH_SHORT).show();
+
+                    } else if (TextUtils.isEmpty(thePassword.getText().toString()) || thePassword.getText().toString().length() < 6){
+
+                        Snackbar.make(rootLayout, "Password Too weak Or Invalid", Snackbar.LENGTH_SHORT).show();
+
+                    } else {
+
+                        signUpWithEmail(theEmail.getText().toString(), thePassword.getText().toString());
+                        alertDialog.dismiss();
+
+                    }
+
+                }
+            }
+        });
+
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                google.setEnabled(true);
+                email.setEnabled(true);
+                anonymous.setEnabled(true);
+                emailChoiceLayout.setVisibility(View.GONE);
+            }
+        });
+
+
+        alertDialog.show();
+
+    }
+
+    private void signUpWithEmail(String s, String s1) {
+
+        mAuth.createUserWithEmailAndPassword(s, s1).addOnCompleteListener(
+                new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()){
+
+                            handleSignInResponse();
+
+                        } else {
+
+                            Snackbar.make(rootLayout, "Sign Up Failed", Snackbar.LENGTH_SHORT).show();
+
+                        }
+                    }
+                }
+        );
+
+    }
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (target == null)
+            return false;
+
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+    }
+
     private void signInAnonymously() {
 
         mDialog = new SpotsDialog(Login.this, "Processing . . .");
@@ -300,12 +556,24 @@ public class Login extends AppCompatActivity {
 
     }
 
-    private void signInWithEmail() {
-        startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
-                .setAllowNewEmailAccounts(true)
-                .setLogo(R.drawable.hosh_colored_logo)
-                .setTheme(R.style.EmailBackground)
-                .build(), PER_LOGIN);
+    private void signInWithEmail(String theEmail, String tehPassword) {
+
+        mAuth.signInWithEmailAndPassword(theEmail, tehPassword).addOnCompleteListener(
+                new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()){
+
+                            handleSignInResponse();
+
+                        } else {
+
+                            Snackbar.make(rootLayout, "Sign In Failed", Snackbar.LENGTH_SHORT).show();
+
+                        }
+                    }
+                }
+        );
     }
 
     private void signInWithGoogle() {
@@ -340,61 +608,49 @@ public class Login extends AppCompatActivity {
             }
         } else if (requestCode == PER_LOGIN){
 
-            handleSignInResponse(resultCode, data);
+            handleSignInResponse();
             return;
 
         }
     }
 
-    private void handleSignInResponse(int resultCode, Intent data) {
+    private void handleSignInResponse() {
 
         mDialog = new SpotsDialog(Login.this, "Processing . . .");
         mDialog.show();
 
-        if (resultCode == RESULT_OK) {
+        if (mAuth.getCurrentUser() != null) {
 
-            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-
-                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                authed.child(uid).setValue("true").addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            authed.child(uid).setValue("true").addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
 
                         /*---   STORE CHOICE   ---*/
-                        Paper.book().write(Common.SIGN_UP_CHOICE, "EMail");
+                    Paper.book().write(Common.SIGN_UP_CHOICE, "EMail");
 
-                        if (!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+                    if (!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
 
-                            mDialog.dismiss();
-                            FirebaseAuth.getInstance().getCurrentUser()
-                                    .sendEmailVerification();
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            updateUI(user);
+                        mDialog.dismiss();
+                        FirebaseAuth.getInstance().getCurrentUser()
+                                .sendEmailVerification();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        updateUI(user);
 
-                        } else {
+                    } else {
 
-                            mDialog.dismiss();
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            updateUI(user);
-
-                        }
+                        mDialog.dismiss();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        updateUI(user);
 
                     }
-                });
 
-            } else {
-
-                mDialog.dismiss();
-
-            }
-
-
+                }
+            });
 
         } else {
 
             mDialog.dismiss();
-            Snackbar.make(rootLayout, "Login Failed !", Snackbar.LENGTH_LONG).show();
-            finish();
 
         }
 

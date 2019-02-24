@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="7dp"
+    android:layout_margin="15dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign In With Email"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:drawableStart="@drawable/email_sign_in_icon"
+            android:drawableTint="@color/colorPrimaryDark"
+            android:drawablePadding="10dp"
+            android:padding="10dp"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/signInEmail"
+            android:hint="E - Mail"
+            android:textColorHint="@color/colorAccent"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:inputType="textEmailAddress"
+            android:layout_margin="3dp"
+            android:padding="5dp"
+            android:drawableStart="@drawable/ic_email"
+            android:drawablePadding="10dp"
+            app:met_clearButton="true"
+            app:met_baseColor="@color/colorAccent"
+            app:met_floatingLabelAnimating="true"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/colorPrimary"
+            app:met_singleLineEllipsis="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/signInPassword"
+            android:hint="Password"
+            android:textColorHint="@color/colorAccent"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:inputType="textPassword"
+            android:layout_margin="3dp"
+            android:maxLength="16"
+            android:drawableStart="@drawable/ic_password"
+            android:drawablePadding="10dp"
+            app:met_minCharacters="6"
+            android:padding="5dp"
+            app:met_clearButton="true"
+            app:met_maxCharacters="16"
+            app:met_baseColor="@color/colorAccent"
+            app:met_floatingLabelAnimating="true"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/colorPrimary"
+            app:met_singleLineEllipsis="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Forgot Password? Reset"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="17sp"
+            android:layout_margin="8dp"
+            android:id="@+id/resetPassword"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/signInEmailButton"
+            android:layout_gravity="end"
+            android:text="SIGN IN"
+            android:textSize="17sp"
+            android:textColor="@color/white"
+            android:layout_margin="5dp"
+            android:background="@drawable/buttons"/>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
