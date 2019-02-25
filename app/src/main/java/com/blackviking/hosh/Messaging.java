@@ -618,7 +618,7 @@ public class Messaging extends AppCompatActivity {
                                         public void onError() {
                                             Picasso.with(getBaseContext())
                                                     .load(model.getMessageThumb())
-                                                    .noPlaceholder()
+                                                    .placeholder(R.drawable.ic_loading_animation)
                                                     .into(viewHolder.yourMsgImage);
                                         }
                                     });
@@ -637,6 +637,7 @@ public class Messaging extends AppCompatActivity {
 
                     }
 
+                    viewHolder.myTextTimeStamp.setVisibility(View.VISIBLE);
                     viewHolder.myTextTimeStamp.setText(lastSeenTime);
 
 
@@ -652,7 +653,7 @@ public class Messaging extends AppCompatActivity {
 
                         if (model.getRead().equals("false")){
 
-                            messageRef.child(adapter.getRef(getItemCount() - 1).getKey()).child("read").setValue("true");
+                            messageRef.child(adapter.getRef(position).getKey()).child("read").setValue("true");
                             messageListRef.child(friendId).child("read").setValue("true");
 
                         }
@@ -670,7 +671,7 @@ public class Messaging extends AppCompatActivity {
                             Picasso.with(getBaseContext())
                                     .load(model.getMessageThumb())
                                     .networkPolicy(NetworkPolicy.OFFLINE)
-                                    .noPlaceholder()
+                                    .placeholder(R.drawable.ic_loading_animation)
                                     .into(viewHolder.otherMsgImage, new Callback() {
                                         @Override
                                         public void onSuccess() {
@@ -681,7 +682,7 @@ public class Messaging extends AppCompatActivity {
                                         public void onError() {
                                             Picasso.with(getBaseContext())
                                                     .load(model.getMessageThumb())
-                                                    .noPlaceholder()
+                                                    .placeholder(R.drawable.ic_loading_animation)
                                                     .into(viewHolder.otherMsgImage);
                                         }
                                     });
@@ -700,6 +701,7 @@ public class Messaging extends AppCompatActivity {
 
                     }
 
+                    viewHolder.otherTextTimeStamp.setVisibility(View.VISIBLE);
                     viewHolder.otherTextTimeStamp.setText(lastSeenTime);
                     viewHolder.itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
                         @Override

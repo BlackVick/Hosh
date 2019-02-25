@@ -221,7 +221,7 @@ public class Feed extends Fragment {
                                             Intent i = new Intent(android.content.Intent.ACTION_SEND);
                                             i.setType("text/plain");
                                             i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
-                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
+                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \nCheck Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. \nUse The Link below \nhttps://play.google.com/store/apps/details?id=com.blackviking.hosh");
                                             startActivity(Intent.createChooser(i,"Share via"));
 
                                             return true;
@@ -264,7 +264,7 @@ public class Feed extends Fragment {
                                             Intent i = new Intent(android.content.Intent.ACTION_SEND);
                                             i.setType("text/plain");
                                             i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Hosh Invite");
-                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \n Check Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. ");
+                                            i.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, \n \nCheck Out My New Story On HOSH. You Can Download For Free On PlayStore And Connect With Other Hoshers. \nUse The Link below \nhttps://play.google.com/store/apps/details?id=com.blackviking.hosh");
                                             startActivity(Intent.createChooser(i,"Share via"));
 
                                             return true;

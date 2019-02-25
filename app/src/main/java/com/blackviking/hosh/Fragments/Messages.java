@@ -60,13 +60,9 @@ public class Messages extends Fragment {
         currentUid = mAuth.getCurrentUser().getUid();
 
         chatRef = db.getReference("Users").child(currentUid).child("Messages");
-        chatRef.keepSynced(true);
         chatListRef = db.getReference("Users").child(currentUid).child("MessageList");
-        chatListRef.keepSynced(true);
         sessionIdRef = db.getReference("Users").child(currentUid).child("MessageSessions");
-        sessionIdRef.keepSynced(true);
         userRef = db.getReference("Users");
-        userRef.keepSynced(true);
 
 
 
@@ -175,7 +171,7 @@ public class Messages extends Fragment {
                                 Picasso.with(getContext())
                                         .load(image)
                                         .networkPolicy(NetworkPolicy.OFFLINE)
-                                        .placeholder(R.drawable.empty_profile)
+                                        .placeholder(R.drawable.ic_loading_animation)
                                         .into(viewHolder.friendsPicture, new Callback() {
                                             @Override
                                             public void onSuccess() {
@@ -186,7 +182,7 @@ public class Messages extends Fragment {
                                             public void onError() {
                                                 Picasso.with(getContext())
                                                         .load(image)
-                                                        .noPlaceholder()
+                                                        .placeholder(R.drawable.ic_loading_animation)
                                                         .into(viewHolder.friendsPicture);
                                             }
                                         });
@@ -235,7 +231,7 @@ public class Messages extends Fragment {
                                         Picasso.with(getContext())
                                                 .load(image)
                                                 .networkPolicy(NetworkPolicy.OFFLINE)
-                                                .placeholder(R.drawable.empty_profile)
+                                                .placeholder(R.drawable.ic_loading_animation)
                                                 .into(viewHolder.friendsPicture, new Callback() {
                                                     @Override
                                                     public void onSuccess() {
@@ -246,7 +242,7 @@ public class Messages extends Fragment {
                                                     public void onError() {
                                                         Picasso.with(getContext())
                                                                 .load(image)
-                                                                .noPlaceholder()
+                                                                .placeholder(R.drawable.ic_loading_animation)
                                                                 .into(viewHolder.friendsPicture);
                                                     }
                                                 });
