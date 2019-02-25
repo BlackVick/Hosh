@@ -192,31 +192,41 @@ public class Hopdate extends Fragment {
 
                     newHopdate = new HopdateModel("User", "", theHopdate, currentUid, originalImageUrl, thumbDownloadUrl, dateString, "Image");
 
-                    pushRef = hopdateRef.push();
-                    final String pushId = pushRef.getKey();
-                    hopdateRef.child(pushId).setValue(newHopdate);
+                    if (newHopdate.getHopdate() != null || newHopdate.getImageUrl() != null
+                            || newHopdate.getImageThumbUrl() != null){
 
-                    FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
-                    Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
+                        pushRef = hopdateRef.push();
+                        final String pushId = pushRef.getKey();
+                        hopdateRef.child(pushId).setValue(newHopdate);
 
-                    Intent i = new Intent(getContext(), Home.class);
-                    startActivity(i);
-                    getActivity().finish();
+                        FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
+                        Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
+
+                        Intent i = new Intent(getContext(), Home.class);
+                        startActivity(i);
+                        getActivity().finish();
+
+                    }
 
                 } else {
 
-                    newHopdate = new HopdateModel("User", "", theHopdate, currentUid, "", "", dateString, "Text");
+                    if (newHopdate.getHopdate() != null || newHopdate.getImageUrl() != null
+                            || newHopdate.getImageThumbUrl() != null){
 
-                    pushRef = hopdateRef.push();
-                    final String pushId = pushRef.getKey();
-                    hopdateRef.child(pushId).setValue(newHopdate);
+                        newHopdate = new HopdateModel("User", "", theHopdate, currentUid, "", "", dateString, "Text");
 
-                    FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
-                    Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
+                        pushRef = hopdateRef.push();
+                        final String pushId = pushRef.getKey();
+                        hopdateRef.child(pushId).setValue(newHopdate);
 
-                    Intent i = new Intent(getContext(), Home.class);
-                    startActivity(i);
-                    getActivity().finish();
+                        FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
+                        Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
+
+                        Intent i = new Intent(getContext(), Home.class);
+                        startActivity(i);
+                        getActivity().finish();
+
+                    }
 
                 }
 
@@ -377,8 +387,8 @@ public class Hopdate extends Fragment {
             if (resultCode == RESULT_OK) {
 
                 mDialog = new SpotsDialog(getContext(), "Upload In Progress . . .");
-                //mDialog.setCancelable(false);
-                //mDialog.setCanceledOnTouchOutside(false);
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
                 mDialog.show();
 
                 Uri resultUri = result.getUri();
@@ -441,11 +451,9 @@ public class Hopdate extends Fragment {
                                                 if (thumb_task.isSuccessful()){
 
                                                     mDialog.dismiss();
-                                                    Snackbar.make(getView(), "Upload Completed", Snackbar.LENGTH_SHORT).show();
 
                                                 } else {
                                                     mDialog.dismiss();
-                                                    Toast.makeText(getContext(), "Error Occurred While Uploading", Toast.LENGTH_SHORT).show();
                                                     imageUri = null;
                                                 }
                                             }
@@ -454,7 +462,6 @@ public class Hopdate extends Fragment {
                                     } else {
 
                                         mDialog.dismiss();
-                                        Toast.makeText(getContext(), "Error Occurred Or Upload Cancelled", Toast.LENGTH_SHORT).show();
                                         imageUri = null;
 
                                     }

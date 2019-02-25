@@ -383,6 +383,8 @@ public class ImageGallery extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
 
                 mDialog = new SpotsDialog(ImageGallery.this, "Upload In Progress . . .");
+                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
                 mDialog.show();
 
                 Uri resultUri = result.getUri();
@@ -446,11 +448,9 @@ public class ImageGallery extends AppCompatActivity {
                                             mDialog.dismiss();
                                             ImageModel newImage = new ImageModel(originalImageUrl, thumbDownloadUrl, "Unsecured");
                                             galleryRef.push().setValue(newImage);
-                                            Snackbar.make(rootLayout, "Upload Completed", Snackbar.LENGTH_LONG).show();
 
                                         } else {
                                             mDialog.dismiss();
-                                            Toast.makeText(ImageGallery.this, "Error Occurred", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
@@ -460,7 +460,6 @@ public class ImageGallery extends AppCompatActivity {
                             } else {
 
                                 mDialog.dismiss();
-                                Toast.makeText(ImageGallery.this, "Error Occurred", Toast.LENGTH_SHORT).show();
 
                             }
                         }

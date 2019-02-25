@@ -166,7 +166,7 @@ public class OtherUserProfile extends AppCompatActivity {
         /*---   FOLLOW CHECK   ---*/
         userRef.child(currentUid).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
 
                 if (dataSnapshot.child("Following").child(userId).exists()) {
 
@@ -213,7 +213,7 @@ public class OtherUserProfile extends AppCompatActivity {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             Snackbar.make(rootLayout, "You are now following @" + currentUser.getUserName(), Snackbar.LENGTH_LONG).show();
-                                                            sendFollowNotification(currentUser.getUserName(), currentUid);
+                                                            sendFollowNotification(dataSnapshot.child("userName").getValue().toString(), currentUid);
 
                                                         }
                                                     });
@@ -244,11 +244,11 @@ public class OtherUserProfile extends AppCompatActivity {
 
     }
 
-    private void sendFollowNotification(String userName, String currentUid) {
+    private void sendFollowNotification(String userName1, String currentUid) {
 
         Map<String, String> dataSend = new HashMap<>();
         dataSend.put("title", "Account");
-        dataSend.put("message", "@"+userName+" Just Followed You");
+        dataSend.put("message", "@"+userName1+" Just Followed You");
         dataSend.put("user_id", currentUid);
         DataMessage dataMessage = new DataMessage(new StringBuilder("/topics/").append(userId).toString(), dataSend);
 
