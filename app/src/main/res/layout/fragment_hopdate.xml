@@ -1,4 +1,5 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,62 +8,69 @@
 
     <include layout="@layout/snippet_for_general"/>
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_above="@id/hopdateShare">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_margin="30dp"
-                app:corner_radius="15dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/share_photo_icon"
-                    android:adjustViewBounds="true"
-                    android:id="@+id/hopdateImage"/>
-
-            </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
-
-            <EditText
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:id="@+id/hopdateDetails"
-                android:hint="Your Hopdate . . ."
-                android:textColorHint="@color/grey"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:drawableStart="@drawable/ic_action_hookup"
-                android:drawableTint="@color/grey"
-                android:drawablePadding="7dp"
-                android:maxLength="150"
-                android:maxLines="4"
-                android:minLines="2"/>
+                android:animateLayoutChanges="true"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_margin="30dp"
+                    app:corner_radius="15dp">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/white_backround_ripple"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="16dp"
-            android:text="SHARE"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="16sp"
-            android:id="@+id/hopdateShare"/>
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/share_photo_icon"
+                        android:adjustViewBounds="true"
+                        android:id="@+id/hopdateImage"/>
 
-    </RelativeLayout>
+                </com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:id="@+id/hopdateDetails"
+                    android:hint="Your Hopdate . . ."
+                    android:textColorHint="@color/grey"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:drawableStart="@drawable/ic_action_hookup"
+                    android:drawableTint="@color/grey"
+                    android:drawablePadding="7dp"
+                    android:maxLength="150"
+                    android:maxLines="4"
+                    android:minLines="2"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_backround_ripple"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="5dp"
+        android:text="SHARE"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        android:id="@+id/hopdateShare"/>
 
 </RelativeLayout>

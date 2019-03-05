@@ -192,41 +192,31 @@ public class Hopdate extends Fragment {
 
                     newHopdate = new HopdateModel("User", "", theHopdate, currentUid, originalImageUrl, thumbDownloadUrl, dateString, "Image");
 
-                    if (newHopdate.getHopdate() != null || newHopdate.getImageUrl() != null
-                            || newHopdate.getImageThumbUrl() != null){
+                    pushRef = hopdateRef.push();
+                    final String pushId = pushRef.getKey();
+                    hopdateRef.child(pushId).setValue(newHopdate);
 
-                        pushRef = hopdateRef.push();
-                        final String pushId = pushRef.getKey();
-                        hopdateRef.child(pushId).setValue(newHopdate);
+                    FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
+                    Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
 
-                        FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
-                        Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
-
-                        Intent i = new Intent(getContext(), Home.class);
-                        startActivity(i);
-                        getActivity().finish();
-
-                    }
+                    Intent i = new Intent(getContext(), Home.class);
+                    startActivity(i);
+                    getActivity().finish();
 
                 } else {
 
-                    if (newHopdate.getHopdate() != null || newHopdate.getImageUrl() != null
-                            || newHopdate.getImageThumbUrl() != null){
+                    newHopdate = new HopdateModel("User", "", theHopdate, currentUid, "", "", dateString, "Text");
 
-                        newHopdate = new HopdateModel("User", "", theHopdate, currentUid, "", "", dateString, "Text");
+                    pushRef = hopdateRef.push();
+                    final String pushId = pushRef.getKey();
+                    hopdateRef.child(pushId).setValue(newHopdate);
 
-                        pushRef = hopdateRef.push();
-                        final String pushId = pushRef.getKey();
-                        hopdateRef.child(pushId).setValue(newHopdate);
+                    FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
+                    Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
 
-                        FirebaseMessaging.getInstance().subscribeToTopic(Common.FEED_NOTIFICATION_TOPIC+pushId);
-                        Paper.book().write(Common.FEED_NOTIFICATION_TOPIC+pushId, "true");
-
-                        Intent i = new Intent(getContext(), Home.class);
-                        startActivity(i);
-                        getActivity().finish();
-
-                    }
+                    Intent i = new Intent(getContext(), Home.class);
+                    startActivity(i);
+                    getActivity().finish();
 
                 }
 
